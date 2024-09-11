@@ -1,0 +1,32 @@
+﻿@page "/server"
+@inject HttpClient Http
+
+<PageTitle>Server</PageTitle>
+
+<h1>@forecasts?[0].ToString()</h1>
+
+@code {
+
+    private WeatherForecast[]? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>(@"https://localhost:8081/WeatherForecast/GetWeatherForecast");
+    }
+
+    public class WeatherForecast
+    {
+        public DateOnly Date { get; set; }
+
+        public int TemperatureC { get; set; }
+
+        public string? Summary { get; set; }
+
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+
+        public override string ToString()
+        {
+            return Date + ";" + TemperatureC + ";" + Summary + ";" + TemperatureF;
+        }
+    }
+}

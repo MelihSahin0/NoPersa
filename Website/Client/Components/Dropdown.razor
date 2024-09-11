@@ -1,0 +1,21 @@
+﻿@using Website.Client.Util;
+
+<div class="mx-2 relative inline-block text-left" @onfocusout="CloseDropdown" tabindex="0">
+    <button @onclick="ChangeDropdownVisibility" class="@Scaling.GetTextScaling text-black select-none bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg px-5 py-2.5 text-center inline-flex items-center" type="button">
+        @Title
+        <svg class="w-2.5 h-2.5 ms-3" fill="none" viewBox="0 0 10 6">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+        </svg>
+    </button>
+
+    <div class="@(!dropdownIsVisible ? "hidden" : "") z-10 absolute divide-y divide-sky-600 bg-sky-600 rounded-lg shadow w-full">
+        <ul class="py-2 text-sm text-black" tabindex="0">
+            @for (int i = 0; i < Items.Count; i++)
+            {
+                <li class="flex justify-center items-center hover:bg-sky-700" tabindex="0">
+                    <a href="@ItemsHref[i]" @onclick="CloseDropdown" class="@Scaling.GetTextScaling flex py-1 text-center select-none" tabindex="0">@Items[i]</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

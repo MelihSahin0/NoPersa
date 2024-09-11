@@ -1,0 +1,11 @@
+﻿@page "/customer"
+@using Website.Client.Components;
+
+<EditForm Model="Customer" OnValidSubmit="Submit" FormName="CustomerForm">
+    <DataAnnotationsValidator />
+    <button type="submit">Send</button>
+    <InputText @bind-Value="Customer!.Name"/>
+    <ValidationMessage For="@(() => Customer!.Name)" />
+    <InputText @bind-Value="Customer!.Email"/>
+    <ValidationMessage For="@(() => Customer!.Email)" />
+</EditForm>

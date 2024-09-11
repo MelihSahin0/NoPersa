@@ -1,0 +1,39 @@
+services:
+  managmentservice:
+    image: ${DOCKER_REGISTRY-}managmentservice
+    container_name: ManagmentService
+    build:
+      context: .
+      dockerfile: ManagmentService/Dockerfile
+    ports:
+      - "8081:8081"
+    pull_policy: always
+    restart: always
+    depends_on:
+      - NoPersaSqlServer
+
+  website.server:
+    image: ${DOCKER_REGISTRY-}websiteserver
+    container_name: Website
+    build:
+      context: .
+      dockerfile: Website/Server/Dockerfile
+    ports:
+      - "7039:7039"
+    restart: always
+
+  NoPersaSqlServer:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: NoPersaSqlServer
+    ports:
+        - "1433:1433"
+    restart: always
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=myStong_Password123#
+    volumes:
+        - NoPersaSqlServer-data:/var/opt/mssql
+
+volumes:
+  NoPersaSqlServer-data:
+

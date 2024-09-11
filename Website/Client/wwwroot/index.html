@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Website</title>
+    <base href="/" />
+    <link rel="stylesheet" href="/css/output.css" >
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="flex items-center justify-center h-screen">
+            <div class="flex flex-col justify-center items-center h-screen">
+                <div class="border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-sky-600"></div>
+                <strong class="text-2xl">Loading...</strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="text-sky-500">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js');</script>
+</body>
+
+</html>
