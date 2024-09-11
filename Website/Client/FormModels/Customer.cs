@@ -11,3 +11,4 @@ namespace Website.Client.FormModels
         public string Email { get; set; } = string.Empty;
     }
 }
+
