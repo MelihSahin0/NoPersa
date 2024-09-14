@@ -1,11 +1,57 @@
 ﻿@page "/customer"
 @using Website.Client.Components;
+@using Website.Client.Util;
 
-<EditForm Model="Customer" OnValidSubmit="Submit" FormName="CustomerForm">
-    <DataAnnotationsValidator />
+<EditForm Model="Customer" OnValidSubmit="@Submit">
+    <ObjectGraphDataAnnotationsValidator />
+    <div class="flex flex-row">
+        <div class="flex flex-col w-1/2 items-center">
+            <FormInputText Label="Serialnumber:" @bind-Value="Customer!.SerialNumber" For="@(() => Customer!.SerialNumber)" />
+            <FormInputText Label="Title:" @bind-Value="Customer!.Title" For="@(() => Customer!.Title)" />
+            <FormInputText Label="Name:" @bind-Value="Customer.Name" For="@(() => Customer.Name)" />
+            <FormInputText Label="Address:" @bind-Value="Customer.Address" For="@(() => Customer.Address)" />
+            <FormInputText Label="Contact Information:" @bind-Value="Customer!.ContactInformation" For="@(() => Customer!.ContactInformation)" />
+            <FormInputText Label="Region:" @bind-Value="Customer.Region" For="@(() => Customer.Region)" />
+            <FormInputText Label="Geographical Location:" @bind-Value="Customer!.GeoLocation" For="@(() => Customer!.GeoLocation)" />
+          
+            <div class="flex flex-auto flex-col">
+                @for (int i = 1; i < DateTime.Now.Day + 1; i++)
+                {
+                    var dailyDelivery = Customer.GetDailyDeliveryByDay(i);
+                    <div class="flex flex-auto flex-row">
+                    <a class="w-10 flex justify-center">@i</a>
+                    <FormInputText Label="" @bind-Value="dailyDelivery.Price" For="@(() => dailyDelivery.Price)"/>
+                    <FormInputText Label="" @bind-Value="dailyDelivery.NumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" />
+                    </div>
+                }
+            </div>
+
+            <a>DatePicker...</a>
+            <a>Artice...</a>
+            <a>Price...</a>
+        </div>
+        <div class="flex flex-col w-1/2 items-left">
+            <div class="flex flex-row flex-wrap">
+                <FormInputCheckbox Label="Monday" @bind-Value="Customer.Workdays!.Monday"/>
+                <FormInputCheckbox Label="Tuesday" @bind-Value="Customer.Workdays!.Tuesday"/>
+                <FormInputCheckbox Label="Wednesday" @bind-Value="Customer.Workdays!.Wednesday"/>
+                <FormInputCheckbox Label="Thursday" @bind-Value="Customer.Workdays!.Thursday" />
+                <FormInputCheckbox Label="Friday" @bind-Value="Customer.Workdays!.Friday" />
+                <FormInputCheckbox Label="Saturday" @bind-Value="Customer.Workdays!.Saturday" />
+                <FormInputCheckbox Label="Sunday" @bind-Value="Customer.Workdays!.Sunday" />
+            </div>
+            <a class="mt-5">Holidays:</a>
+            <div class="flex flex-row flex-wrap">
+                <FormInputCheckbox Label="Monday" @bind-Value="Customer.Holidays!.Monday" />
+                <FormInputCheckbox Label="Tuesday" @bind-Value="Customer.Holidays!.Tuesday" />
+                <FormInputCheckbox Label="Wednesday" @bind-Value="Customer.Holidays!.Wednesday" />
+                <FormInputCheckbox Label="Thursday" @bind-Value="Customer.Holidays!.Thursday" />
+                <FormInputCheckbox Label="Friday" @bind-Value="Customer.Holidays!.Friday" />
+                <FormInputCheckbox Label="Saturday" @bind-Value="Customer.Holidays!.Saturday" />
+                <FormInputCheckbox Label="Sunday" @bind-Value="Customer.Holidays!.Sunday" />
+            </div>
+        </div>
+    </div>
+
     <button type="submit">Send</button>
-    <InputText @bind-Value="Customer!.Name"/>
-    <ValidationMessage For="@(() => Customer!.Name)" />
-    <InputText @bind-Value="Customer!.Email"/>
-    <ValidationMessage For="@(() => Customer!.Email)" />
 </EditForm>
