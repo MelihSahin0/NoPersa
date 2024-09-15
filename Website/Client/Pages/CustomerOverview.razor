@@ -19,9 +19,9 @@
                 {
                     var dailyDelivery = Customer.GetDailyDeliveryByDay(i);
                     <div class="flex flex-auto flex-row">
-                    <a class="w-10 flex justify-center">@i</a>
-                    <FormInputText Label="" @bind-Value="dailyDelivery.Price" For="@(() => dailyDelivery.Price)"/>
-                    <FormInputText Label="" @bind-Value="dailyDelivery.NumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" />
+                        <a class="w-10 flex justify-center">@i</a>
+                        <FormInputText Label="" class="w-20" @bind-Value="dailyDelivery.Price" For="@(() => dailyDelivery.Price)"/>
+                        <FormInputText Label="" class="w-20" @bind-Value="dailyDelivery.NumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" />
                     </div>
                 }
             </div>

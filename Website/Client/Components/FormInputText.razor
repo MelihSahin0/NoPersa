@@ -1,7 +1,7 @@
 ﻿@using Website.Client.Util;
 @using Website.Client.Styles;
 
-<div>
+<div class="@Class">
     @if (!Label.Equals(string.Empty))
     {
         <label for="input" class="@Scaling.GetTextScaling()">@Label</label>
@@ -9,5 +9,5 @@
     }
     <InputText id="input" type="text" class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()}")"
                @bind-Value="Value" @oninput="OnValueInput" />
-    <ValidationMessage class="text-red" For="@For" />
+    <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red w-full")" For="@For" />
 </div>

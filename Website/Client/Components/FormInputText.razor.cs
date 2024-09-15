@@ -10,6 +10,9 @@ namespace Website.Client.Components
         private EditContext? CascadedEditContext { get; set; }
 
         [Parameter]
+        public string? Class { get; init; }
+
+        [Parameter]
         public required string Label { get; init; }
 
         [Parameter]

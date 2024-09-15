@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Globalization;
+using Website.Client.Util;
 
 namespace Website.Client.Validations
 {
@@ -23,7 +25,7 @@ namespace Website.Client.Validations
                 return true;
             }
 
-            if (!double.TryParse(value.ToString(), out double number))
+            if (!Parser.ParseToDouble(value.ToString()!, out double number))
             {
                 errorType = 0;
                 return false;

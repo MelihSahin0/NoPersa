@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Website.Client.Exceptions;
 using Website.Client.Util;
 using Website.Client.Validations;
