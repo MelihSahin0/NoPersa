@@ -4,10 +4,13 @@ using System.Linq.Expressions;
 
 namespace Website.Client.Components
 {
-    public partial class FormInputText
+    public partial class FormTextInput
     {
         [CascadingParameter]
         private EditContext? CascadedEditContext { get; set; }
+
+        [Parameter]
+        public Func<string?, bool>? ValidationFunction { get; set; }
 
         [Parameter]
         public string? Class { get; init; }
@@ -20,6 +23,9 @@ namespace Website.Client.Components
 
         [Parameter]
         public EventCallback<string?> ValueChanged { get; set; }
+
+        [Parameter]
+        public Expression<Func<string?>>? ValueExpression { get; set; }
 
         [Parameter]
         public Expression<Func<string>>? For { get; set; }

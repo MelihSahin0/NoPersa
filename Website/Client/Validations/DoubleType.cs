@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using Website.Client.Util;
 
 namespace Website.Client.Validations
@@ -8,8 +7,8 @@ namespace Website.Client.Validations
        AllowMultiple = false)]
     public class DoubleType : ValidationAttribute
     {
-        private double min;
-        private double max;
+        private readonly double min;
+        private readonly double max;
         private int errorType;
 
         public DoubleType(double min = double.MinValue, double max = double.MaxValue)

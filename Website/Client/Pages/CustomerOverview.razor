@@ -1,18 +1,19 @@
 ﻿@page "/customer"
 @using Website.Client.Components;
 @using Website.Client.Util;
+@using Website.Client.Validations;
 
 <EditForm Model="Customer" OnValidSubmit="@Submit">
     <ObjectGraphDataAnnotationsValidator />
     <div class="flex flex-row">
         <div class="flex flex-col w-1/2 items-center">
-            <FormInputText Label="Serialnumber:" @bind-Value="Customer!.SerialNumber" For="@(() => Customer!.SerialNumber)" />
-            <FormInputText Label="Title:" @bind-Value="Customer!.Title" For="@(() => Customer!.Title)" />
-            <FormInputText Label="Name:" @bind-Value="Customer.Name" For="@(() => Customer.Name)" />
-            <FormInputText Label="Address:" @bind-Value="Customer.Address" For="@(() => Customer.Address)" />
-            <FormInputText Label="Contact Information:" @bind-Value="Customer!.ContactInformation" For="@(() => Customer!.ContactInformation)" />
-            <FormInputText Label="Region:" @bind-Value="Customer.Region" For="@(() => Customer.Region)" />
-            <FormInputText Label="Geographical Location:" @bind-Value="Customer!.GeoLocation" For="@(() => Customer!.GeoLocation)" />
+            <FormTextInput Label="Serialnumber:" @bind-Value="Customer!.SerialNumber" For="@(() => Customer!.SerialNumber)" />
+            <FormTextInput Label="Title:" @bind-Value="Customer!.Title" For="@(() => Customer!.Title)" />
+            <FormTextInput Label="Name:" @bind-Value="Customer.Name" For="@(() => Customer.Name)" />
+            <FormTextInput Label="Address:" @bind-Value="Customer.Address" For="@(() => Customer.Address)" />
+            <FormTextInput Label="Contact Information:" @bind-Value="Customer!.ContactInformation" For="@(() => Customer!.ContactInformation)" />
+            <FormTextInput Label="Region:" @bind-Value="Customer.Region" For="@(() => Customer.Region)" />
+            <FormTextInput Label="Geographical Location:" @bind-Value="Customer!.GeoLocation" For="@(() => Customer!.GeoLocation)" />
           
             <div class="flex flex-auto flex-col">
                 @for (int i = 1; i < DateTime.Now.Day + 1; i++)
@@ -20,8 +21,8 @@
                     var dailyDelivery = Customer.GetDailyDeliveryByDay(i);
                     <div class="flex flex-auto flex-row">
                         <a class="w-10 flex justify-center">@i</a>
-                        <FormInputText Label="" class="w-20" @bind-Value="dailyDelivery.Price" For="@(() => dailyDelivery.Price)"/>
-                        <FormInputText Label="" class="w-20" @bind-Value="dailyDelivery.NumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" />
+                        <FormTextInput Label="" class="w-20" @bind-Value="dailyDelivery.Price" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double"/>
+                        <FormTextInput Label="" class="w-20" @bind-Value="dailyDelivery.NumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" />
                     </div>
                 }
             </div>

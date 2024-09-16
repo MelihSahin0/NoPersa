@@ -1,0 +1,18 @@
+﻿@using Website.Client.Components.Base;
+@using Website.Client.Util;
+@using Website.Client.Styles;
+
+<div class="@Class">
+    @if (!Label.Equals(string.Empty))
+    {
+        <label for="input" class="@Scaling.GetTextScaling()">@Label</label>
+        <br />
+    }
+    <TextInput id="input"
+               class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()}")"
+               Value="@Value"
+               ValueChanged="@ValueChanged"
+               ValueExpression="@ValueExpression"
+               ValidationFunction="ValidationFunction" />
+    <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red w-full")" For="@For" />
+</div>

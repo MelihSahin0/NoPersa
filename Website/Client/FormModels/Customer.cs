@@ -128,7 +128,7 @@ namespace Website.Client.FormModels
 
         public class DailyDelivery
         {
-            [DoubleType(ErrorMessage = "Number of Boxes is a decimal number")]
+            [DoubleType]
             public string? Price { get; set; }
 
             [IntType(min: 0)]
