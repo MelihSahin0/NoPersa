@@ -18,12 +18,11 @@ namespace Website.Client.Components.Base
             {
                 CurrentValueAsString = previousValidValue;
                 result = previousValidValue;
-                return false;
+                return true;
             }
 
             result = value;
             previousValidValue = result;
-
             return true;
         }
 

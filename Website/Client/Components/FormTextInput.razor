@@ -5,10 +5,10 @@
 <div class="@Class">
     @if (!Label.Equals(string.Empty))
     {
-        <label for="input" class="@Scaling.GetTextScaling()">@Label</label>
+        <label for="@Id" class="@Scaling.GetTextScaling() select-none">@Label</label>
         <br />
     }
-    <TextInput id="input"
+    <TextInput id="@Id"
                class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()}")"
                Value="@Value"
                ValueChanged="@ValueChanged"

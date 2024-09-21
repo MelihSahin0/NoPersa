@@ -1,0 +1,39 @@
+﻿@using Website.Client.Styles
+
+<div id="@Id" class="relative inline-block text-left w-52">
+    <!-- Input Field -->
+    <div>
+        <button @onclick="ToggleDropdown" type="button" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} flex items-center justify-between bg-white")">
+            <span>@Month @Year</span>
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Dropdown -->
+    @if (isDropdownOpen)
+    {
+        <div class="origin-top-right absolute mt-1 text-white rounded-md shadow-lg bg-gray-800 ring-1 ring-skyFocus z-10">
+            <div class="px-4 py-2 flex justify-between items-center">
+                <!-- Year Navigation -->
+                <button type="button" @onclick="() => ChangeYear(-1)" class="text-white hover:text-skyHover">&lt;</button>
+                <span class="@($"{Scaling.GetTextScaling}") select-none">@selectedYear</span>
+                <button type="button" @onclick="() => ChangeYear(1)" class="text-white hover:text-skyHover">&gt;</button>
+            </div>
+
+            <!-- Months Grid -->
+            <div class="grid grid-cols-4 gap-2 px-4 py-2 place-content-center">
+                @for (int i = 0; i < months.Length; i++)
+                {
+                    var currentIndex = i;
+                    <button type="button"
+                            @onclick="() => SelectMonth(currentIndex + 1)"
+                            class="@($"{Scaling.GetTextScaling()} p-1 rounded-md bg-gray-700 hover:bg-skyHover")">
+                        @months[i]
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>

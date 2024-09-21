@@ -1,12 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SharedLibrary.Validations;
+using System.ComponentModel.DataAnnotations;
 using Website.Client.Exceptions;
 using Website.Client.Util;
-using Website.Client.Validations;
 
 namespace Website.Client.FormModels
 {
     public class Customer
     {
+        public int Id { get; set; } = -1;
+
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? SerialNumber { get; set; }
 
@@ -25,22 +27,30 @@ namespace Website.Client.FormModels
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public required string Region { get; set; }
 
+        [GeoCoordinatesType]
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? GeoLocation { get; set; }
 
-        [Required(ErrorMessage = "Month is required.")]
+        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
+        public string? ContactInformation { get; set; }
+
         [ValidateComplexType]
+        [Required(ErrorMessage = "Month is required.")]
         public required MonthOfTheYear Month { get; set; }
 
         [Required]
-        public required int Article { get; set; }
+        public required string Article { get; set; }
 
         [Required(ErrorMessage = "Price is required.")]
-        public required double Price { get; set; }
+        public required string Price { get; set; }
 
-        [Required(ErrorMessage = "Monthly Delivery is required")]
+        [Required(ErrorMessage = "Number of Boxes is required")]
+        [IntType(min: 0)]
+        public required string DefaultNumberOfBoxes { get; set; }
+
         [ValidateComplexType]
-        public required MonthlyDelivery MonthlyDeliveries { get; set; }
+        [Required(ErrorMessage = "Monthly Delivery is required")]
+        public required List<MonthlyDelivery> MonthlyDeliveries { get; set; }
 
         [Required]
         public Weekdays? Workdays { get; set; }
@@ -48,50 +58,49 @@ namespace Website.Client.FormModels
         [Required]
         public Weekdays? Holidays { get; set; }
 
-        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
-        public string? ContactInformation { get; set; }
-
         public DailyDelivery GetDailyDeliveryByDay(int day)
         {
             return day switch
             {
-                1 => MonthlyDeliveries.Day1,
-                2 => MonthlyDeliveries.Day2,
-                3 => MonthlyDeliveries.Day3,
-                4 => MonthlyDeliveries.Day4,
-                5 => MonthlyDeliveries.Day5,
-                6 => MonthlyDeliveries.Day6,
-                7 => MonthlyDeliveries.Day7,
-                8 => MonthlyDeliveries.Day8,
-                9 => MonthlyDeliveries.Day9,
-                10 => MonthlyDeliveries.Day10,
-                11 => MonthlyDeliveries.Day11,
-                12 => MonthlyDeliveries.Day12,
-                13 => MonthlyDeliveries.Day13,
-                14 => MonthlyDeliveries.Day14,
-                15 => MonthlyDeliveries.Day15,
-                16 => MonthlyDeliveries.Day16,
-                17 => MonthlyDeliveries.Day17,
-                18 => MonthlyDeliveries.Day18,
-                19 => MonthlyDeliveries.Day19,
-                20 => MonthlyDeliveries.Day20,
-                21 => MonthlyDeliveries.Day21,
-                22 => MonthlyDeliveries.Day22,
-                23 => MonthlyDeliveries.Day23,
-                24 => MonthlyDeliveries.Day24,
-                25 => MonthlyDeliveries.Day25,
-                26 => MonthlyDeliveries.Day26,
-                27 => MonthlyDeliveries.Day27,
-                28 => MonthlyDeliveries.Day28,
-                29 => MonthlyDeliveries.Day29,
-                30 => MonthlyDeliveries.Day30,
-                31 => MonthlyDeliveries.Day31,
+                1 => MonthlyDeliveries.First().Day1,
+                2 => MonthlyDeliveries.First().Day2,
+                3 => MonthlyDeliveries.First().Day3,
+                4 => MonthlyDeliveries.First().Day4,
+                5 => MonthlyDeliveries.First().Day5,
+                6 => MonthlyDeliveries.First().Day6,
+                7 => MonthlyDeliveries.First().Day7,
+                8 => MonthlyDeliveries.First().Day8,
+                9 => MonthlyDeliveries.First().Day9,
+                10 => MonthlyDeliveries.First().Day10,
+                11 => MonthlyDeliveries.First().Day11,
+                12 => MonthlyDeliveries.First().Day12,
+                13 => MonthlyDeliveries.First().Day13,
+                14 => MonthlyDeliveries.First().Day14,
+                15 => MonthlyDeliveries.First().Day15,
+                16 => MonthlyDeliveries.First().Day16,
+                17 => MonthlyDeliveries.First().Day17,
+                18 => MonthlyDeliveries.First().Day18,
+                19 => MonthlyDeliveries.First().Day19,
+                20 => MonthlyDeliveries.First().Day20,
+                21 => MonthlyDeliveries.First().Day21,
+                22 => MonthlyDeliveries.First().Day22,
+                23 => MonthlyDeliveries.First().Day23,
+                24 => MonthlyDeliveries.First().Day24,
+                25 => MonthlyDeliveries.First().Day25,
+                26 => MonthlyDeliveries.First().Day26,
+                27 => MonthlyDeliveries.First().Day27,
+                28 => MonthlyDeliveries.First().Day28,
+                29 => MonthlyDeliveries.First().Day29,
+                30 => MonthlyDeliveries.First().Day30,
+                31 => MonthlyDeliveries.First().Day31,
                 _ => throw new InvalidDateException()
             };
         }
 
         public class MonthlyDelivery
         {
+            public required MonthOfTheYear MonthOfTheYear { get; init; }
+
             [ValidateComplexType]
             public required DailyDelivery Day1 { get; set; }
             public required DailyDelivery Day2 { get; set; }
@@ -128,7 +137,7 @@ namespace Website.Client.FormModels
 
         public class DailyDelivery
         {
-            [DoubleType]
+            [DoubleType(min: 0)]
             public string? Price { get; set; }
 
             [IntType(min: 0)]
@@ -138,10 +147,10 @@ namespace Website.Client.FormModels
         public class MonthOfTheYear
         {
             [Required]
-            public Months Month { get; set; }
+            public required Months Month { get; set; }
 
             [Required]
-            public string? Year { get; set; }
+            public required string Year { get; set; }
         }
     }
 }

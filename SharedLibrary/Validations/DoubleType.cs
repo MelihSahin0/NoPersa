@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Website.Client.Util;
 
-namespace Website.Client.Validations
+namespace SharedLibrary.Validations
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
        AllowMultiple = false)]
@@ -19,7 +18,7 @@ namespace Website.Client.Validations
 
         public override bool IsValid(object? value)
         {
-            if (value is null || string.IsNullOrWhiteSpace(value.ToString()))
+            if (string.IsNullOrWhiteSpace(value?.ToString()))
             {
                 return true;
             }

@@ -6,6 +6,8 @@ namespace Website.Client.Components
 {
     public partial class FormTextInput
     {
+        private readonly string Id = Guid.NewGuid().ToString();
+
         [CascadingParameter]
         private EditContext? CascadedEditContext { get; set; }
 

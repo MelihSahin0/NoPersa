@@ -1,0 +1,17 @@
+﻿@using Website.Client.Components.Base;
+@using Website.Client.Util;
+@using Website.Client.Styles;
+
+<div class="flex justify-between">
+    @if (!Label.Equals(string.Empty))
+    {
+        <label for="@Id" class="@Scaling.GetTextScaling() select-none">@Label</label>
+    }
+    <DatePicker Id="@Id"
+                Year="@Year"
+                YearChanged="@YearChanged"
+                YearExpression="@YearExpression"
+                Month="@Month"
+                MonthChanged="@MonthChanged"
+                MonthExpression="@MonthExpression"/>
+</div>

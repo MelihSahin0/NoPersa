@@ -1,0 +1,12 @@
+Packet Manager: Microsoft.EntityFrameworkCore.Design  
+
+dotnet ef migrations add NameOfYourMigration --output-dir Database\Migrations
+
+so the table know when to migrate what
+
+public class xyz : Miration
+{
+	up 
+
+	down
+}

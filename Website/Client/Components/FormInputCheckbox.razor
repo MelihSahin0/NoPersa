@@ -1,8 +1,8 @@
 ﻿@using Website.Client.Util;
 @using Website.Client.Styles;
 
-<div class="flex flex-col mr-5">
-    <label for="input" class="@Scaling.GetTextScaling()">@Label</label>
-    <InputCheckbox id="input" type="text" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()}")"
+<div class="flex flex-col">
+    <label for="@Id" class="@Scaling.GetTextScaling() text-center select-none">@Label</label>
+    <InputCheckbox id="@Id" type="text" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()}")"
                    @bind-Value="Value" @oninput="OnValueChanged" />
 </div>

@@ -8,10 +8,15 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Website.Server", "Website\Server\Website.Server.csproj", "{E844211F-FCB9-48A4-864B-129CF6788E9E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Website.Client", "Website\Client\Website.Client.csproj", "{111402F1-1656-49E4-960F-CB319CB08F15}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8C8D354B-A239-4CF6-A3BD-61BA93C5E025} = {8C8D354B-A239-4CF6-A3BD-61BA93C5E025}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Website.Shared", "Website\Shared\Website.Shared.csproj", "{CB29A801-F7C1-4D4F-B21F-E0D644F5DC7C}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{CBD6E1F6-7037-4443-B59B-DDC397F2DA96}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{8C8D354B-A239-4CF6-A3BD-61BA93C5E025}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +44,10 @@ Global
 		{CBD6E1F6-7037-4443-B59B-DDC397F2DA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBD6E1F6-7037-4443-B59B-DDC397F2DA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBD6E1F6-7037-4443-B59B-DDC397F2DA96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C8D354B-A239-4CF6-A3BD-61BA93C5E025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C8D354B-A239-4CF6-A3BD-61BA93C5E025}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C8D354B-A239-4CF6-A3BD-61BA93C5E025}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C8D354B-A239-4CF6-A3BD-61BA93C5E025}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

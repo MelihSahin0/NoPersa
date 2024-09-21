@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System.Linq.Expressions;
 
 namespace Website.Client.Components
 {
     public partial class FormInputCheckbox
     {
+        private readonly string Id = Guid.NewGuid().ToString();
+
         [CascadingParameter]
         private EditContext? CascadedEditContext { get; set; }
 
