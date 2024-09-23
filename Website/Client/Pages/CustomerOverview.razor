@@ -1,7 +1,7 @@
 ﻿@page "/customer"
 @using Website.Client.Components;
 @using Website.Client.Components.Base;
-@using Website.Client.Util;
+@using Website.Client.Validations;
 
 <EditForm Model="Customer" OnValidSubmit="@Submit">
     <ObjectGraphDataAnnotationsValidator />
@@ -27,13 +27,13 @@
             <div class="mt-6 p-4 bg-gray-100 w-4/6 rounded-md">
                 <h3 class="text-lg font-semibold mb-4 select-none">Delivery Information</h3>
 
-                <FormMonthYearPicker Label="DatePicker" @bind-Year="@Customer.Month.Year" @bind-Month="@Customer.Month.Month"/>
+                <FormMonthYearPicker Label="Monthpicker" OnMonthYearSelected="@(() => Customer.OnMonthYearSelected())" @bind-Year="@Customer.DisplayMonth.Year" @bind-Month="@Customer.DisplayMonth.Month" />
                 
                 <div class="flex flex-col mt-1">
-                    <div class="grid grid-cols-5 gap-4 mb-5">
-                        <FormTextInput Class="col-span-1" Label="Article" @bind-Value="@Customer.Article" For="@(() => Customer.Article)" />
-                        <FormTextInput Class="col-span-2" Label="Price per Box" @bind-Value="@Customer.Price" For="@(() => Customer.Price)" />
-                        <FormTextInput Class="col-span-2" Label="Number of Boxes" @bind-Value="@Customer.DefaultNumberOfBoxes" For="@(() => Customer.DefaultNumberOfBoxes)" />
+                    <div class="grid grid-cols-5 gap-4">
+                        <FormTextInput Class="col-span-1" TextOrientation="text-center" LabelTextOrientation="center" Label="Article" @bind-Value="@Customer.Article" For="@(() => Customer.Article)" />
+                        <FormTextInput Class="col-span-2" TextOrientation="text-center" LabelTextOrientation="center" Label="Price per Box" @bind-Value="@Customer.DefaultPrice" For="@(() => Customer.DefaultPrice)" ValidationFunction="OnInputValidation.Double" />
+                        <FormTextInput Class="col-span-2" TextOrientation="text-center" LabelTextOrientation="center" Label="Number of Boxes" @bind-Value="@Customer.DefaultNumberOfBoxes" For="@(() => Customer.DefaultNumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
                     </div>
                      <div class="grid grid-cols-5 gap-4">
                         <a class="font-semibold col-span-1 text-center select-none">Day</a>
@@ -46,8 +46,8 @@
                         var dailyDelivery = Customer.GetDailyDeliveryByDay(i);
                         <div class="grid grid-cols-5 gap-4 mt-1">
                             <a class="text-center col-span-1 select-none">@i</a>
-                            <FormTextInput Class="col-span-2" Label="" @bind-Value="dailyDelivery.Price" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
-                            <FormTextInput Class="col-span-2" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                            <FormTextInput Class="col-span-2" TextOrientation="text-center" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@Customer.DefaultPrice" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
+                            <FormTextInput Class="col-span-2" TextOrientation="text-center" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@Customer.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
                         </div>
                     }
                 </div>

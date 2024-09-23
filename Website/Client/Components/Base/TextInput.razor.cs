@@ -8,6 +8,9 @@ namespace Website.Client.Components.Base
         private string? previousValidValue;
 
         [Parameter]
+        public string? Placeholder { get; set; }
+
+        [Parameter]
         public Func<string?, bool>? ValidationFunction { get; set; }
 
         protected override bool TryParseValueFromString(string? value, out string? result, out string validationErrorMessage)

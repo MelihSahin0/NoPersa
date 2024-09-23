@@ -8,6 +8,18 @@ namespace Website.Client.Components
     {
         private readonly string Id = Guid.NewGuid().ToString();
 
+        [Parameter]
+        public string LabelOrientation { get; set; } = "top";
+
+        [Parameter]
+        public string LabelTextOrientation { get; set; } = "left";
+
+        [Parameter]
+        public string TextOrientation { get; set; } = "text-left";
+
+        [Parameter]
+        public string? Placeholder { get; set; }
+
         [CascadingParameter]
         private EditContext? CascadedEditContext { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Website.Client.Util
+namespace Website.Client.Validations
 {
     public static class OnInputValidation
     {
@@ -8,27 +8,27 @@ namespace Website.Client.Util
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return false;
+                return true;
             }
 
-            return Regex.IsMatch(value.ToString()!, @"^[0-9]*([.,][0-9]*)?$");
+            return Regex.IsMatch(value.ToString()!, @"^\-?[0-9]*([.,][0-9]*)?$");
         }
 
         public static bool Integer(string? value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return false;
+                return true;
             }
 
-            return Regex.IsMatch(value.ToString()!, @"^[0-9]+$");
+            return Regex.IsMatch(value.ToString()!, @"^\-?[0-9]*$");
         }
 
         public static bool GeoCoordinates(string? value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                return false;
+                return true;
             }
 
             return Regex.IsMatch(value.ToString(), "^[0-9.,\\- ]+$");

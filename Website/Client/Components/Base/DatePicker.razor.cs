@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Linq.Expressions;
-using Website.Client.Util;
+using Website.Client.Enums;
 
 namespace Website.Client.Components.Base
 {
@@ -27,6 +27,9 @@ namespace Website.Client.Components.Base
         [Parameter]
         public Expression<Func<Months>>? MonthExpression { get; set; }
 
+        [Parameter]
+        public EventCallback OnMonthYearSelected { get; set; }
+
         private bool isDropdownOpen = false;
         private int selectedYear;
         private static readonly string[] months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -48,6 +51,7 @@ namespace Website.Client.Components.Base
             isDropdownOpen = false;
             await YearChanged.InvokeAsync(Year);
             await MonthChanged.InvokeAsync(Month);
+            await OnMonthYearSelected.InvokeAsync();
         }
 
         private void ChangeYear(int change)

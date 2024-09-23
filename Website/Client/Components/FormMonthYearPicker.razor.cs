@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Linq.Expressions;
-using Website.Client.Util;
+using Website.Client.Enums;
 
 namespace Website.Client.Components
 {
@@ -28,5 +28,8 @@ namespace Website.Client.Components
 
         [Parameter]
         public Expression<Func<Months>>? MonthExpression { get; set; }
+
+        [Parameter]
+        public EventCallback OnMonthYearSelected { get; set; }
     }
 }

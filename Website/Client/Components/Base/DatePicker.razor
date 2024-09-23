@@ -28,7 +28,7 @@
                 {
                     var currentIndex = i;
                     <button type="button"
-                            @onclick="() => SelectMonth(currentIndex + 1)"
+                            @onclick="() => SelectMonth(currentIndex)"
                             class="@($"{Scaling.GetTextScaling()} p-1 rounded-md bg-gray-700 hover:bg-skyHover")">
                         @months[i]
                     </button>

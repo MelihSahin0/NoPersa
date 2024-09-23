@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SharedLibrary.Validations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SharedLibrary.Models
@@ -43,5 +44,18 @@ namespace SharedLibrary.Models
 
         [Required]
         public required Weekdays Holidays { get; set; }
+
+        [Required]
+        public required int Article { get; set; }
+
+        [Required]
+        [DoubleType(min: 0)]
+        public required double DefaultPrice { get; set; }
+
+        [Required]
+        [IntType(min: 0)]
+        public required int DefaultNumberOfBoxes { get; set; }
+
+        public ICollection<MonthlyOverview> MonthlyOverviews { get; } = [];
     }
 }

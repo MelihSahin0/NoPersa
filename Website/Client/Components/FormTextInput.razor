@@ -1,15 +1,15 @@
 ﻿@using Website.Client.Components.Base;
-@using Website.Client.Util;
+@using Website.Client.Validations;
 @using Website.Client.Styles;
 
-<div class="@Class">
+<div class="@($"{Class} {(LabelOrientation.Equals("top") ? "flex flex-col" : "flex flex-row")}")">
     @if (!Label.Equals(string.Empty))
     {
-        <label for="@Id" class="@Scaling.GetTextScaling() select-none">@Label</label>
-        <br />
+        <label for="@Id" class="@($"{Scaling.GetTextScaling()} {(LabelTextOrientation.Equals("center") ? "text-center" : "")} select-none")">@Label</label>
     }
     <TextInput id="@Id"
-               class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()}")"
+               class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation}")"
+               Placeholder="@Placeholder"
                Value="@Value"
                ValueChanged="@ValueChanged"
                ValueExpression="@ValueExpression"

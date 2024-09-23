@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Website.Client.Enums;
 using Website.Client.FormModels;
-using Website.Client.Util;
+using Website.Client.Models;
 
 namespace Website.Client.Pages
 {
@@ -29,53 +30,53 @@ namespace Website.Client.Pages
                 Address = string.Empty,
                 Region = string.Empty,
                 GeoLocation = string.Empty,
-                Month = new Customer.MonthOfTheYear() 
+                DisplayMonth = new MonthOfTheYear() 
                 { 
                     Month = (Months)dateTime.Month, 
                     Year = dateTime.Year.ToString() 
                 },
                 Article = "0",
-                Price = "0",
+                DefaultPrice = "0",
                 DefaultNumberOfBoxes = "0",
                 MonthlyDeliveries = [
-                    new Customer.MonthlyDelivery()
+                    new MonthlyDelivery()
                     {
-                        MonthOfTheYear = new Customer.MonthOfTheYear()
+                        MonthOfTheYear = new MonthOfTheYear()
                         {
                                 Month = (Months)dateTime.Month,
                                 Year = dateTime.Year.ToString()
                         },
-                        Day1 = new Customer.DailyDelivery(),
-                        Day2 = new Customer.DailyDelivery(),
-                        Day3 = new Customer.DailyDelivery(),
-                        Day4 = new Customer.DailyDelivery(),
-                        Day5 = new Customer.DailyDelivery(),
-                        Day6 = new Customer.DailyDelivery(),
-                        Day7 = new Customer.DailyDelivery(),
-                        Day8 = new Customer.DailyDelivery(),
-                        Day9 = new Customer.DailyDelivery(),
-                        Day10 = new Customer.DailyDelivery(),
-                        Day11 = new Customer.DailyDelivery(),
-                        Day12 = new Customer.DailyDelivery(),
-                        Day13 = new Customer.DailyDelivery(),
-                        Day14 = new Customer.DailyDelivery(),
-                        Day15 = new Customer.DailyDelivery(),
-                        Day16 = new Customer.DailyDelivery(),
-                        Day17 = new Customer.DailyDelivery(),
-                        Day18 = new Customer.DailyDelivery(),
-                        Day19 = new Customer.DailyDelivery(),
-                        Day20 = new Customer.DailyDelivery(),
-                        Day21 = new Customer.DailyDelivery(),
-                        Day22 = new Customer.DailyDelivery(),
-                        Day23 = new Customer.DailyDelivery(),
-                        Day24 = new Customer.DailyDelivery(),
-                        Day25 = new Customer.DailyDelivery(),
-                        Day26 = new Customer.DailyDelivery(),
-                        Day27 = new Customer.DailyDelivery(),
-                        Day28 = new Customer.DailyDelivery(),
-                        Day29 = new Customer.DailyDelivery(),
-                        Day30 = new Customer.DailyDelivery(),
-                        Day31 = new Customer.DailyDelivery()
+                        Day1 = new DailyDelivery(),
+                        Day2 = new DailyDelivery(),
+                        Day3 = new DailyDelivery(),
+                        Day4 = new DailyDelivery(),
+                        Day5 = new DailyDelivery(),
+                        Day6 = new DailyDelivery(),
+                        Day7 = new DailyDelivery(),
+                        Day8 = new DailyDelivery(),
+                        Day9 = new DailyDelivery(),
+                        Day10 = new DailyDelivery(),
+                        Day11 = new DailyDelivery(),
+                        Day12 = new DailyDelivery(),
+                        Day13 = new DailyDelivery(),
+                        Day14 = new DailyDelivery(),
+                        Day15 = new DailyDelivery(),
+                        Day16 = new DailyDelivery(),
+                        Day17 = new DailyDelivery(),
+                        Day18 = new DailyDelivery(),
+                        Day19 = new DailyDelivery(),
+                        Day20 = new DailyDelivery(),
+                        Day21 = new DailyDelivery(),
+                        Day22 = new DailyDelivery(),
+                        Day23 = new DailyDelivery(),
+                        Day24 = new DailyDelivery(),
+                        Day25 = new DailyDelivery(),
+                        Day26 = new DailyDelivery(),
+                        Day27 = new DailyDelivery(),
+                        Day28 = new DailyDelivery(),
+                        Day29 = new DailyDelivery(),
+                        Day30 = new DailyDelivery(),
+                        Day31 = new DailyDelivery()
                     }
                 ],
                 Workdays = new Weekdays(),

@@ -23,11 +23,13 @@ namespace ManagmentService.DTOs
 
         public DTOWeekdays? Holidays { get; set; }
 
-        public DTOMonthOfTheYear? Month { get; set; }
+        public DTOMonthOfTheYear? DisplayMonth { get; set; }
 
         public string? Article { get; set; }
 
-        public string? Price { get; set; }
+        public string? DefaultPrice { get; set; }
+
+        public string? DefaultNumberOfBoxes { get; set; }
 
         public DTOMonthlyDelivery[]? MonthlyDeliveries { get; set; }
     }
