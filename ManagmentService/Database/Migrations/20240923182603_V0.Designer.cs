@@ -3,78 +3,81 @@ using System;
 using ManagmentService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ManagmentService.Migrations
+namespace ManagmentService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    partial class NoPersaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923182603_V0")]
+    partial class V0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int>("Article")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ContactInformation")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int>("DefaultNumberOfBoxes")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("DefaultPrice")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.Property<string>("GeoLocation")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int>("HolidaysId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Region")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("SerialNumber")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("Title")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int>("WorkdaysId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -91,15 +94,15 @@ namespace ManagmentService.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("NumberOfBoxes")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double?>("Price")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.HasKey("Id");
 
@@ -110,111 +113,111 @@ namespace ManagmentService.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CustomerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day10Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day11Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day12Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day13Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day14Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day15Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day16Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day17Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day18Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day19Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day1Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day20Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day21Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day22Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day23Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day24Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day25Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day26Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day27Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day28Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day29Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day2Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day30Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day31Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day3Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day4Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day5Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day6Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day7Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day8Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Day9Id")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Month")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Year")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -223,53 +226,74 @@ namespace ManagmentService.Migrations
                     b.HasIndex("Day10Id")
                         .IsUnique();
 
-                    b.HasIndex("Day11Id");
+                    b.HasIndex("Day11Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day12Id");
+                    b.HasIndex("Day12Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day13Id");
+                    b.HasIndex("Day13Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day14Id");
+                    b.HasIndex("Day14Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day15Id");
+                    b.HasIndex("Day15Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day16Id");
+                    b.HasIndex("Day16Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day17Id");
+                    b.HasIndex("Day17Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day18Id");
+                    b.HasIndex("Day18Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day19Id");
+                    b.HasIndex("Day19Id")
+                        .IsUnique();
 
                     b.HasIndex("Day1Id")
                         .IsUnique();
 
-                    b.HasIndex("Day20Id");
+                    b.HasIndex("Day20Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day21Id");
+                    b.HasIndex("Day21Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day22Id");
+                    b.HasIndex("Day22Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day23Id");
+                    b.HasIndex("Day23Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day24Id");
+                    b.HasIndex("Day24Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day25Id");
+                    b.HasIndex("Day25Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day26Id");
+                    b.HasIndex("Day26Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day27Id");
+                    b.HasIndex("Day27Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day28Id");
+                    b.HasIndex("Day28Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day29Id");
+                    b.HasIndex("Day29Id")
+                        .IsUnique();
 
                     b.HasIndex("Day2Id")
                         .IsUnique();
 
-                    b.HasIndex("Day30Id");
+                    b.HasIndex("Day30Id")
+                        .IsUnique();
 
-                    b.HasIndex("Day31Id");
+                    b.HasIndex("Day31Id")
+                        .IsUnique();
 
                     b.HasIndex("Day3Id")
                         .IsUnique();
@@ -299,30 +323,30 @@ namespace ManagmentService.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Friday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Monday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Saturday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Sunday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Thursday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Tuesday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Wednesday")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -363,56 +387,56 @@ namespace ManagmentService.Migrations
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day11")
-                        .WithMany()
-                        .HasForeignKey("Day11Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day11Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day12")
-                        .WithMany()
-                        .HasForeignKey("Day12Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day12Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day13")
-                        .WithMany()
-                        .HasForeignKey("Day13Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day13Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day14")
-                        .WithMany()
-                        .HasForeignKey("Day14Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day14Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day15")
-                        .WithMany()
-                        .HasForeignKey("Day15Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day15Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day16")
-                        .WithMany()
-                        .HasForeignKey("Day16Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day16Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day17")
-                        .WithMany()
-                        .HasForeignKey("Day17Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day17Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day18")
-                        .WithMany()
-                        .HasForeignKey("Day18Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day18Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day19")
-                        .WithMany()
-                        .HasForeignKey("Day19Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day19Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -423,62 +447,62 @@ namespace ManagmentService.Migrations
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day20")
-                        .WithMany()
-                        .HasForeignKey("Day20Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day20Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day21")
-                        .WithMany()
-                        .HasForeignKey("Day21Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day21Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day22")
-                        .WithMany()
-                        .HasForeignKey("Day22Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day22Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day23")
-                        .WithMany()
-                        .HasForeignKey("Day23Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day23Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day24")
-                        .WithMany()
-                        .HasForeignKey("Day24Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day24Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day25")
-                        .WithMany()
-                        .HasForeignKey("Day25Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day25Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day26")
-                        .WithMany()
-                        .HasForeignKey("Day26Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day26Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day27")
-                        .WithMany()
-                        .HasForeignKey("Day27Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day27Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day28")
-                        .WithMany()
-                        .HasForeignKey("Day28Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day28Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day29")
-                        .WithMany()
-                        .HasForeignKey("Day29Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day29Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -489,14 +513,14 @@ namespace ManagmentService.Migrations
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day30")
-                        .WithMany()
-                        .HasForeignKey("Day30Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day30Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day31")
-                        .WithMany()
-                        .HasForeignKey("Day31Id")
+                        .WithOne()
+                        .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day31Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

@@ -74,7 +74,7 @@ namespace Website.Client.FormModels
                 i++;
             }
 
-            //TODO
+            //TODO Call backend to check if it exists
 
             MonthlyDeliveries.Add(new MonthlyDelivery()
             {

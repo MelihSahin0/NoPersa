@@ -10,7 +10,7 @@ services:
     pull_policy: always
     restart: always
     depends_on:
-      - NoPersaSqlServer
+      - NoPersaPostgresDb
 
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver
@@ -22,18 +22,19 @@ services:
       - "7039:7039"
     restart: always
 
-  NoPersaSqlServer:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: NoPersaSqlServer
+  NoPersaPostgresDb:
+    image: postgres:latest
+    container_name: NoPersaPostgresDb
     ports:
-        - "1433:1433"
+        - "5432:5432"
     restart: always
     environment:
-        - ACCEPT_EULA=Y
-        - SA_PASSWORD=myStong_Password123#
+        - POSTGRES_DB=NoPersaDb
+        - POSTGRES_USER=admin
+        - POSTGRES_PASSWORD=myStong_Password123#
     volumes:
-        - NoPersaSqlServer-data:/var/opt/mssql
+        - NoPersaPostgresDb-data:/var/lib/postgresql/data
 
 volumes:
-  NoPersaSqlServer-data:
+  NoPersaPostgresDb-data:
 

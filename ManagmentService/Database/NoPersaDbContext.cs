@@ -11,6 +11,8 @@ namespace ManagmentService.Database
 
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Weekdays> Weekdays { get; set; }
+        public DbSet<MonthlyOverview> MonthlyOverview { get; set; }
+        public DbSet<DailyOverview> DailyOverview { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,7 +31,8 @@ namespace ManagmentService.Database
             modelBuilder.Entity<Customer>()
                 .HasMany(c => c.MonthlyOverviews)
                 .WithOne(m => m.Customer)
-                .HasForeignKey(m => m.CustomerId);
+                .HasForeignKey(m => m.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<MonthlyOverview>()
                 .HasOne(m => m.Day1)

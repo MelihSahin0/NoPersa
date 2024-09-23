@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Website.Client.Models
+﻿namespace Website.Client.Models
 {
     public class MonthlyDelivery
     {

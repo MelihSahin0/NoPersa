@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ManagmentService.Migrations
+namespace ManagmentService.Database.Migrations
 {
     /// <inheritdoc />
     public partial class V0 : Migration
@@ -14,10 +15,10 @@ namespace ManagmentService.Migrations
                 name: "DailyOverview",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Price = table.Column<double>(type: "float", nullable: true),
-                    NumberOfBoxes = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Price = table.Column<double>(type: "double precision", nullable: true),
+                    NumberOfBoxes = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,15 +29,15 @@ namespace ManagmentService.Migrations
                 name: "Weekdays",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Monday = table.Column<bool>(type: "bit", nullable: false),
-                    Tuesday = table.Column<bool>(type: "bit", nullable: false),
-                    Wednesday = table.Column<bool>(type: "bit", nullable: false),
-                    Thursday = table.Column<bool>(type: "bit", nullable: false),
-                    Friday = table.Column<bool>(type: "bit", nullable: false),
-                    Saturday = table.Column<bool>(type: "bit", nullable: false),
-                    Sunday = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Monday = table.Column<bool>(type: "boolean", nullable: false),
+                    Tuesday = table.Column<bool>(type: "boolean", nullable: false),
+                    Wednesday = table.Column<bool>(type: "boolean", nullable: false),
+                    Thursday = table.Column<bool>(type: "boolean", nullable: false),
+                    Friday = table.Column<bool>(type: "boolean", nullable: false),
+                    Saturday = table.Column<bool>(type: "boolean", nullable: false),
+                    Sunday = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,20 +48,20 @@ namespace ManagmentService.Migrations
                 name: "Customer",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SerialNumber = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                    Title = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    Region = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    GeoLocation = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                    ContactInformation = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: true),
-                    WorkdaysId = table.Column<int>(type: "int", nullable: false),
-                    HolidaysId = table.Column<int>(type: "int", nullable: false),
-                    Article = table.Column<int>(type: "int", nullable: false),
-                    DefaultPrice = table.Column<double>(type: "float", nullable: false),
-                    DefaultNumberOfBoxes = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SerialNumber = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Address = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Region = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    GeoLocation = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    ContactInformation = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    WorkdaysId = table.Column<int>(type: "integer", nullable: false),
+                    HolidaysId = table.Column<int>(type: "integer", nullable: false),
+                    Article = table.Column<int>(type: "integer", nullable: false),
+                    DefaultPrice = table.Column<double>(type: "double precision", nullable: false),
+                    DefaultNumberOfBoxes = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,42 +82,42 @@ namespace ManagmentService.Migrations
                 name: "MonthlyOverview",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Month = table.Column<int>(type: "int", nullable: false),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Day1Id = table.Column<int>(type: "int", nullable: false),
-                    Day2Id = table.Column<int>(type: "int", nullable: false),
-                    Day3Id = table.Column<int>(type: "int", nullable: false),
-                    Day4Id = table.Column<int>(type: "int", nullable: false),
-                    Day5Id = table.Column<int>(type: "int", nullable: false),
-                    Day6Id = table.Column<int>(type: "int", nullable: false),
-                    Day7Id = table.Column<int>(type: "int", nullable: false),
-                    Day8Id = table.Column<int>(type: "int", nullable: false),
-                    Day9Id = table.Column<int>(type: "int", nullable: false),
-                    Day10Id = table.Column<int>(type: "int", nullable: false),
-                    Day11Id = table.Column<int>(type: "int", nullable: false),
-                    Day12Id = table.Column<int>(type: "int", nullable: false),
-                    Day13Id = table.Column<int>(type: "int", nullable: false),
-                    Day14Id = table.Column<int>(type: "int", nullable: false),
-                    Day15Id = table.Column<int>(type: "int", nullable: false),
-                    Day16Id = table.Column<int>(type: "int", nullable: false),
-                    Day17Id = table.Column<int>(type: "int", nullable: false),
-                    Day18Id = table.Column<int>(type: "int", nullable: false),
-                    Day19Id = table.Column<int>(type: "int", nullable: false),
-                    Day20Id = table.Column<int>(type: "int", nullable: false),
-                    Day21Id = table.Column<int>(type: "int", nullable: false),
-                    Day22Id = table.Column<int>(type: "int", nullable: false),
-                    Day23Id = table.Column<int>(type: "int", nullable: false),
-                    Day24Id = table.Column<int>(type: "int", nullable: false),
-                    Day25Id = table.Column<int>(type: "int", nullable: false),
-                    Day26Id = table.Column<int>(type: "int", nullable: false),
-                    Day27Id = table.Column<int>(type: "int", nullable: false),
-                    Day28Id = table.Column<int>(type: "int", nullable: false),
-                    Day29Id = table.Column<int>(type: "int", nullable: false),
-                    Day30Id = table.Column<int>(type: "int", nullable: false),
-                    Day31Id = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Month = table.Column<int>(type: "integer", nullable: false),
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Day1Id = table.Column<int>(type: "integer", nullable: false),
+                    Day2Id = table.Column<int>(type: "integer", nullable: false),
+                    Day3Id = table.Column<int>(type: "integer", nullable: false),
+                    Day4Id = table.Column<int>(type: "integer", nullable: false),
+                    Day5Id = table.Column<int>(type: "integer", nullable: false),
+                    Day6Id = table.Column<int>(type: "integer", nullable: false),
+                    Day7Id = table.Column<int>(type: "integer", nullable: false),
+                    Day8Id = table.Column<int>(type: "integer", nullable: false),
+                    Day9Id = table.Column<int>(type: "integer", nullable: false),
+                    Day10Id = table.Column<int>(type: "integer", nullable: false),
+                    Day11Id = table.Column<int>(type: "integer", nullable: false),
+                    Day12Id = table.Column<int>(type: "integer", nullable: false),
+                    Day13Id = table.Column<int>(type: "integer", nullable: false),
+                    Day14Id = table.Column<int>(type: "integer", nullable: false),
+                    Day15Id = table.Column<int>(type: "integer", nullable: false),
+                    Day16Id = table.Column<int>(type: "integer", nullable: false),
+                    Day17Id = table.Column<int>(type: "integer", nullable: false),
+                    Day18Id = table.Column<int>(type: "integer", nullable: false),
+                    Day19Id = table.Column<int>(type: "integer", nullable: false),
+                    Day20Id = table.Column<int>(type: "integer", nullable: false),
+                    Day21Id = table.Column<int>(type: "integer", nullable: false),
+                    Day22Id = table.Column<int>(type: "integer", nullable: false),
+                    Day23Id = table.Column<int>(type: "integer", nullable: false),
+                    Day24Id = table.Column<int>(type: "integer", nullable: false),
+                    Day25Id = table.Column<int>(type: "integer", nullable: false),
+                    Day26Id = table.Column<int>(type: "integer", nullable: false),
+                    Day27Id = table.Column<int>(type: "integer", nullable: false),
+                    Day28Id = table.Column<int>(type: "integer", nullable: false),
+                    Day29Id = table.Column<int>(type: "integer", nullable: false),
+                    Day30Id = table.Column<int>(type: "integer", nullable: false),
+                    Day31Id = table.Column<int>(type: "integer", nullable: false),
+                    CustomerId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -341,47 +342,56 @@ namespace ManagmentService.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day11Id",
                 table: "MonthlyOverview",
-                column: "Day11Id");
+                column: "Day11Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day12Id",
                 table: "MonthlyOverview",
-                column: "Day12Id");
+                column: "Day12Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day13Id",
                 table: "MonthlyOverview",
-                column: "Day13Id");
+                column: "Day13Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day14Id",
                 table: "MonthlyOverview",
-                column: "Day14Id");
+                column: "Day14Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day15Id",
                 table: "MonthlyOverview",
-                column: "Day15Id");
+                column: "Day15Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day16Id",
                 table: "MonthlyOverview",
-                column: "Day16Id");
+                column: "Day16Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day17Id",
                 table: "MonthlyOverview",
-                column: "Day17Id");
+                column: "Day17Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day18Id",
                 table: "MonthlyOverview",
-                column: "Day18Id");
+                column: "Day18Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day19Id",
                 table: "MonthlyOverview",
-                column: "Day19Id");
+                column: "Day19Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day1Id",
@@ -392,52 +402,62 @@ namespace ManagmentService.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day20Id",
                 table: "MonthlyOverview",
-                column: "Day20Id");
+                column: "Day20Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day21Id",
                 table: "MonthlyOverview",
-                column: "Day21Id");
+                column: "Day21Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day22Id",
                 table: "MonthlyOverview",
-                column: "Day22Id");
+                column: "Day22Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day23Id",
                 table: "MonthlyOverview",
-                column: "Day23Id");
+                column: "Day23Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day24Id",
                 table: "MonthlyOverview",
-                column: "Day24Id");
+                column: "Day24Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day25Id",
                 table: "MonthlyOverview",
-                column: "Day25Id");
+                column: "Day25Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day26Id",
                 table: "MonthlyOverview",
-                column: "Day26Id");
+                column: "Day26Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day27Id",
                 table: "MonthlyOverview",
-                column: "Day27Id");
+                column: "Day27Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day28Id",
                 table: "MonthlyOverview",
-                column: "Day28Id");
+                column: "Day28Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day29Id",
                 table: "MonthlyOverview",
-                column: "Day29Id");
+                column: "Day29Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day2Id",
@@ -448,12 +468,14 @@ namespace ManagmentService.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day30Id",
                 table: "MonthlyOverview",
-                column: "Day30Id");
+                column: "Day30Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day31Id",
                 table: "MonthlyOverview",
-                column: "Day31Id");
+                column: "Day31Id",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_Day3Id",
