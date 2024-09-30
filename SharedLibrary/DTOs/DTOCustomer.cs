@@ -1,5 +1,5 @@
 ﻿
-namespace ManagmentService.DTOs
+namespace SharedLibrary.DTOs
 {
     public class DTOCustomer
     {
@@ -32,5 +32,7 @@ namespace ManagmentService.DTOs
         public string? DefaultNumberOfBoxes { get; set; }
 
         public DTOMonthlyDelivery[]? MonthlyDeliveries { get; set; }
+
+
     }
 }

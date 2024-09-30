@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Enums;
+using Website.Client.Exceptions;
 using Website.Client.FormModels;
 using Website.Client.Models;
 
@@ -10,13 +12,22 @@ namespace Website.Client.Pages
 {
     public partial class CustomerOverview
     {
-        private Customer? Customer {  get; set; }
+        [Inject]
+        public required ILocalStorageService LocalStorage { get; set; }
 
         [Inject]
-        private HttpClient? HttpClient { get; set; }
+        public required JsonSerializerOptions JsonSerializerOptions { get; set; }
 
         [Inject]
-        private NavigationManager? NavigationManager { get; set; }
+        public required HttpClient HttpClient { get; set; }
+
+        [Inject]
+        public required NavigationManager NavigationManager { get; set; }
+
+        [Inject]
+        public required NotificationService NotificationService { get; set; }
+
+        private Customer? Customer { get; set; }
 
         protected override void OnInitialized()
         {
@@ -24,6 +35,10 @@ namespace Website.Client.Pages
 
             Customer ??= new()
             {
+                LocalStorage = LocalStorage,
+                JsonSerializerOptions = JsonSerializerOptions,
+                HttpClient = HttpClient,
+                NotificationService = NotificationService,
                 SerialNumber = string.Empty,
                 Name = string.Empty,
                 Title = string.Empty,
@@ -87,17 +102,16 @@ namespace Website.Client.Pages
 
         private async Task Submit(EditContext editContext)
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = null
-            };
+            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("defaultAddress")}/CustomerManagment/CustomerAdd", Customer, JsonSerializerOptions);
 
-            using var response = await HttpClient?.PostAsJsonAsync("https://localhost:8081/CustomerManagment/CustomerAdd", Customer, options);
-            Console.WriteLine(response);
-
-            if (response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
+                NotificationService.SetSuccess("Successfully added/updated customer");
                 NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                NotificationService.SetError(await response.Content.ReadAsStringAsync());
             }
         }
     }

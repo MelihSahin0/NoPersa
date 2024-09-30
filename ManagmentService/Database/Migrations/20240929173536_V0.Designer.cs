@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ManagmentService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    [Migration("20240923182603_V0")]
+    [Migration("20240929173536_V0")]
     partial class V0
     {
         /// <inheritdoc />
@@ -377,193 +377,193 @@ namespace ManagmentService.Database.Migrations
                     b.HasOne("SharedLibrary.Models.Customer", "Customer")
                         .WithMany("MonthlyOverviews")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day10")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day10Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day11")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day11Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day12")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day12Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day13")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day13Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day14")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day14Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day15")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day15Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day16")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day16Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day17")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day17Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day18")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day18Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day19")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day19Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day1")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day1Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day20")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day20Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day21")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day21Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day22")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day22Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day23")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day23Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day24")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day24Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day25")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day25Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day26")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day26Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day27")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day27Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day28")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day28Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day29")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day29Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day2")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day2Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day30")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day30Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day31")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day31Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day3")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day3Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day4")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day4Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day5")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day5Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day6")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day6Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day7")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day7Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day8")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day8Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.DailyOverview", "Day9")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.MonthlyOverview", "Day9Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Customer");

@@ -202,7 +202,6 @@ namespace SharedLibrary.Models
         [Required]
         public required DailyOverview Day31 { get; set; }
 
-
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }
 

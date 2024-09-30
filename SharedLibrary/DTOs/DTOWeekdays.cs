@@ -1,5 +1,5 @@
 ﻿
-namespace ManagmentService.DTOs
+namespace SharedLibrary.DTOs
 {
     public class DTOWeekdays
     {

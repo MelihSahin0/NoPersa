@@ -30,20 +30,14 @@ namespace SharedLibrary.Models
 
         public override bool Equals(object? obj)
         {
-            if (obj is not Weekdays)
-            {
-                return false;
-            }
-
-            Weekdays weekday = (Weekdays)obj;
-            if ((Monday == weekday.Monday) && (Tuesday == weekday.Tuesday) && (Wednesday == weekday.Wednesday) &&
-               (Thursday == weekday.Thursday) && (Friday == weekday.Friday) && (Saturday == weekday.Saturday) && 
-               (Sunday == weekday.Sunday))
-            {
-                return true;
-            }
-
-            return false;
+           return obj is Weekdays weekday &&
+               Monday == weekday.Monday &&
+               Tuesday == weekday.Tuesday &&
+               Wednesday == weekday.Wednesday &&
+               Thursday == weekday.Thursday &&
+               Friday == weekday.Friday &&
+               Saturday == weekday.Saturday &&
+               Sunday == weekday.Sunday;
         }
 
         public override int GetHashCode()

@@ -126,194 +126,162 @@ namespace ManagmentService.Database.Migrations
                         name: "FK_MonthlyOverview_Customer_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day10Id",
                         column: x => x.Day10Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day11Id",
                         column: x => x.Day11Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day12Id",
                         column: x => x.Day12Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day13Id",
                         column: x => x.Day13Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day14Id",
                         column: x => x.Day14Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day15Id",
                         column: x => x.Day15Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day16Id",
                         column: x => x.Day16Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day17Id",
                         column: x => x.Day17Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day18Id",
                         column: x => x.Day18Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day19Id",
                         column: x => x.Day19Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day1Id",
                         column: x => x.Day1Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day20Id",
                         column: x => x.Day20Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day21Id",
                         column: x => x.Day21Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day22Id",
                         column: x => x.Day22Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day23Id",
                         column: x => x.Day23Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day24Id",
                         column: x => x.Day24Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day25Id",
                         column: x => x.Day25Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day26Id",
                         column: x => x.Day26Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day27Id",
                         column: x => x.Day27Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day28Id",
                         column: x => x.Day28Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day29Id",
                         column: x => x.Day29Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day2Id",
                         column: x => x.Day2Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day30Id",
                         column: x => x.Day30Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day31Id",
                         column: x => x.Day31Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day3Id",
                         column: x => x.Day3Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day4Id",
                         column: x => x.Day4Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day5Id",
                         column: x => x.Day5Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day6Id",
                         column: x => x.Day6Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day7Id",
                         column: x => x.Day7Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day8Id",
                         column: x => x.Day8Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MonthlyOverview_DailyOverview_Day9Id",
                         column: x => x.Day9Id,
                         principalTable: "DailyOverview",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(

@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Website.Client.Exceptions
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="topbar">
@@ -6,6 +7,33 @@
     </div>
 
     <main class="m-5">
-        @Body
+        <CustomErrorBoundary @ref="errorBoundary">
+            <ChildContent>
+                @if (!string.IsNullOrWhiteSpace(errorMessage) || !string.IsNullOrWhiteSpace(successMessage))
+                {
+                    <div id="blazor-message-ui" class="flex flex-row justify-between p-4 m-4 @(!string.IsNullOrWhiteSpace(errorMessage) ? "bg-red" : "bg-green")">
+                        <a class="select-none text-white">@successMessage @errorMessage</a>
+                        <div>
+                            <button class="select-none text-white" @onclick="Dismiss">X</button>
+                        </div>
+                    </div>
+                }
+                @Body
+            </ChildContent>
+            <ErrorContent Context="Exception">
+                <div id="blazor-error-ui" class="bg-red p-4 flex flex-col">
+                    <h3 class="text-white">@Exception.GetType():</h3>
+                    <h3 class="text-white">@Exception.Message</h3>
+                    <br/>
+                    <a class="text-white">
+                        Please copy the messages above and write down what you did, bevor this message occured. 
+                        Afterwards please send the content to the developer.
+                    </a>
+                    <div class="flex flex-row justify-start w-full">
+                        <button class="text-sky" @onclick="() => errorBoundary?.Recover()">Refresh</button>
+                    </div>
+                </div>
+            </ErrorContent>
+        </CustomErrorBoundary>
     </main>
 </div>

@@ -1,5 +1,10 @@
-﻿using SharedLibrary.Validations;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
+using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Json;
+using System.Reflection.Emit;
+using System.Text.Json;
 using Website.Client.Exceptions;
 using Website.Client.Models;
 
@@ -7,7 +12,15 @@ namespace Website.Client.FormModels
 {
     public class Customer
     {
-        public int Id { get; set; } = -1;
+        public required ILocalStorageService LocalStorage { get; set; }
+
+        public required JsonSerializerOptions JsonSerializerOptions { get; set; }
+
+        public required HttpClient HttpClient { get; set; }
+
+        public required NotificationService NotificationService { get; set; }
+
+        public int Id { get; set; } = 0;
 
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? SerialNumber { get; set; }
@@ -60,7 +73,7 @@ namespace Website.Client.FormModels
         public required List<MonthlyDelivery> MonthlyDeliveries { get; set; }
 
         private int selectedMonthlyDeliveries = 0;
-        public void OnMonthYearSelected()
+        public async Task OnMonthYearSelected()
         {
             int i = 0;
             foreach (MonthlyDelivery monthlyDelivery in MonthlyDeliveries)
@@ -74,43 +87,57 @@ namespace Website.Client.FormModels
                 i++;
             }
 
-            //TODO Call backend to check if it exists
+            using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("defaultAddress")}/CustomerManagment/CustomerGetDailyDelivery",
+                                     new
+                                     {
+                                         ReferenceId = Id,
+                                         Month = DisplayMonth.Month,
+                                         Year = DisplayMonth.Year,
+                                     }, JsonSerializerOptions)!;
 
-            MonthlyDeliveries.Add(new MonthlyDelivery()
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                MonthOfTheYear = new MonthOfTheYear() { Month = DisplayMonth.Month, Year = DisplayMonth.Year },
-                Day1 = new DailyDelivery(),
-                Day2 = new DailyDelivery(),
-                Day3 = new DailyDelivery(),
-                Day4 = new DailyDelivery(),
-                Day5 = new DailyDelivery(),
-                Day6 = new DailyDelivery(),
-                Day7 = new DailyDelivery(),
-                Day8 = new DailyDelivery(),
-                Day9 = new DailyDelivery(),
-                Day10 = new DailyDelivery(),
-                Day11 = new DailyDelivery(),
-                Day12 = new DailyDelivery(),
-                Day13 = new DailyDelivery(),
-                Day14 = new DailyDelivery(),
-                Day15 = new DailyDelivery(),
-                Day16 = new DailyDelivery(),
-                Day17 = new DailyDelivery(),
-                Day18 = new DailyDelivery(),
-                Day19 = new DailyDelivery(),
-                Day20 = new DailyDelivery(),
-                Day21 = new DailyDelivery(),
-                Day22 = new DailyDelivery(),
-                Day23 = new DailyDelivery(),
-                Day24 = new DailyDelivery(),
-                Day25 = new DailyDelivery(),
-                Day26 = new DailyDelivery(),
-                Day27 = new DailyDelivery(),
-                Day28 = new DailyDelivery(),
-                Day29 = new DailyDelivery(),
-                Day30 = new DailyDelivery(),
-                Day31 = new DailyDelivery()
-            });
+                MonthlyDeliveries.Add(JsonSerializer.Deserialize<MonthlyDelivery>(response.Content.ToString()!, JsonSerializerOptions)!);
+            }
+            else
+            {
+                MonthlyDeliveries.Add(new MonthlyDelivery()
+                {
+                    MonthOfTheYear = new MonthOfTheYear() { Month = DisplayMonth.Month, Year = DisplayMonth.Year },
+                    Day1 = new DailyDelivery(),
+                    Day2 = new DailyDelivery(),
+                    Day3 = new DailyDelivery(),
+                    Day4 = new DailyDelivery(),
+                    Day5 = new DailyDelivery(),
+                    Day6 = new DailyDelivery(),
+                    Day7 = new DailyDelivery(),
+                    Day8 = new DailyDelivery(),
+                    Day9 = new DailyDelivery(),
+                    Day10 = new DailyDelivery(),
+                    Day11 = new DailyDelivery(),
+                    Day12 = new DailyDelivery(),
+                    Day13 = new DailyDelivery(),
+                    Day14 = new DailyDelivery(),
+                    Day15 = new DailyDelivery(),
+                    Day16 = new DailyDelivery(),
+                    Day17 = new DailyDelivery(),
+                    Day18 = new DailyDelivery(),
+                    Day19 = new DailyDelivery(),
+                    Day20 = new DailyDelivery(),
+                    Day21 = new DailyDelivery(),
+                    Day22 = new DailyDelivery(),
+                    Day23 = new DailyDelivery(),
+                    Day24 = new DailyDelivery(),
+                    Day25 = new DailyDelivery(),
+                    Day26 = new DailyDelivery(),
+                    Day27 = new DailyDelivery(),
+                    Day28 = new DailyDelivery(),
+                    Day29 = new DailyDelivery(),
+                    Day30 = new DailyDelivery(),
+                    Day31 = new DailyDelivery()
+                });
+            }
+
             selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;
         }
 

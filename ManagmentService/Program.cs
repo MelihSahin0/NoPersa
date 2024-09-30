@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ManagmentService.Database;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+using SharedLibrary.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,12 +18,11 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+builder.Services.AddAutoMapper(typeof(CustomerProfile), typeof(DailyOverviewProfile), typeof(MonthlyOverviewProfile), typeof(WeekdaysProfile));
 
 var app = builder.Build();
 
