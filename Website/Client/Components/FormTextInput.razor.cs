@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Linq.Expressions;
+using Website.Client.Styles;
 
 namespace Website.Client.Components
 {
@@ -44,22 +45,17 @@ namespace Website.Client.Components
         [Parameter]
         public Expression<Func<string>>? For { get; set; }
 
-        private async Task OnValueInput(ChangeEventArgs e)
-        {
-            var newValue = (string?)Convert.ChangeType(e.Value, typeof(string));
-            Value = newValue;
-            await ValueChanged.InvokeAsync(Value);
-            CascadedEditContext?.NotifyFieldChanged(FieldIdentifier.Create(For));
-        }
-
         public string ValidStateCss()
         {
-            if (For == null) return "border-black";
+            if (For == null)
+            {
+                InputStyles.GetBorderDefaultStyle(false);
+            }
 
             var fieldIdentifier = FieldIdentifier.Create(For);
             var isInvalid = CascadedEditContext!.GetValidationMessages(fieldIdentifier).Any();
 
-            return isInvalid ? "border-red" : "border-black";
+            return InputStyles.GetBorderDefaultStyle(isInvalid);
         }
     }
 }

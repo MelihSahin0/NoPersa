@@ -7,9 +7,9 @@ const numbersFull = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14
 const sizes = ["none","sm", "md", "lg", "xl", "2xl", "3xl", "full"]
 
 const customColors = {
-    sky: color.sky["600"],
-    skyHover: color.sky["700"],
-    skyFocus: color.sky["800"],
+    sky: color.sky["400"],
+    skyHover: color.sky["500"],
+    skyFocus: color.sky["600"],
     red: color.red["500"],
     lightRed: color.red["300"],
     green: color.green["500"],
@@ -29,12 +29,15 @@ const generateColorClasses = (colorName) => [
     `hover:bg-${colorName}`,
     `hover:border-${colorName}`,
     `hover:ring-${colorName}`,
+    `hover:text-${colorName}`,
     `focus:bg-${colorName}`,
     `focus:border-${colorName}`,
     `focus:ring-${colorName}`,
+    `focus:text-${colorName}`,
     `active:bg-${colorName}`,
     `active:border-${colorName}`,
     `active:ring-${colorName}`,
+    `active:text-${colorName}`,
 ];
 
 const generateBorderSize = (integers) => [
@@ -56,6 +59,8 @@ const generatePaddingAndMargin = (integers) => [
     `pr-${integers}`,
     `pb-${integers}`,
     `pl-${integers}`,
+    `px-${integers}`,
+    `py-${integers}`,
 ] 
 
 const generateRingClassse = (integers) => [

@@ -1,6 +1,7 @@
 ﻿@page "/customer"
 @using Website.Client.Components;
 @using Website.Client.Components.Base;
+@using Website.Client.Styles
 @using Website.Client.Validations;
 
 <EditForm Model="Customer" OnValidSubmit="@Submit">
@@ -87,7 +88,7 @@
                 </div>
             </div>
             <div>
-                <button type="submit">Send</button>
+                <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
             </div>
         </div>
     </div>

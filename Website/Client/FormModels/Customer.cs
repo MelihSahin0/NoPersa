@@ -1,9 +1,7 @@
 ﻿using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
-using System.Reflection.Emit;
 using System.Text.Json;
 using Website.Client.Exceptions;
 using Website.Client.Models;
@@ -20,7 +18,8 @@ namespace Website.Client.FormModels
 
         public required NotificationService NotificationService { get; set; }
 
-        public int Id { get; set; } = 0;
+        [Required]
+        public required int Id { get; set; }
 
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? SerialNumber { get; set; }
@@ -87,7 +86,7 @@ namespace Website.Client.FormModels
                 i++;
             }
 
-            using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("defaultAddress")}/CustomerManagment/CustomerGetDailyDelivery",
+            using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagmentService")}/CustomerManagment/GetCustomerDailyDelivery",
                                      new
                                      {
                                          ReferenceId = Id,
@@ -97,9 +96,9 @@ namespace Website.Client.FormModels
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                MonthlyDeliveries.Add(JsonSerializer.Deserialize<MonthlyDelivery>(response.Content.ToString()!, JsonSerializerOptions)!);
+                MonthlyDeliveries.Add(JsonSerializer.Deserialize<MonthlyDelivery>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!);
             }
-            else
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 MonthlyDeliveries.Add(new MonthlyDelivery()
                 {
@@ -136,6 +135,10 @@ namespace Website.Client.FormModels
                     Day30 = new DailyDelivery(),
                     Day31 = new DailyDelivery()
                 });
+            }
+            else
+            {
+                throw new Exception();
             }
 
             selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;

@@ -10,7 +10,8 @@ namespace Website.Client
 
         protected override async Task OnInitializedAsync()
         {
-            await LocalStorage.SetItemAsync("defaultAddress", "localhost:8081");
+            await LocalStorage.SetItemAsync("ManagmentService", "localhost:8081");
+            await LocalStorage.SetItemAsync("DeliveryService", "localhost:8082");
         }
     }
 }

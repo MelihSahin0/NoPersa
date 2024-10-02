@@ -14,7 +14,7 @@
         <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
             <Dropdown Title="Verwaltung"
                       Items="@(new string[] {"Artikelpreise", "Kunde erstellen", "Kunde suchen"}.AsReadOnly())"
-                      ItemsHref="@(new string[] {"", "customer", ""}.AsReadOnly())"/>
+                      ItemsHref="@(new string[] {"", "customer", ""}.AsReadOnly())" />
 
             <Dropdown Title="Gastronomie"
                       Items="@(new string[] {"Abüllen", "Essenswünsche", "Speiseplan"}.AsReadOnly())"
@@ -22,7 +22,7 @@
 
             <Dropdown Title="Lieferung"
                       Items="@(new string[] {"Ausliefern", "Boxstatus", "Lieferstatus", "Routen bearbeiten", "Reihenfolge bearbeiten"}.AsReadOnly())"
-                      ItemsHref="@(new string[] {"", "", "", "", ""}.AsReadOnly())"/>
+                      ItemsHref="@(new string[] {"", "", "", "modifyRoutes", ""}.AsReadOnly())" />
 
             <Dropdown Title="Import/Export"
                       Items="@(new string[] {"Fahrpläne exportieren", "Kunden exportieren", "Kunde importieren", "Rechnungen exportieren"}.AsReadOnly())"

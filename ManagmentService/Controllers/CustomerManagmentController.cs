@@ -23,8 +23,8 @@ namespace ManagmentService.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost("CustomerAdd", Name = "CustomerAdd")]
-        public IActionResult CustomerAdd([FromBody] DTOCustomer customer)
+        [HttpPost("AddCustomer", Name = "AddCustomer")]
+        public IActionResult AddCustomer([FromBody] DTOCustomer customer)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ManagmentService.Controllers
                 }
                 context.SaveChanges();
 
-                return Ok(mapper.Map<DTOCustomer>(dbCustomer));
+                return Ok(customer);
             }
             catch (ValidationException e)
             {
@@ -71,27 +71,40 @@ namespace ManagmentService.Controllers
             }
         }
 
-        [HttpPost("CustomerGetDailyDelivery", Name = "CustomerGetDailyDelivery")]
-        public IActionResult CustomerGetDailyDelivery([FromBody] DTOMonthOfTheYear monthOfTheYear)
+        [HttpPost("GetCustomerDailyDelivery", Name = "GetCustomerDailyDelivery")]
+        public IActionResult GetCustomerDailyDelivery([FromBody] DTOMonthOfTheYear monthOfTheYear)
         {
-            var query = context.MonthlyOverview.AsQueryable();
+            try
+            {
+                var query = context.MonthlyOverview.AsQueryable();
 
-            for (int i = 1; i <= 31; i++)
-            {
-                var propertyName = $"Day{i}";
-                query = query.Include(propertyName);
-            }
+                for (int i = 1; i <= 31; i++)
+                {
+                    var propertyName = $"Day{i}";
+                    query = query.Include(propertyName);
+                }
 
-            MonthlyOverview? monthlyOverview = query.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
-                                                                         m.Year == int.Parse(monthOfTheYear.Year!) &&
-                                                                         m.Month == monthOfTheYear.Month);
-            if (monthlyOverview == null)
-            {
-                return NotFound();
+                MonthlyOverview? monthlyOverview = query.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
+                                                                             m.Year == int.Parse(monthOfTheYear.Year!) &&
+                                                                             m.Month == monthOfTheYear.Month);
+                if (monthlyOverview == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
+                }
             }
-            else
+            catch (ValidationException e)
             {
-                return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
+                logger.LogError(e.Message);
+                return ValidationProblem(e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.Message);
+                return BadRequest("An error occurred while processing your request.");
             }
         }
     }

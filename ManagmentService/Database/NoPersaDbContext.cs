@@ -219,6 +219,12 @@ namespace ManagmentService.Database
                 .WithOne()
                 .HasForeignKey<MonthlyOverview>(m => m.Day31Id)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Customer>()
+                .HasOne(c => c.Route)
+                .WithMany(r => r.Customers)
+                .HasForeignKey(c => c.RouteId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

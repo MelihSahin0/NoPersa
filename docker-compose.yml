@@ -11,6 +11,18 @@ services:
     restart: always
     depends_on:
       - NoPersaPostgresDb
+  deliveryservice:
+    image: ${DOCKER_REGISTRY-}deliveryservice
+    container_name: DeliveryService
+    build:
+      context: .
+      dockerfile: DeliveryService/Dockerfile
+    ports:
+      - "8082:8082"
+    pull_policy: always
+    restart: always
+    depends_on:
+      - NoPersaPostgresDb
 
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver

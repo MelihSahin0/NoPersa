@@ -27,7 +27,7 @@ namespace Website.Client.Pages
         [Inject]
         public required NotificationService NotificationService { get; set; }
 
-        private Customer? Customer { get; set; }
+        public required Customer Customer { get; set; }
 
         protected override void OnInitialized()
         {
@@ -39,6 +39,7 @@ namespace Website.Client.Pages
                 JsonSerializerOptions = JsonSerializerOptions,
                 HttpClient = HttpClient,
                 NotificationService = NotificationService,
+                Id = 0,
                 SerialNumber = string.Empty,
                 Name = string.Empty,
                 Title = string.Empty,
@@ -102,7 +103,7 @@ namespace Website.Client.Pages
 
         private async Task Submit(EditContext editContext)
         {
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("defaultAddress")}/CustomerManagment/CustomerAdd", Customer, JsonSerializerOptions);
+            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagmentService")}/CustomerManagment/AddCustomer", Customer, JsonSerializerOptions);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
