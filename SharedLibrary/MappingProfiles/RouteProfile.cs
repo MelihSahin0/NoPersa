@@ -24,6 +24,17 @@ namespace SharedLibrary.MappingProfiles
                     Name = c.Name,
                     Position = c.Position
                 }).ToArray() : null));
+
+            CreateMap<Customer, DTOCustomerRoute>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
+
+            CreateMap<DTOCustomerRoute, Customer>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
+
         }
     }
 }

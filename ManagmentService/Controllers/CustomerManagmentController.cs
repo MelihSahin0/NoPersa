@@ -32,6 +32,10 @@ namespace ManagmentService.Controllers
 
                 if (customer.Id == 0)
                 {
+                    if (dbCustomer.RouteId != null)
+                    {
+                        dbCustomer.Position = context.Customer.Where(x => x.RouteId == dbCustomer.RouteId).Count();
+                    }
                     context.Customer.Add(dbCustomer);
                 }
                 else

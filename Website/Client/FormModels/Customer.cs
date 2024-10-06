@@ -10,13 +10,21 @@ namespace Website.Client.FormModels
 {
     public class Customer
     {
-        public required ILocalStorageService LocalStorage { get; set; }
+        public ILocalStorageService LocalStorage { get; init; }
 
-        public required JsonSerializerOptions JsonSerializerOptions { get; set; }
+        public JsonSerializerOptions JsonSerializerOptions { get; init; }
 
-        public required HttpClient HttpClient { get; set; }
+        public HttpClient HttpClient { get; init; }
 
-        public required NotificationService NotificationService { get; set; }
+        public NotificationService NotificationService { get; init; }
+
+        public Customer(ILocalStorageService localStorage, JsonSerializerOptions jsonSerializerOptions, HttpClient httpClient, NotificationService notificationService)
+        {
+            LocalStorage = localStorage;
+            JsonSerializerOptions = jsonSerializerOptions;
+            HttpClient = httpClient;
+            NotificationService = notificationService;
+        }
 
         [Required]
         public required int Id { get; set; }
@@ -70,6 +78,11 @@ namespace Website.Client.FormModels
         [ValidateComplexType]
         [Required(ErrorMessage = "Monthly Delivery is required")]
         public required List<MonthlyDelivery> MonthlyDeliveries { get; set; }
+
+        [IntType(min: 0)]
+        public int? RouteId { get; set; }
+
+        public List<Models.Route>? Routes { get; set; }
 
         private int selectedMonthlyDeliveries = 0;
         public async Task OnMonthYearSelected()
@@ -138,7 +151,7 @@ namespace Website.Client.FormModels
             }
             else
             {
-                throw new Exception();
+                throw new ServiceNotReachableException();
             }
 
             selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;

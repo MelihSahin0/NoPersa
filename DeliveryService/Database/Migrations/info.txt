@@ -1,3 +1,0 @@
-Packet Manager: Microsoft.EntityFrameworkCore.Design  
-
-dotnet ef migrations add NameOfYourMigration --output-dir Database\Migrations

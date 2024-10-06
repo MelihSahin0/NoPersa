@@ -33,12 +33,8 @@ namespace Website.Client.Pages
         {
             DateTime dateTime = DateTime.Now;
 
-            Customer ??= new()
+            Customer ??= new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
-                LocalStorage = LocalStorage,
-                JsonSerializerOptions = JsonSerializerOptions,
-                HttpClient = HttpClient,
-                NotificationService = NotificationService,
                 Id = 0,
                 SerialNumber = string.Empty,
                 Name = string.Empty,
@@ -97,8 +93,31 @@ namespace Website.Client.Pages
                 ],
                 Workdays = new Weekdays(),
                 Holidays = new Weekdays(),
-                ContactInformation = string.Empty
+                ContactInformation = string.Empty,
+                RouteId = null,
+                Routes = []
             };
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            try
+            {
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutes")!;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    Customer.Routes = (JsonSerializer.Deserialize<FormModels.Route>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!).Routes;
+                }
+                else
+                {
+                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                }
+            }
+            catch
+            {
+                NotificationService.SetError("Server is not reachable.");
+            }
         }
 
         private async Task Submit(EditContext editContext)

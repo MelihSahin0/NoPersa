@@ -66,16 +66,19 @@ namespace Website.Client.Components
             }
         }
 
+        private bool IsPopupVisible = false;
+        private int? toDeletePosition;
         private void DelteRoute(int position)
         {
-            Routes.Remove(Routes.FirstOrDefault(r => r.Position == position)!);
+            toDeletePosition = position;
 
-            int i = 0;
-            foreach (var route in Routes.OrderBy(x => x.Position).ToList())
+            if (Routes[position].CustomersRoute.Count > 0)
             {
-                route.Position = i++;
-
-                route.IsDragOver = false;
+                IsPopupVisible = true;
+            }
+            else
+            {
+                DeleteRouteConfirmed();
             }
         }
 
@@ -97,9 +100,32 @@ namespace Website.Client.Components
             return InputStyles.GetBorderDefaultStyle(isInvalid);
         }
 
-        public void FilterChanged()
+        private void HandlePopupClose(bool result)
         {
+            IsPopupVisible = false;
+            
+            if (result)
+            {
+                DeleteRouteConfirmed();  
+            }
+        }
 
+        private void DeleteRouteConfirmed()
+        {
+            if (toDeletePosition != null)
+            {
+                Routes.Remove(Routes.FirstOrDefault(r => r.Position == toDeletePosition)!);
+
+                int i = 0;
+                foreach (var route in Routes.OrderBy(x => x.Position).ToList())
+                {
+                    route.Position = i++;
+
+                    route.IsDragOver = false;
+                }
+
+                toDeletePosition = null;
+            }
         }
     }
 }

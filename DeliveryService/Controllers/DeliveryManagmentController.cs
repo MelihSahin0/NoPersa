@@ -3,7 +3,9 @@ using DeliveryService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs;
+using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 using Route = SharedLibrary.Models.Route;
 
 namespace DeliveryService.Controllers
@@ -23,8 +25,8 @@ namespace DeliveryService.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost("AddRoutes", Name = "AddRoutes")]
-        public IActionResult AddRoutes([FromBody] DTORoutes routes)
+        [HttpPost("UpdateRoutes", Name = "UpdateRoutes")]
+        public IActionResult UpdateRoutes([FromBody] DTORoutes routes)
         {
             try
             {
@@ -44,10 +46,8 @@ namespace DeliveryService.Controllers
                         oldRoutes.Add(route);
                     }
                 }
-                context.Routes.AddRange(newRoutes);
 
                 var existingRoutes = context.Routes.Where(r => oldRoutes.Select(or => or.Id).Contains(r.Id)).ToList();
-
                 foreach (var existingRoute in existingRoutes)
                 {
                     var updatedRoute = oldRoutes.FirstOrDefault(or => or.Id == existingRoute.Id);
@@ -58,8 +58,48 @@ namespace DeliveryService.Controllers
                     }
                 }
 
+                var notFoundRoutes = context.Routes.Where(er => !oldRoutes.Select(or => or.Id).Contains(er.Id)).Include(r => r.Customers).ToList();
+                foreach (var obsoleteRoute in notFoundRoutes)
+                {
+                    foreach (Customer customer in obsoleteRoute.Customers)
+                    {
+                        customer.Position = null;
+                    }
+                    context.Routes.Remove(obsoleteRoute);
+                }
+
+                context.Routes.AddRange(newRoutes);
+
                 context.SaveChanges();
                 return Ok(routes);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e.Message);
+                return ValidationProblem(e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e.Message);
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpGet("GetRoutesDetails", Name = "GetRoutesDetails")]
+        public IActionResult GetRoutesDetails()
+        {
+            try
+            {
+                DTORoutes dTORoutes = new();
+                List<DTORoute> routes = [];
+
+                foreach (Route route in context.Routes.Include(r => r.Customers))
+                {
+                    routes.Add(mapper.Map<DTORoute>(route));
+                }
+                dTORoutes.Routes = [.. routes];
+
+                return Ok(dTORoutes);
             }
             catch (ValidationException e)
             {
@@ -80,6 +120,7 @@ namespace DeliveryService.Controllers
             {
                 DTORoutes dTORoutes = new();
                 List<DTORoute> routes = [];
+
                 foreach (Route route in context.Routes)
                 {
                     routes.Add(mapper.Map<DTORoute>(route));

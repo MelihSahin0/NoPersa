@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Extensions.Options;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
 
@@ -17,7 +16,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Article, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Article) ? (int?)null : int.Parse(src.Article)))
                 .ForMember(dest => dest.DefaultPrice, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.DefaultPrice) ? (int?)null : int.Parse(src.DefaultPrice)))
                 .ForMember(dest => dest.DefaultNumberOfBoxes, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.DefaultNumberOfBoxes) ? (int?)null : int.Parse(src.DefaultNumberOfBoxes)))
-                .ForMember(dest => dest.MonthlyOverviews, opt => opt.MapFrom(src => src.MonthlyDeliveries));
+                .ForMember(dest => dest.MonthlyOverviews, opt => opt.MapFrom(src => src.MonthlyDeliveries))
+                .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId ?? (int?)null));
 
             CreateMap<Customer, DTOCustomer>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
@@ -26,7 +26,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Article, opt => opt.MapFrom(src => src.Article))
                 .ForMember(dest => dest.DefaultPrice, opt => opt.MapFrom(src => src.DefaultPrice))
                 .ForMember(dest => dest.DefaultNumberOfBoxes, opt => opt.MapFrom(src => src.DefaultNumberOfBoxes))
-                .ForMember(dest => dest.MonthlyDeliveries, opt => opt.MapFrom(src => src.MonthlyOverviews));
+                .ForMember(dest => dest.MonthlyDeliveries, opt => opt.MapFrom(src => src.MonthlyOverviews))
+                .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId ?? (int?)null));
         }
     }
 }

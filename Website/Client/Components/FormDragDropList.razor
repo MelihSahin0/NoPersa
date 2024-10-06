@@ -2,6 +2,12 @@
 @using Website.Client.Styles
 
 <div class="@Class">
+    <Popup IsVisible="@IsPopupVisible"
+           Titel="Warning"
+           FalseButton="Cancel"
+           TrueButton="Proceed"
+           Message="This route still has customers left. All customers will be archived after the route is deleted. Do you whish to proceed?"
+           OnClose="HandlePopupClose"/>
     <div class="w-full">
         @if (DisplayFilter)
         {

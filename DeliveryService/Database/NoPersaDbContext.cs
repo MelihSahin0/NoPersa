@@ -13,6 +13,9 @@ namespace DeliveryService.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Route>()
+                      .ToTable("Route")
+                      .HasKey(r => r.Id);
         }
     }
 }

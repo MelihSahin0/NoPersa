@@ -34,7 +34,7 @@ namespace Website.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutes")!;
+            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesDetails")!;
            
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
@@ -42,13 +42,13 @@ namespace Website.Client.Pages
             }
             else
             {
-                throw new Exception();
+                throw new ServiceNotReachableException();
             }
         }
 
         private async Task Submit(EditContext editContext)
         {
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/AddRoutes", Routes, JsonSerializerOptions);
+            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/UpdateRoutes", Routes, JsonSerializerOptions);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

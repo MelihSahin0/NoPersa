@@ -224,7 +224,7 @@ namespace ManagmentService.Database
                 .HasOne(c => c.Route)
                 .WithMany(r => r.Customers)
                 .HasForeignKey(c => c.RouteId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
