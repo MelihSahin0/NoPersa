@@ -95,7 +95,7 @@ namespace Website.Client.Pages
                 Holidays = new Weekdays(),
                 ContactInformation = string.Empty,
                 RouteId = null,
-                Routes = []
+                RouteDetails = []
             };
         }
 
@@ -103,11 +103,11 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutes")!;
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesOverview")!;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    Customer.Routes = (JsonSerializer.Deserialize<FormModels.Route>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!).Routes;
+                    Customer.RouteDetails = [.. JsonSerializer.Deserialize<Route>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteOverview.OrderBy(x => x.Name)];
                 }
                 else
                 {

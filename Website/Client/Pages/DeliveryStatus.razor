@@ -1,0 +1,22 @@
+﻿@page "/deliveryStatus"
+@using Website.Client.Components
+@using Website.Client.Models
+@using Website.Client.Styles
+
+<div class="max-w-full">
+    <div class="flex flex-row max-w-full justify-between mb-2 border-black border-b-2">
+        <Tab @bind-Value="TabIndex" Items="@DeliveryStats.RouteDetails.Select(route => route.Name).ToList()" />
+        <a>TODAY</a>
+    </div>
+    <div class="flex flex-row max-w-full">
+        @if (DeliveryStats.RouteDetails.Any()) 
+        {        
+            @foreach (CustomersRoute customerRoutes in DeliveryStats.RouteDetails[TabIndex].CustomersRoute.OrderBy(AbandonedMutexException => AbandonedMutexException.Position).ToList())
+            {
+                <div class="bg-gray-700 m-2">
+                    <h1 class="@($"{Scaling.GetTextScaling()} {(customerRoutes.ToDeliver ? "bg-lightGreen" : "bg-lightRed")} text-white p-1 hover:bg-skyHover")">@customerRoutes.Name</h1>
+                </div>
+            }
+        }
+    </div>
+</div>

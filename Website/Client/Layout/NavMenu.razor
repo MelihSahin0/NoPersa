@@ -8,7 +8,7 @@
         <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse select-none">
             <button type="button" class="flex items-center">
                 <span class="text-xl">User</span>
-                <span class="text-xl mx-2 bg-sky rounded-full md:me-0 focus:ring-5 w-7 focus:ring-gray-300">U</span>
+                <span class="text-xl mx-2 bg-sky rounded-full md:me-0  w-7">U</span>
             </button>
         </div>
         <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
@@ -22,7 +22,7 @@
 
             <Dropdown Title="Lieferung"
                       Items="@(new string[] {"Ausliefern", "Boxstatus", "Lieferstatus", "Routen bearbeiten", "Reihenfolge bearbeiten"}.AsReadOnly())"
-                      ItemsHref="@(new string[] {"", "", "", "modifyRoutes", ""}.AsReadOnly())" />
+                      ItemsHref="@(new string[] {"", "", "deliveryStatus", "modifyRoutes", ""}.AsReadOnly())" />
 
             <Dropdown Title="Import/Export"
                       Items="@(new string[] {"Fahrpläne exportieren", "Kunden exportieren", "Kunde importieren", "Rechnungen exportieren"}.AsReadOnly())"

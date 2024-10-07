@@ -38,13 +38,13 @@ namespace Website.Client.Components
         public string StartFilter { get; set; } = string.Empty;
 
         [Parameter]
-        public required List<Route> Routes { get; set; }
+        public required List<RouteOverview> Routes { get; set; }
 
         [Parameter]
-        public EventCallback<List<Route>> RoutesChanged { get; set; }
+        public EventCallback<List<RouteOverview>> RoutesChanged { get; set; }
 
-        private Route? draggedItem;
-        private void HandleDrop(Route landingModel)
+        private RouteOverview? draggedItem;
+        private void HandleDrop(RouteOverview landingModel)
         {
             if (draggedItem is null)
             {
@@ -72,7 +72,7 @@ namespace Website.Client.Components
         {
             toDeletePosition = position;
 
-            if (Routes[position].CustomersRoute.Count > 0)
+            if (Routes[position].NumberOfCustomers > 0)
             {
                 IsPopupVisible = true;
             }
@@ -84,7 +84,7 @@ namespace Website.Client.Components
 
         private void AddRoute()
         {
-            Routes.Add(new Route() { Id = 0, Position = Routes.Count, Name = "", CustomersRoute = [] });
+            Routes.Add(new RouteOverview() { Id = 0, Position = Routes.Count, Name = "", NumberOfCustomers = 0 });
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)

@@ -8,33 +8,26 @@ namespace SharedLibrary.MappingProfiles
     {
         public RouteProfile() 
         {
-            CreateMap<DTORoute, Route>()
+            CreateMap<DTORouteOverview, Route>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id == -1 ? 0 : src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Name) ? null : src.Name))
-                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position.HasValue ? src.Position.Value : (int?)null)) 
-                .ForMember(dest => dest.Customers, opt => opt.MapFrom(src => src.CustomersRoute));
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position ?? (int?)null));
 
-            CreateMap<Route, DTORoute>()
+            CreateMap<Route, DTORouteOverview>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position))
-                .ForMember(dest => dest.CustomersRoute, opt => opt.MapFrom(src => src.Customers != null ? src.Customers.Select(c => new DTOCustomerRoute
-                { 
-                    Id = c.Id,
-                    Name = c.Name,
-                    Position = c.Position
-                }).ToArray() : null));
+                .ForMember(dest => dest.NumberOfCustomers, opt => opt.MapFrom(src => src.Customers.Count()));
+
+            CreateMap<Route, DTORouteDetails>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
 
             CreateMap<Customer, DTOCustomerRoute>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
-
-            CreateMap<DTOCustomerRoute, Customer>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
-
         }
     }
 }

@@ -29,12 +29,12 @@ namespace Website.Client.Pages
 
         protected override void OnInitialized()
         {
-            Routes = new Route() { Routes = [] };
+            Routes = new Route() { RouteOverview = [] };
         }
 
         protected override async Task OnInitializedAsync()
         {
-            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesDetails")!;
+            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesOverview")!;
            
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

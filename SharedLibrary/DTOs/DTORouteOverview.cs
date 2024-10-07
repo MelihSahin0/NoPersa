@@ -1,7 +1,6 @@
-﻿
 namespace SharedLibrary.DTOs
 {
-    public class DTORoute
+    public class DTORouteOverview
     {
         public int Id { get; set; }
 
@@ -9,6 +8,6 @@ namespace SharedLibrary.DTOs
 
         public string? Name { get; set; }
 
-        public DTOCustomerRoute[]? CustomersRoute { get; set; }
+        public int? NumberOfCustomers { get; set; }
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata.Ecma335;
 using Route = SharedLibrary.Models.Route;
 
 namespace DeliveryService.Controllers
@@ -32,9 +31,9 @@ namespace DeliveryService.Controllers
             {
                 List<Route> newRoutes = [];
                 List<Route> oldRoutes = [];
-                for (int i = 0; i < routes.Routes?.Length; i++)
+                for (int i = 0; i < routes.RouteOverview?.Length; i++)
                 {
-                    Route route = mapper.Map<Route>(routes.Routes[i]);
+                    Route route = mapper.Map<Route>(routes.RouteOverview[i]);
                     route.Customers = [];
 
                     if (route.Id == 0)
@@ -85,19 +84,19 @@ namespace DeliveryService.Controllers
             }
         }
 
-        [HttpGet("GetRoutesDetails", Name = "GetRoutesDetails")]
-        public IActionResult GetRoutesDetails()
+        [HttpGet("GetRoutesOverview", Name = "GetRoutesOverview")]
+        public IActionResult GetRoutesOverview()
         {
             try
             {
                 DTORoutes dTORoutes = new();
-                List<DTORoute> routes = [];
+                List<DTORouteOverview> routes = [];
 
                 foreach (Route route in context.Routes.Include(r => r.Customers))
                 {
-                    routes.Add(mapper.Map<DTORoute>(route));
+                    routes.Add(mapper.Map<DTORouteOverview>(route));
                 }
-                dTORoutes.Routes = [.. routes];
+                dTORoutes.RouteOverview = [.. routes];
 
                 return Ok(dTORoutes);
             }
@@ -113,21 +112,45 @@ namespace DeliveryService.Controllers
             }
         }
 
-        [HttpGet("GetRoutes", Name = "GetRoutes")]
-        public IActionResult GetRoutes()
+        [HttpPost("GetRoutesDetails", Name = "GetRoutesDetails")]
+        public IActionResult GetRoutesDetails([FromBody] DTOSelectedDay dTOSelectedDay)
         {
             try
             {
-                DTORoutes dTORoutes = new();
-                List<DTORoute> routes = [];
+                DTODeliveryStatus dTODeliveryStatus = new();
+                List<DTORouteDetails> routes = [];
 
-                foreach (Route route in context.Routes)
+                foreach (Route route in context.Routes.Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.Holidays))
                 {
-                    routes.Add(mapper.Map<DTORoute>(route));
-                }
-                dTORoutes.Routes = [.. routes];
+                    List<DTOCustomerRoute> customerRoutes = [];
+                    foreach (Customer customer in route.Customers ?? [])
+                    {
+                        DTOCustomerRoute dTOCustomerRoutes = mapper.Map<DTOCustomerRoute>(customer);
 
-                return Ok(dTORoutes);
+                        MonthlyOverview? foundOverview = customer.MonthlyOverviews.FirstOrDefault(x =>
+                                x.Year == int.Parse(dTOSelectedDay.Year) && x.Month == dTOSelectedDay.Month);
+
+                        if (foundOverview != null)
+                        {
+                            int? dayValue = GetDayValue(foundOverview, dTOSelectedDay.Day);
+                            dTOCustomerRoutes.ToDeliver = dayValue > 0 || (dayValue == null && SetDeliveryToTrueOrFalse(customer, dTOSelectedDay));
+                        }
+                        else
+                        {
+                            dTOCustomerRoutes.ToDeliver = SetDeliveryToTrueOrFalse(customer, dTOSelectedDay);
+                        }
+
+                        customerRoutes.Add(dTOCustomerRoutes);
+                    }
+                    DTORouteDetails dTORouteDetails = mapper.Map<DTORouteDetails>(route);
+                    dTORouteDetails.CustomersRoute = [..customerRoutes];
+                    routes.Add(dTORouteDetails);
+                }
+
+                dTODeliveryStatus.RouteDetails = [.. routes];
+
+                return Ok(dTODeliveryStatus);
             }
             catch (ValidationException e)
             {
@@ -138,6 +161,47 @@ namespace DeliveryService.Controllers
             {
                 logger.LogError(e.Message);
                 return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        private int? GetDayValue(MonthlyOverview monthlyData, int day)
+        {
+            if (day < 1 || day > 31)
+            {
+                throw new ArgumentOutOfRangeException(nameof(day), "Day must be between 1 and 31.");
+            }
+
+            string propertyName = $"Day{day}";
+            var propertyInfo = typeof(MonthlyOverview).GetProperty(propertyName);
+
+            if (propertyInfo == null || !propertyInfo.CanRead)
+            {
+                throw new InvalidOperationException($"Property '{propertyName}' does not exist or cannot be read.");
+            }
+
+            return (int?)propertyInfo.GetValue(monthlyData);
+        }
+
+        private bool SetDeliveryToTrueOrFalse(Customer customer, DTOSelectedDay dTOSelectedDay)
+        {
+            DateTime date = new DateTime(int.Parse(dTOSelectedDay.Year), dTOSelectedDay.Month, dTOSelectedDay.Day);
+            string propertyName = date.DayOfWeek.ToString();
+
+            //Call if date is holiday
+            if (true) //No Holiady
+            {
+                var propertyInfo = typeof(Weekdays).GetProperty(propertyName);
+
+                if (propertyInfo == null || !propertyInfo.CanRead)
+                {
+                    throw new InvalidOperationException($"Property '{propertyName}' does not exist or cannot be read.");
+                }
+
+                return (bool)(propertyInfo.GetValue(customer.Workdays) ?? true);  
+            }
+            else
+            {
+                return false;   
             }
         }
     }

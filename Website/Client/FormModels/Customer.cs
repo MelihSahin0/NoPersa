@@ -82,7 +82,7 @@ namespace Website.Client.FormModels
         [IntType(min: 0)]
         public int? RouteId { get; set; }
 
-        public List<Models.Route>? Routes { get; set; }
+        public List<RouteOverview>? RouteDetails { get; set; }
 
         private int selectedMonthlyDeliveries = 0;
         public async Task OnMonthYearSelected()

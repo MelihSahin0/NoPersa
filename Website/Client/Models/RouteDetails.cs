@@ -2,7 +2,7 @@
 
 namespace Website.Client.Models
 {
-    public class Route
+    public class RouteDetails
     {
         [Required]
         public required int Id { get; set; }
@@ -10,14 +10,11 @@ namespace Website.Client.Models
         [Required]
         public required int Position { get; set; }
 
-        [Required(ErrorMessage = "Name is required.")]
-        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
+        [Required]
         public required string Name { get; set; }
 
         [Required]
         public required List<CustomersRoute> CustomersRoute { get; set; }
-
-        public bool IsDragOver { get; set; }
     }
 
     public class CustomersRoute
@@ -31,6 +28,7 @@ namespace Website.Client.Models
         [Required]
         public required string Name { get; init; }
 
-        public bool IsDragOver { get; set; }
+        [Required]
+        public required bool ToDeliver { get; set; }
     }
 }

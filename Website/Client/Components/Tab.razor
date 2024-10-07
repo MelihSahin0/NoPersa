@@ -1,0 +1,10 @@
+﻿@using Website.Client.Styles
+
+<div class="flex flex-row flex-wrap max-w-full">
+    @for (int i = 0; i < Items.Count; i++)
+    {
+        int index = i;
+        <button class="@($"text-xl -mb-0.5 mx-2 z-10 relative font-semibold rounded-tr-md rounded-tl-md text-center select-none hover:text-skyHover hover:border-skyHover {(index == Value ? "border-b-2 border-sky text-sky" : "border-black text-black")}")"
+                @onclick="() => OnButtonClick(index)">@Items[index]</button>
+    }
+</div>

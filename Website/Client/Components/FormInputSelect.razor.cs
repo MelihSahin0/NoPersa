@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using Website.Client.Models;
 
@@ -17,7 +16,7 @@ namespace Website.Client.Components
         public int? Value { get; set; }
 
         [Parameter]
-        public List<Route>? List { get; set; }
+        public List<RouteOverview>? List { get; set; }
 
         [Parameter]
         public EventCallback<int?> ValueChanged { get; set; }

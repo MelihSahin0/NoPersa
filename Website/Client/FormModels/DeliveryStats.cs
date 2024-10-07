@@ -3,10 +3,10 @@ using Website.Client.Models;
 
 namespace Website.Client.FormModels
 {
-    public class Route
+    public class DeliveryStats
     {
         [ValidateComplexType]
         [Required]
-        public required List<RouteOverview> RouteOverview { get; set; }
+        public required List<RouteDetails> RouteDetails { get; set; }
     }
 }

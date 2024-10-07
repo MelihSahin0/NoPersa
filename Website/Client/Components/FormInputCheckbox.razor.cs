@@ -7,9 +7,6 @@ namespace Website.Client.Components
     {
         private readonly string Id = Guid.NewGuid().ToString();
 
-        [CascadingParameter]
-        private EditContext? CascadedEditContext { get; set; }
-
         [Parameter]
         public required string Label { get; init; }
 

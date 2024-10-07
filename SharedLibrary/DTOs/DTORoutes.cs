@@ -2,6 +2,6 @@
 {
     public class DTORoutes
     {
-        public DTORoute[]? Routes { get; set; }
+        public DTORouteOverview[]? RouteOverview { get; set; }
     }
 }

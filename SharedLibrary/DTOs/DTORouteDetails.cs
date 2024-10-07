@@ -1,14 +1,14 @@
 ﻿
 namespace SharedLibrary.DTOs
 {
-    public class DTOCustomerRoute
+    public class DTORouteDetails
     {
-        public int Id { get; init; }
+        public int Id { get; set; }
 
         public int? Position { get; set; }
 
         public string? Name { get; set; }
 
-        public bool? ToDeliver { get; set; }
+        public DTOCustomerRoute[]? CustomersRoute { get; set; }
     }
 }
