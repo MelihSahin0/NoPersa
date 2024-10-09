@@ -1,4 +1,6 @@
 ﻿
+using SharedLibrary.DTOs.GetDTOs;
+
 namespace SharedLibrary.DTOs
 {
     public class DTOMonthlyDelivery

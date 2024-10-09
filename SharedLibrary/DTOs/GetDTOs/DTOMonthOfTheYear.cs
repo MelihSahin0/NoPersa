@@ -1,5 +1,4 @@
-﻿
-namespace SharedLibrary.DTOs
+﻿namespace SharedLibrary.DTOs.GetDTOs
 {
     public class DTOMonthOfTheYear
     {

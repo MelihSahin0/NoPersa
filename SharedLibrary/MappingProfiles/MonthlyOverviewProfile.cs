@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 
 namespace SharedLibrary.MappingProfiles

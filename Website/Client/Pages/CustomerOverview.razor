@@ -46,10 +46,11 @@
                     @for (int i = 1; i < 31 + 1; i++)
                     {
                         var dailyDelivery = Customer.MonthlyDeliveries[Customer.selectedMonthlyDeliveries].DailyDeliveries.First(d => d.DayOfMonth == i);
+                        Console.WriteLine(Customer.ModifyMonthlyDelivery);
                         <div class="grid grid-cols-5 gap-4 mt-1">
                             <a class="text-center col-span-1 select-none">@i</a>
-                            <FormTextInput Class="col-span-2" TextOrientation="text-center" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@Customer.DefaultPrice" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
-                            <FormTextInput Class="col-span-2" TextOrientation="text-center" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@Customer.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                            <FormTextInput Class="col-span-2" TextOrientation="text-center" IsDisabled="@(!Customer.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@Customer.DefaultPrice" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
+                            <FormTextInput Class="col-span-2" TextOrientation="text-center" IsDisabled="@(!Customer.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@Customer.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
                         </div>
                     }
                 </div>
@@ -88,7 +89,7 @@
                     </div>
                     <div>
                         <p class="font-semibold">Special:</p>
-                        <div class="flex justify-between">
+                        <div class="flex justify-left space-x-2">
                             <FormInputRadio Label1="Temporary no delivery" Label2="Temporary delivery" @bind-Value1="Customer.TemporaryNoDelivery" @bind-Value2="Customer.TemporaryDelivery" />
                         </div>
                     </div>

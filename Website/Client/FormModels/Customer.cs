@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using SharedLibrary.Util;
 using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
@@ -6,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Website.Client.Exceptions;
 using Website.Client.Models;
+using Website.Client.Services;
 
 namespace Website.Client.FormModels
 {
@@ -89,6 +91,9 @@ namespace Website.Client.FormModels
         [ValidateComplexType]
         [Required(ErrorMessage = "Monthly Delivery is required")]
         public required List<MonthlyDelivery> MonthlyDeliveries { get; set; }
+
+        [JsonIgnore]
+        public bool ModifyMonthlyDelivery => DateTimeCalc.MonthDifferenceMax1(DateTime.Today.Year, MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Year, DateTime.Today.Month, (int)MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Month);
 
         [IntType(min: 0)]
         public int? RouteId { get; set; }

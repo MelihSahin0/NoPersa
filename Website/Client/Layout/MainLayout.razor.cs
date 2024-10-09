@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Website.Client.Exceptions;
+using Website.Client.Services;
 
 namespace Website.Client.Layout
 {

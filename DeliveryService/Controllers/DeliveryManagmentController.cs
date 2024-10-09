@@ -2,8 +2,8 @@
 using DeliveryService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrary;
 using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
 using Route = SharedLibrary.Models.Route;
@@ -28,6 +28,8 @@ namespace DeliveryService.Controllers
         [HttpPost("UpdateRoutes", Name = "UpdateRoutes")]
         public IActionResult UpdateRoutes([FromBody] DTORoutes routes)
         {
+            using var transaction = context.Database.BeginTransaction();
+
             try
             {
                 List<Route> newRoutes = [];
@@ -71,15 +73,19 @@ namespace DeliveryService.Controllers
                 context.Routes.AddRange(newRoutes);
 
                 context.SaveChanges();
+                transaction.Commit();
+
                 return Ok(routes);
             }
             catch (ValidationException e)
             {
+                transaction.Rollback();
                 logger.LogError(e.Message);
                 return ValidationProblem(e.Message);
             }
             catch (Exception e)
             {
+                transaction.Rollback();
                 logger.LogError(e.Message);
                 return BadRequest("An error occurred while processing your request.");
             }
@@ -173,6 +179,15 @@ namespace DeliveryService.Controllers
         {
             DateTime date = new(dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
             string propertyName = date.DayOfWeek.ToString();
+
+            if (customer.TemporaryDelivery)
+            {
+                return true;
+            }
+            if (customer.TemporaryNoDelivery)
+            {
+                return false;
+            }
 
             //Call if date is holiday
             if (true) //No Holiady

@@ -10,6 +10,7 @@
     <TextInput id="@Id"
                class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation}")"
                Placeholder="@Placeholder"
+               IsDisabled="@IsDisabled"
                Value="@Value"
                ValueChanged="@ValueChanged"
                ValueExpression="@ValueExpression"

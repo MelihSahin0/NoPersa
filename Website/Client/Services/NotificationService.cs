@@ -1,4 +1,4 @@
-﻿namespace Website.Client.Exceptions
+﻿namespace Website.Client.Services
 {
     public class NotificationService
     {

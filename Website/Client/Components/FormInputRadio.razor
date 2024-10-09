@@ -2,17 +2,29 @@
 @using Website.Client.Validations;
 @using Website.Client.Styles;
 
-<div class="flex flex-row">
-    <div class="flex flex-col">
-        <label for="@Id1" class="@Scaling.GetTextScaling() text-center select-none">@Label1</label>
-        <InputCheckbox id="@Id1" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} rounded-full")"
-                       @bind-Value="Value1"
-                       @oninput="(e) => OnValueChanged(e, 1)" />
+<div class="flex flex-col">
+    <label for="@Id1" class="@Scaling.GetTextScaling() text-center select-none">@Label1</label>
+    <div class="flex items-center justify-center relative w-full">
+        <InputCheckbox id="@Id1" class="absolute opacity-0 cursor-pointer"
+                        @bind-Value="Value1"
+                        @oninput="(e) => OnValueChanged(e, 1)" />
+        <span class="@($"{Scaling.GetTextScaling()} {(Value1 ? "bg-blue ring-blue hover:bg-blueHover hover:ring-blueHover" : "bg-white ring-gray-400 hover:ring-gray-500")} w-3 h-3 ring-1 rounded-full flex items-center justify-center cursor-pointer transition duration-200 ease-in-out")">
+            <svg class="@($"{(Value1 ? "" : "hidden")} w-3 h-3 text-white")" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </span>
     </div>
-    <div class="flex flex-col">
-        <label for="@Id2" class="@Scaling.GetTextScaling() text-center select-none">@Label2</label>
-        <InputCheckbox id="@Id2" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} rounded-full")"
-                       @bind-Value="Value2"
-                       @oninput="(e) => OnValueChanged(e, 2)" />
+</div>
+<div class="flex flex-col">
+    <label for="@Id2" class="@Scaling.GetTextScaling() text-center select-none">@Label2</label>
+    <div class="flex items-center justify-center relative w-full">
+        <InputCheckbox id="@Id2" class="absolute opacity-0 cursor-pointer"
+                        @bind-Value="Value2"
+                        @oninput="(e) => OnValueChanged(e, 2)" />
+        <span class="@($"{Scaling.GetTextScaling()} {(Value2 ? "bg-blue ring-blue hover:bg-blueHover hover:ring-blueHover" : "bg-white ring-gray-400 hover:ring-gray-500")} w-3 h-3 ring-1 rounded-full flex items-center justify-center cursor-pointer transition duration-200 ease-in-out")">
+            <svg class="@($"{(Value2 ? "" : "hidden")} w-3 h-3 text-white")" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </span>
     </div>
 </div>

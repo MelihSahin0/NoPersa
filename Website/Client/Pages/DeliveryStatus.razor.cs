@@ -1,8 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
-using Website.Client.Exceptions;
 using Website.Client.FormModels;
+using Website.Client.Services;
 
 namespace Website.Client.Pages
 {
@@ -18,10 +18,17 @@ namespace Website.Client.Pages
         public required HttpClient HttpClient { get; set; }
 
         [Inject]
+        public required NavigationManager NavigationManager { get; set; }
+
+        [Inject]
         public required NotificationService NotificationService { get; set; }
+
+        [Inject]
+        public required NavigationContainer NavigationContainer { get; set; }
 
         public required DeliveryStats DeliveryStats { get; set; }
 
+        public required int TabIndex { get; set; }
         protected override void OnInitialized()
         {
             DateTime dateTime = DateTime.Now;
@@ -40,6 +47,10 @@ namespace Website.Client.Pages
             await DeliveryStats.OnDayMonthYearSelected();
         }
 
-        public required int TabIndex { get; set; }
+        private void OpenCustomerOverview(int customerId)
+        {
+            NavigationContainer.CustomerId = customerId;
+            NavigationManager.NavigateTo("/customer");
+        }
     }
 }

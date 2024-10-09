@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Enums;
-using Website.Client.Exceptions;
 using Website.Client.FormModels;
 using Website.Client.Models;
+using Website.Client.Services;
 
 namespace Website.Client.Pages
 {
@@ -26,6 +26,9 @@ namespace Website.Client.Pages
 
         [Inject]
         public required NotificationService NotificationService { get; set; }
+
+        [Inject]
+        public required NavigationContainer NavigationContainer { get; set; }
 
         public required Customer Customer { get; set; }
 
@@ -81,15 +84,55 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesOverview")!;
-
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (NavigationContainer.CustomerId != null)
                 {
-                    Customer.RouteDetails = [.. JsonSerializer.Deserialize<Route>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteOverview.OrderBy(x => x.Name)];
+                    var data = new
+                    {
+                        Id = NavigationContainer.CustomerId
+                    };
+                    NavigationContainer.CustomerId = null;
+
+                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagmentService")}/CustomerManagment/GetCustomer", data, JsonSerializerOptions)!;
+
+                    if (response1.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        Customer customer = JsonSerializer.Deserialize<Customer>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+
+                        Customer.Id = customer.Id;
+                        Customer.SerialNumber = customer.SerialNumber;
+                        Customer.Name = customer.Name;
+                        Customer.Title = customer.Title;
+                        Customer.Address = customer.Address;
+                        Customer.Region = customer.Region;
+                        Customer.GeoLocation = customer.GeoLocation;
+                        Customer.Article = customer.Article;
+                        Customer.DefaultPrice = customer.DefaultPrice;
+                        Customer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
+                        Customer.MonthlyDeliveries = customer.MonthlyDeliveries;
+                        Customer.TemporaryDelivery = customer.TemporaryDelivery;
+                        Customer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
+                        Customer.Workdays = customer.Workdays;
+                        Customer.Holidays = customer.Holidays;
+                        Customer.ContactInformation = customer.ContactInformation;
+                        Customer.RouteId = customer.RouteId;
+                    }
+                    else if (response1.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {}
+                    else
+                    {
+                        NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                    }
+                }
+
+                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesOverview")!;
+
+                if (response2.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    Customer.RouteDetails = [.. JsonSerializer.Deserialize<Route>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteOverview.OrderBy(x => x.Name)];
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError(await response2.Content.ReadAsStringAsync());
                 }
             }
             catch
@@ -100,7 +143,7 @@ namespace Website.Client.Pages
 
         private async Task Submit(EditContext editContext)
         {
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagmentService")}/CustomerManagment/AddCustomer", Customer, JsonSerializerOptions);
+            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagmentService")}/CustomerManagment/UpdateCustomer", Customer, JsonSerializerOptions);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

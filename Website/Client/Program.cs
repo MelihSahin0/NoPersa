@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SharedLibrary.MappingProfiles;
 using System.Text.Json;
 using Website.Client;
-using Website.Client.Exceptions;
+using Website.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,6 +14,7 @@ builder.Services.AddHttpClient("Website.ServerAPI", client => client.BaseAddress
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAutoMapper(typeof(CustomerProfile), typeof(WeekdaysProfile), typeof(MonthlyOverviewProfile), typeof(DailyOverviewProfile));
 builder.Services.AddSingleton<NotificationService>();
+builder.Services.AddSingleton<NavigationContainer>();
 
 builder.Services.AddSingleton(new JsonSerializerOptions
 {

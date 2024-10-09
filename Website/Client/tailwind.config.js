@@ -15,6 +15,8 @@ const customColors = {
     green: color.green["500"],
     lightGreen: color.green["300"],
     orange: color.orange["500"],
+    blue: "#3273F6",
+    blueHover: "#265BC1",
     white: "#ffffff",
     black: "#000000"
 };

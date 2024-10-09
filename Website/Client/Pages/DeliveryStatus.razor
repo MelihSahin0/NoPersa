@@ -14,7 +14,7 @@
             @foreach (CustomersRoute customerRoutes in DeliveryStats.RouteDetails[TabIndex].CustomersRoute.OrderBy(AbandonedMutexException => AbandonedMutexException.Position).ToList())
             {
                 <div class="bg-gray-700 m-2 ring-1 ring-black rounded-md">
-                    <h1 class="@($"{Scaling.GetTextScaling()} {(customerRoutes.ToDeliver ? "bg-lightGreen" : "bg-lightRed")} text-white p-1 rounded-md select-none hover:bg-skyHover")">@customerRoutes.Name</h1>
+                    <button class="@($"{Scaling.GetTextScaling()} {(customerRoutes.ToDeliver ? "bg-lightGreen" : "bg-lightRed")} text-white p-1 rounded-md select-none hover:bg-skyHover")" @onclick="() => OpenCustomerOverview(customerRoutes.Id)">@customerRoutes.Name</button>
                 </div>
             }
         }

@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using SharedLibrary.DTOs.GetDTOs;
 
 namespace SharedLibrary.DTOs
 {

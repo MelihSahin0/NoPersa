@@ -19,6 +19,9 @@ namespace Website.Client.Components
         public string TextOrientation { get; set; } = "text-left";
 
         [Parameter]
+        public bool IsDisabled { get; set; } = false;
+
+        [Parameter]
         public string? Placeholder { get; set; }
 
         [CascadingParameter]

@@ -11,6 +11,9 @@ namespace Website.Client.Components.Base
         public string? Placeholder { get; set; }
 
         [Parameter]
+        public bool IsDisabled { get; set; }
+
+        [Parameter]
         public Func<string?, bool>? ValidationFunction { get; set; }
 
         protected override bool TryParseValueFromString(string? value, out string? result, out string validationErrorMessage)
