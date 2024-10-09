@@ -9,6 +9,6 @@ namespace Website.Client.Models
         public required Months Month { get; set; }
 
         [Required]
-        public required string Year { get; set; }
+        public required int Year { get; set; }
     }
 }

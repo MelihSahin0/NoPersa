@@ -6,14 +6,17 @@
 <div class="flex justify-between">
     @if (!Label.Equals(string.Empty))
     {
-        <label for="@Id" class="@Scaling.GetTextScaling() select-none">@Label</label>
+        <label for="@Id" class="@Scaling.GetTextScaling() select-none mr-2">@Label</label>
     }
-    <MonthPicker Id="@Id"
+    <DatePicker Id="@Id"
                 Year="@Year"
                 YearChanged="@YearChanged"
                 YearExpression="@YearExpression"
                 Month="@Month"
                 MonthChanged="@MonthChanged"
                 MonthExpression="@MonthExpression"
-                OnMonthYearSelected="@OnMonthYearSelected"/>
+                Day="@Day"
+                DayChanged="@DayChanged"
+                DayExpression="@DayExpression"
+                OnDayMonthYearSelected="@OnDayMonthYearSelected" />
 </div>

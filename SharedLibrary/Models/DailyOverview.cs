@@ -9,11 +9,20 @@ namespace SharedLibrary.Models
         [Key]
         public int Id { get; set; }
 
+        [Required]
+        [IntType(min: 0)]
+        public required int DayOfMonth { get; set; }
+
         [DoubleType(min: 0)]
         public double? Price { get; set; }
 
         [IntType(min: 0)]
         public int? NumberOfBoxes { get; set; }
+
+        [ForeignKey("MonthlyOverviewId")]
+        public int MonthlyOverviewId { get; set; }
+
+        public required MonthlyOverview MonthlyOverview { get; set; }
 
         [NotMapped]
         public double TotalSales => (Price ?? 0) * (NumberOfBoxes ?? 0);

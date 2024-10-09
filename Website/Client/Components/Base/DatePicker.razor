@@ -4,7 +4,7 @@
     <!-- Input Field -->
     <div>
         <button @onclick="ToggleDropdown" type="button" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} flex items-center justify-between bg-white")">
-            <span>@Month @Year</span>
+            <span>@Day @Month @Year</span>
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
@@ -14,23 +14,31 @@
     <!-- Dropdown -->
     @if (isDropdownOpen)
     {
-        <div class="origin-top-right absolute mt-1 text-white rounded-md shadow-lg bg-gray-800 ring-1 ring-skyFocus z-10">
-            <div class="px-4 py-2 flex justify-between items-center">
+        <div class="w-52 origin-top-right absolute mt-1 text-white rounded-md shadow-lg bg-gray-800 ring-1 ring-skyFocus z-10">
+            <div class="px-4 py-2 flex flex-col">
                 <!-- Year Navigation -->
-                <button type="button" @onclick="() => ChangeYear(-1)" class="text-white hover:text-skyHover">&lt;</button>
-                <span class="@($"{Scaling.GetTextScaling}") select-none">@selectedYear</span>
-                <button type="button" @onclick="() => ChangeYear(1)" class="text-white hover:text-skyHover">&gt;</button>
+                <div class="flex justify-between items-center">
+                    <button type="button" @onclick="() => ChangeYear(-1)" class="text-white hover:text-skyHover">&lt;</button>
+                    <span class="@($"{Scaling.GetTextScaling}") select-none">@Year</span>
+                    <button type="button" @onclick="() => ChangeYear(1)" class="text-white hover:text-skyHover">&gt;</button>
+                </div>
+                <!-- Month Navigation-->
+                <div class="flex justify-between items-center">
+                    <button type="button" @onclick="() => ChangeMonth(-1)" class="text-white hover:text-skyHover">&lt;</button>
+                    <span class="@($"{Scaling.GetTextScaling}") select-none">@Month</span>
+                    <button type="button" @onclick="() => ChangeMonth(1)" class="text-white hover:text-skyHover">&gt;</button>
+                </div>
             </div>
 
-            <!-- Months Grid -->
+            <!-- Days Grid -->
             <div class="grid grid-cols-4 gap-2 px-4 py-2 place-content-center">
-                @for (int i = 0; i < months.Length; i++)
+                @for (int i = 1; i <= DateTime.DaysInMonth(Year, (int)Month + 1); i++)
                 {
-                    var currentIndex = i;
+                    var currentValue = i;
                     <button type="button"
-                            @onclick="() => SelectMonth(currentIndex)"
+                            @onclick="() => SelectDay(currentValue)"
                             class="@($"{Scaling.GetTextScaling()} p-1 rounded-md bg-gray-700 hover:bg-skyHover")">
-                        @months[i]
+                        @i
                     </button>
                 }
             </div>

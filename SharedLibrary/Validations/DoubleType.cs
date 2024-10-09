@@ -2,8 +2,7 @@
 
 namespace SharedLibrary.Validations
 {
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
-       AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
     public class DoubleType : ValidationAttribute
     {
         private readonly double min;

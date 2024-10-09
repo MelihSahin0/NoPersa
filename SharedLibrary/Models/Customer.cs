@@ -49,6 +49,12 @@ namespace SharedLibrary.Models
         [IntType(min: 0)]
         public int? Position { get; set; }
 
+        [Required]
+        public bool TemporaryDelivery { get; set; }
+
+        [Required]
+        public bool TemporaryNoDelivery { get; set; }
+
         [ForeignKey("WorkdaysId")]
         public int WorkdaysId { get; set; }
 

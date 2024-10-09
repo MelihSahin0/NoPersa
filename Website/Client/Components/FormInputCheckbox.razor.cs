@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 
 namespace Website.Client.Components
 {
@@ -11,7 +10,7 @@ namespace Website.Client.Components
         public required string Label { get; init; }
 
         [Parameter]
-        public bool Value { get; set; }
+        public required bool Value { get; set; }
 
         [Parameter]
         public EventCallback<bool> ValueChanged { get; set; }

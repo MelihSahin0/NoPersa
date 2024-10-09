@@ -7,6 +7,6 @@ namespace SharedLibrary.DTOs
 
         public int Month { get; set; }
 
-        public string? Year { get; set; }
+        public int Year { get; set; }
     }
 }

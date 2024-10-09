@@ -89,7 +89,7 @@ namespace ManagmentService.Controllers
                 }
 
                 MonthlyOverview? monthlyOverview = query.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
-                                                                             m.Year == int.Parse(monthOfTheYear.Year!) &&
+                                                                             m.Year == monthOfTheYear.Year &&
                                                                              m.Month == monthOfTheYear.Month);
                 if (monthlyOverview == null)
                 {

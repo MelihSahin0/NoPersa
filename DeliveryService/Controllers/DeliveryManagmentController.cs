@@ -2,6 +2,7 @@
 using DeliveryService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedLibrary;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
@@ -120,8 +121,12 @@ namespace DeliveryService.Controllers
                 DTODeliveryStatus dTODeliveryStatus = new();
                 List<DTORouteDetails> routes = [];
 
-                foreach (Route route in context.Routes.Include(r => r.Customers).ThenInclude(c => c.Workdays)
-                                                      .Include(r => r.Customers).ThenInclude(c => c.Holidays))
+                var query = context.Routes.Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                                          .Include(r => r.Customers).ThenInclude(c => c.Holidays)
+                                          .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month))
+                                                                    .ThenInclude(d=>d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDay.Day));
+
+                foreach (Route route in query)
                 {
                     List<DTOCustomerRoute> customerRoutes = [];
                     foreach (Customer customer in route.Customers ?? [])
@@ -129,12 +134,12 @@ namespace DeliveryService.Controllers
                         DTOCustomerRoute dTOCustomerRoutes = mapper.Map<DTOCustomerRoute>(customer);
 
                         MonthlyOverview? foundOverview = customer.MonthlyOverviews.FirstOrDefault(x =>
-                                x.Year == int.Parse(dTOSelectedDay.Year) && x.Month == dTOSelectedDay.Month);
+                                x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
 
                         if (foundOverview != null)
                         {
-                            int? dayValue = GetDayValue(foundOverview, dTOSelectedDay.Day);
-                            dTOCustomerRoutes.ToDeliver = dayValue > 0 || (dayValue == null && SetDeliveryToTrueOrFalse(customer, dTOSelectedDay));
+                            int? numberOfBoxes = ((DailyOverview)foundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
+                            dTOCustomerRoutes.ToDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && SetDeliveryToTrueOrFalse(customer, dTOSelectedDay));
                         }
                         else
                         {
@@ -164,27 +169,9 @@ namespace DeliveryService.Controllers
             }
         }
 
-        private int? GetDayValue(MonthlyOverview monthlyData, int day)
-        {
-            if (day < 1 || day > 31)
-            {
-                throw new ArgumentOutOfRangeException(nameof(day), "Day must be between 1 and 31.");
-            }
-
-            string propertyName = $"Day{day}";
-            var propertyInfo = typeof(MonthlyOverview).GetProperty(propertyName);
-
-            if (propertyInfo == null || !propertyInfo.CanRead)
-            {
-                throw new InvalidOperationException($"Property '{propertyName}' does not exist or cannot be read.");
-            }
-
-            return (int?)propertyInfo.GetValue(monthlyData);
-        }
-
         private bool SetDeliveryToTrueOrFalse(Customer customer, DTOSelectedDay dTOSelectedDay)
         {
-            DateTime date = new DateTime(int.Parse(dTOSelectedDay.Year), dTOSelectedDay.Month, dTOSelectedDay.Day);
+            DateTime date = new(dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
             string propertyName = date.DayOfWeek.ToString();
 
             //Call if date is holiday

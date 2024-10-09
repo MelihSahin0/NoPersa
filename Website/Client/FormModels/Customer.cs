@@ -3,6 +3,7 @@ using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Website.Client.Exceptions;
 using Website.Client.Models;
 
@@ -10,12 +11,16 @@ namespace Website.Client.FormModels
 {
     public class Customer
     {
+        [JsonIgnore]
         public ILocalStorageService LocalStorage { get; init; }
 
+        [JsonIgnore]
         public JsonSerializerOptions JsonSerializerOptions { get; init; }
 
+        [JsonIgnore]
         public HttpClient HttpClient { get; init; }
 
+        [JsonIgnore]
         public NotificationService NotificationService { get; init; }
 
         public Customer(ILocalStorageService localStorage, JsonSerializerOptions jsonSerializerOptions, HttpClient httpClient, NotificationService notificationService)
@@ -55,6 +60,12 @@ namespace Website.Client.FormModels
         public string? ContactInformation { get; set; }
 
         [Required]
+        public bool TemporaryDelivery { get; set; }
+
+        [Required]
+        public bool TemporaryNoDelivery { get; set; }
+
+        [Required]
         public Weekdays? Workdays { get; set; }
 
         [Required]
@@ -82,9 +93,11 @@ namespace Website.Client.FormModels
         [IntType(min: 0)]
         public int? RouteId { get; set; }
 
+        [JsonIgnore]
         public List<RouteOverview>? RouteDetails { get; set; }
 
-        private int selectedMonthlyDeliveries = 0;
+        [JsonIgnore]
+        public int selectedMonthlyDeliveries = 0;
         public async Task OnMonthYearSelected()
         {
             int i = 0;
@@ -113,40 +126,16 @@ namespace Website.Client.FormModels
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
+                List<DailyDelivery> dailyOverviews = [];
+                for (int day = 1; day <= 31; day++)
+                {
+                    dailyOverviews.Add(new DailyDelivery() { DayOfMonth = day });
+                }
+
                 MonthlyDeliveries.Add(new MonthlyDelivery()
                 {
                     MonthOfTheYear = new MonthOfTheYear() { Month = DisplayMonth.Month, Year = DisplayMonth.Year },
-                    Day1 = new DailyDelivery(),
-                    Day2 = new DailyDelivery(),
-                    Day3 = new DailyDelivery(),
-                    Day4 = new DailyDelivery(),
-                    Day5 = new DailyDelivery(),
-                    Day6 = new DailyDelivery(),
-                    Day7 = new DailyDelivery(),
-                    Day8 = new DailyDelivery(),
-                    Day9 = new DailyDelivery(),
-                    Day10 = new DailyDelivery(),
-                    Day11 = new DailyDelivery(),
-                    Day12 = new DailyDelivery(),
-                    Day13 = new DailyDelivery(),
-                    Day14 = new DailyDelivery(),
-                    Day15 = new DailyDelivery(),
-                    Day16 = new DailyDelivery(),
-                    Day17 = new DailyDelivery(),
-                    Day18 = new DailyDelivery(),
-                    Day19 = new DailyDelivery(),
-                    Day20 = new DailyDelivery(),
-                    Day21 = new DailyDelivery(),
-                    Day22 = new DailyDelivery(),
-                    Day23 = new DailyDelivery(),
-                    Day24 = new DailyDelivery(),
-                    Day25 = new DailyDelivery(),
-                    Day26 = new DailyDelivery(),
-                    Day27 = new DailyDelivery(),
-                    Day28 = new DailyDelivery(),
-                    Day29 = new DailyDelivery(),
-                    Day30 = new DailyDelivery(),
-                    Day31 = new DailyDelivery()
+                    DailyDeliveries = dailyOverviews
                 });
             }
             else
@@ -155,45 +144,6 @@ namespace Website.Client.FormModels
             }
 
             selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;
-        }
-
-        public DailyDelivery GetDailyDeliveryByDay(int day)
-        {
-            return day switch
-            {
-                1 => MonthlyDeliveries[selectedMonthlyDeliveries].Day1,
-                2 => MonthlyDeliveries[selectedMonthlyDeliveries].Day2,
-                3 => MonthlyDeliveries[selectedMonthlyDeliveries].Day3,
-                4 => MonthlyDeliveries[selectedMonthlyDeliveries].Day4,
-                5 => MonthlyDeliveries[selectedMonthlyDeliveries].Day5,
-                6 => MonthlyDeliveries[selectedMonthlyDeliveries].Day6,
-                7 => MonthlyDeliveries[selectedMonthlyDeliveries].Day7,
-                8 => MonthlyDeliveries[selectedMonthlyDeliveries].Day8,
-                9 => MonthlyDeliveries[selectedMonthlyDeliveries].Day9,
-                10 => MonthlyDeliveries[selectedMonthlyDeliveries].Day10,
-                11 => MonthlyDeliveries[selectedMonthlyDeliveries].Day11,
-                12 => MonthlyDeliveries[selectedMonthlyDeliveries].Day12,
-                13 => MonthlyDeliveries[selectedMonthlyDeliveries].Day13,
-                14 => MonthlyDeliveries[selectedMonthlyDeliveries].Day14,
-                15 => MonthlyDeliveries[selectedMonthlyDeliveries].Day15,
-                16 => MonthlyDeliveries[selectedMonthlyDeliveries].Day16,
-                17 => MonthlyDeliveries[selectedMonthlyDeliveries].Day17,
-                18 => MonthlyDeliveries[selectedMonthlyDeliveries].Day18,
-                19 => MonthlyDeliveries[selectedMonthlyDeliveries].Day19,
-                20 => MonthlyDeliveries[selectedMonthlyDeliveries].Day20,
-                21 => MonthlyDeliveries[selectedMonthlyDeliveries].Day21,
-                22 => MonthlyDeliveries[selectedMonthlyDeliveries].Day22,
-                23 => MonthlyDeliveries[selectedMonthlyDeliveries].Day23,
-                24 => MonthlyDeliveries[selectedMonthlyDeliveries].Day24,
-                25 => MonthlyDeliveries[selectedMonthlyDeliveries].Day25,
-                26 => MonthlyDeliveries[selectedMonthlyDeliveries].Day26,
-                27 => MonthlyDeliveries[selectedMonthlyDeliveries].Day27,
-                28 => MonthlyDeliveries[selectedMonthlyDeliveries].Day28,
-                29 => MonthlyDeliveries[selectedMonthlyDeliveries].Day29,
-                30 => MonthlyDeliveries[selectedMonthlyDeliveries].Day30,
-                31 => MonthlyDeliveries[selectedMonthlyDeliveries].Day31,
-                _ => throw new InvalidDateException()
-            };
         }
     }
 }

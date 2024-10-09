@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace SharedLibrary.DTOs
 {
     public class DTOCustomer
@@ -18,6 +20,10 @@ namespace SharedLibrary.DTOs
         public string? GeoLocation { get; set; }
 
         public string? ContactInformation { get; set; }
+
+        public bool TemporaryDelivery { get; set; }
+
+        public bool TemporaryNoDelivery { get; set; }
 
         public DTOWeekdays? Workdays { get; set; }
 

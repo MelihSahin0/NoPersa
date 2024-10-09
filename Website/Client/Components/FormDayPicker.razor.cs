@@ -4,7 +4,7 @@ using Website.Client.Enums;
 
 namespace Website.Client.Components
 {
-    public partial class FormMonthYearPicker
+    public partial class FormDayPicker
     {
         private readonly string Id = Guid.NewGuid().ToString();
 
@@ -30,6 +30,15 @@ namespace Website.Client.Components
         public Expression<Func<Months>>? MonthExpression { get; set; }
 
         [Parameter]
-        public EventCallback OnMonthYearSelected { get; set; }
+        public required int Day { get; set; }
+
+        [Parameter]
+        public EventCallback<int> DayChanged { get; set; }
+
+        [Parameter]
+        public Expression<Func<int>>? DayExpression { get; set; }
+
+        [Parameter]
+        public EventCallback OnDayMonthYearSelected { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using ManagmentService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ManagmentService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    partial class NoPersaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241008194208_V0")]
+    partial class V0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,12 +77,6 @@ namespace ManagmentService.Database.Migrations
                     b.Property<string>("SerialNumber")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
-
-                    b.Property<bool>("TemporaryDelivery")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("TemporaryNoDelivery")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Title")
                         .HasMaxLength(64)

@@ -4,12 +4,12 @@ using Website.Client.Enums;
 
 namespace Website.Client.Components.Base
 {
-    public partial class DatePicker
+    public partial class MonthPicker
     {
         [Parameter]
         public required string Id { get; set; }
 
-        [Parameter]
+        [Parameter] 
         public required int Year { get; set; }
 
         [Parameter]
@@ -28,21 +28,10 @@ namespace Website.Client.Components.Base
         public Expression<Func<Months>>? MonthExpression { get; set; }
 
         [Parameter]
-        public EventCallback OnMonthSelected { get; set; }
-
-        [Parameter]
-        public required int Day { get; set; }
-
-        [Parameter]
-        public EventCallback<int> DayChanged { get; set; }
-
-        [Parameter]
-        public Expression<Func<int>>? DayExpression { get; set; }
-
-        [Parameter]
-        public EventCallback OnDayMonthYearSelected { get; set; }
+        public EventCallback OnMonthYearSelected { get; set; }
 
         private bool isDropdownOpen = false;
+        private static readonly string[] months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
         private async Task ToggleDropdown()
         {
@@ -50,31 +39,24 @@ namespace Website.Client.Components.Base
             {
                 await YearChanged.InvokeAsync(Year);
                 await MonthChanged.InvokeAsync(Month);
-                await DayChanged.InvokeAsync(Day);
-                await OnDayMonthYearSelected.InvokeAsync();
+                await OnMonthYearSelected.InvokeAsync();
             }
 
             isDropdownOpen = !isDropdownOpen;
         }
 
-        private async Task SelectDay(int day)
+        private async Task SelectMonth(int monthIndex)
         {
-            Day = day;
+            Month = (Months)monthIndex;
             isDropdownOpen = false;
             await YearChanged.InvokeAsync(Year);
             await MonthChanged.InvokeAsync(Month);
-            await DayChanged.InvokeAsync(Day);
-            await OnDayMonthYearSelected.InvokeAsync();
+            await OnMonthYearSelected.InvokeAsync();
         }
 
         private void ChangeYear(int change)
         {
             Year += change;
-        }
-
-        private void ChangeMonth(int change)
-        {
-            Month = (Months)((12 + (int)Month + change) % 12);
         }
     }
 }

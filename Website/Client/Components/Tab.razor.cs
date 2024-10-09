@@ -16,7 +16,6 @@ namespace Website.Client.Components
         private async Task OnButtonClick(int index)
         {
             Value = index;
-            Console.WriteLine("index:" + index);
             await ValueChanged.InvokeAsync(Value);
         }
     }

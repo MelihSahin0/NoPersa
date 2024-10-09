@@ -2,6 +2,7 @@
 
 namespace SharedLibrary.Validations
 {
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
     public class GeoCoordinatesType : ValidationAttribute
     {
         private int errorType;

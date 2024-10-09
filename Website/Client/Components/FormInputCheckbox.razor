@@ -3,6 +3,6 @@
 
 <div class="flex flex-col">
     <label for="@Id" class="@Scaling.GetTextScaling() text-center select-none">@Label</label>
-    <InputCheckbox id="@Id" type="text" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()}")"
+    <InputCheckbox id="@Id" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()}")"
                    @bind-Value="Value" @oninput="OnValueChanged" />
 </div>
