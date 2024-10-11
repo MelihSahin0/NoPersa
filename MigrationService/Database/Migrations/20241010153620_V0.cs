@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ManagmentService.Database.Migrations
+namespace MigrationService.Database.Migrations
 {
     /// <inheritdoc />
     public partial class V0 : Migration
@@ -11,6 +11,21 @@ namespace ManagmentService.Database.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Holiday",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Month = table.Column<int>(type: "integer", nullable: false),
+                    Day = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Holiday", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Route",
                 columns: table => new
@@ -26,7 +41,7 @@ namespace ManagmentService.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Weekdays",
+                name: "Weekday",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -41,7 +56,7 @@ namespace ManagmentService.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Weekdays", x => x.Id);
+                    table.PrimaryKey("PK_Weekday", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -61,6 +76,8 @@ namespace ManagmentService.Database.Migrations
                     DefaultPrice = table.Column<double>(type: "double precision", nullable: false),
                     DefaultNumberOfBoxes = table.Column<int>(type: "integer", nullable: false),
                     Position = table.Column<int>(type: "integer", nullable: true),
+                    TemporaryDelivery = table.Column<bool>(type: "boolean", nullable: false),
+                    TemporaryNoDelivery = table.Column<bool>(type: "boolean", nullable: false),
                     WorkdaysId = table.Column<int>(type: "integer", nullable: false),
                     HolidaysId = table.Column<int>(type: "integer", nullable: false),
                     RouteId = table.Column<int>(type: "integer", nullable: true)
@@ -75,14 +92,14 @@ namespace ManagmentService.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Customer_Weekdays_HolidaysId",
+                        name: "FK_Customer_Weekday_HolidaysId",
                         column: x => x.HolidaysId,
-                        principalTable: "Weekdays",
+                        principalTable: "Weekday",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Customer_Weekdays_WorkdaysId",
+                        name: "FK_Customer_Weekday_WorkdaysId",
                         column: x => x.WorkdaysId,
-                        principalTable: "Weekdays",
+                        principalTable: "Weekday",
                         principalColumn: "Id");
                 });
 
@@ -162,6 +179,9 @@ namespace ManagmentService.Database.Migrations
                 name: "DailyOverview");
 
             migrationBuilder.DropTable(
+                name: "Holiday");
+
+            migrationBuilder.DropTable(
                 name: "MonthlyOverview");
 
             migrationBuilder.DropTable(
@@ -171,7 +191,7 @@ namespace ManagmentService.Database.Migrations
                 name: "Route");
 
             migrationBuilder.DropTable(
-                name: "Weekdays");
+                name: "Weekday");
         }
     }
 }

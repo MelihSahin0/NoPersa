@@ -8,9 +8,9 @@ namespace SharedLibrary.MappingProfiles
     {
         public WeekdaysProfile() 
         {
-            CreateMap<DTOWeekdays, Weekdays>();
+            CreateMap<DTOWeekdays, Weekday>();
 
-            CreateMap<Weekdays, DTOWeekdays>();
+            CreateMap<Weekday, DTOWeekdays>();
         }
     }
 }

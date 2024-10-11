@@ -59,13 +59,13 @@ namespace SharedLibrary.Models
         public int WorkdaysId { get; set; }
 
         [Required]
-        public required Weekdays Workdays { get; set; }
+        public required Weekday Workdays { get; set; }
 
         [ForeignKey("HolidaysId")]
         public int HolidaysId { get; set; }
 
         [Required]
-        public required Weekdays Holidays { get; set; }
+        public required Weekday Holidays { get; set; }
 
         [ForeignKey("RouteId")]
         public int? RouteId { get; set; }

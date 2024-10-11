@@ -131,10 +131,17 @@ namespace Website.Client.FormModels
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
+                DateTime dateTime = DateTime.Today;
+
                 List<DailyDelivery> dailyOverviews = [];
                 for (int day = 1; day <= 31; day++)
                 {
-                    dailyOverviews.Add(new DailyDelivery() { DayOfMonth = day });
+                    dailyOverviews.Add(new DailyDelivery() 
+                    { 
+                        DayOfMonth = day, 
+                        Price = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
+                        NumberOfBoxes = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
+                    });
                 }
 
                 MonthlyDeliveries.Add(new MonthlyDelivery()

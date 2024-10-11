@@ -2,7 +2,7 @@
 
 namespace SharedLibrary.Models
 {
-    public class Weekdays
+    public class Weekday
     {
         [Key]
         public int Id { get; set; }
@@ -30,7 +30,7 @@ namespace SharedLibrary.Models
 
         public override bool Equals(object? obj)
         {
-           return obj is Weekdays weekday &&
+           return obj is Weekday weekday &&
                Monday == weekday.Monday &&
                Tuesday == weekday.Tuesday &&
                Wednesday == weekday.Wednesday &&

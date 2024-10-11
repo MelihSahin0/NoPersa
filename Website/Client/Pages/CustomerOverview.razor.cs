@@ -39,7 +39,12 @@ namespace Website.Client.Pages
             List<DailyDelivery> dailyOverviews = [];
             for (int day = 1; day <= 31; day++)
             {
-                dailyOverviews.Add(new DailyDelivery() { DayOfMonth = day });
+                dailyOverviews.Add(new DailyDelivery()
+                {
+                    DayOfMonth = day,
+                    Price = day < dateTime.Day ? "0" : "",
+                    NumberOfBoxes = day < dateTime.Day ? "0" : ""
+                });
             }
 
             Customer ??= new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
@@ -53,7 +58,7 @@ namespace Website.Client.Pages
                 GeoLocation = string.Empty,
                 DisplayMonth = new MonthOfTheYear()
                 {
-                    Month = (Months)(dateTime.Month - 1),
+                    Month = (Months)(dateTime.Month),
                     Year = dateTime.Year
                 },
                 Article = "0",

@@ -35,20 +35,17 @@ namespace Website.Client.FormModels
         [Required]
         public required List<RouteDetails> RouteDetails { get; set; }
 
-        [Required]
-        public required int Year { get; set; }
+        public int Year { get; set; }
 
-        [Required]
-        public required Months Month {  get; set; }
+        public Months Month {  get; set; }
 
-        [Required]
-        public required int Day { get; set;}
+        public int Day { get; set;}
 
         public async Task OnDayMonthYearSelected()
         {
             try
             {
-                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesDetails",
+                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetDeliveryStatus",
                     new
                     {
                         Year = Year,
@@ -58,7 +55,7 @@ namespace Website.Client.FormModels
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    RouteDetails = [.. JsonSerializer.Deserialize<DeserializeResult>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteDetails.OrderBy(x => x.Position)];
+                    RouteDetails = [.. JsonSerializer.Deserialize<DeliveryStats>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteDetails.OrderBy(x => x.Position)];
                 }
                 else
                 {
@@ -69,11 +66,6 @@ namespace Website.Client.FormModels
             {
                 NotificationService.SetError(e.Message);
             }
-        }
-
-        private class DeserializeResult
-        {
-            public required List<RouteDetails> RouteDetails { get; set; }
         }
     }
 }

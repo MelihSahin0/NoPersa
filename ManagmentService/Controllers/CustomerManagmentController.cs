@@ -30,17 +30,20 @@ namespace ManagmentService.Controllers
         {
             try
             {
-                Customer? customer = context.Customer.Where(c => c.Id == dTOSelectedCustomer.Id)
+                Customer? dbCustomer = context.Customers.Where(c => c.Id == dTOSelectedCustomer.Id)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                         .First();
-                if (customer == null)
+
+                if (dbCustomer == null)
                 {
                     return NotFound();
                 }
                 else
                 {
-                    return Ok(mapper.Map<DTOCustomer>(customer));
+                    CheckMonthlyOverview.CheckAndAdd(dbCustomer);
+
+                    return Ok(mapper.Map<DTOCustomer>(dbCustomer));
                 }
             }
             catch (ValidationException e)
@@ -62,19 +65,32 @@ namespace ManagmentService.Controllers
 
             try
             {
+                DateTime today = DateTime.Today;
                 Customer customer = mapper.Map<Customer>(dTOCustomer);
 
                 if (customer.Id == 0)
                 {
-                    if (customer.RouteId != null)
+                    customer.Position = context.Customers.Where(x => x.RouteId == customer.RouteId).Count();
+         
+                    List<MonthlyOverview> overviewsToRemove = [];
+                    foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
                     {
-                        customer.Position = context.Customer.Where(x => x.RouteId == customer.RouteId).Count();
+                        if (!DateTimeCalc.MonthDifferenceMax1(today.Year, monthlyOverview.Year, today.Month, monthlyOverview.Month))
+                        {
+                            overviewsToRemove.Add(monthlyOverview);
+                        }
                     }
-                    context.Customer.Add(customer);
+
+                    foreach (MonthlyOverview overviewToRemove in overviewsToRemove)
+                    {
+                        customer.MonthlyOverviews.Remove(overviewToRemove);
+                    }
+
+                    context.Customers.Add(customer);
                 }
                 else
                 {
-                    Customer? dbCustomer = context.Customer.Where(c => c.Id == customer.Id)
+                    Customer? dbCustomer = context.Customers.Where(c => c.Id == customer.Id)
                                            .Include(w => w.Workdays).Include(h => h.Holidays)
                                            .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                            .FirstOrDefault();
@@ -100,27 +116,12 @@ namespace ManagmentService.Controllers
                     dbCustomer.Workdays = customer.Workdays;
                     dbCustomer.Holidays = customer.Holidays;
 
-                    //dbCustomer.Workdays.Monday = customer.Workdays.Monday;
-                    //dbCustomer.Workdays.Tuesday = customer.Workdays.Tuesday;
-                    //dbCustomer.Workdays.Wednesday = customer.Workdays.Wednesday;
-                    //dbCustomer.Workdays.Thursday = customer.Workdays.Thursday;
-                    //dbCustomer.Workdays.Friday = customer.Workdays.Friday;
-                    //dbCustomer.Workdays.Saturday = customer.Workdays.Saturday;
-                    //dbCustomer.Workdays.Sunday = customer.Workdays.Sunday;
-                    //dbCustomer.Holidays.Monday = customer.Holidays.Monday;
-                    //dbCustomer.Holidays.Tuesday = customer.Holidays.Tuesday;
-                    //dbCustomer.Holidays.Wednesday = customer.Holidays.Wednesday;
-                    //dbCustomer.Holidays.Thursday = customer.Holidays.Thursday;
-                    //dbCustomer.Holidays.Friday = customer.Holidays.Friday;
-                    //dbCustomer.Holidays.Saturday = customer.Holidays.Saturday;
-                    //dbCustomer.Holidays.Sunday = customer.Holidays.Sunday;
-
                     List<MonthlyOverview> newMonthlyOverviews = [];
                     foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
                     {
                         monthlyOverview.CustomerId = customer.Id;
 
-                        var dbMonthlyOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(m => m.Year == monthlyOverview.Year && m.Month == monthlyOverview.Month);
+                        MonthlyOverview? dbMonthlyOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(m => m.Year == monthlyOverview.Year && m.Month == monthlyOverview.Month);
 
                         if (dbMonthlyOverview == null)
                         {
@@ -128,12 +129,11 @@ namespace ManagmentService.Controllers
                         }
                         else
                         {
-                            DateTime today = DateTime.Today;
                             if (DateTimeCalc.MonthDifferenceMax1(today.Year, monthlyOverview.Year, today.Month, monthlyOverview.Month))
                             {
-                                foreach (var dailyOverview in monthlyOverview.DailyOverviews)
+                                foreach (DailyOverview dailyOverview in monthlyOverview.DailyOverviews)
                                 {
-                                    var dbDailyOverview = dbMonthlyOverview.DailyOverviews.FirstOrDefault(d => d.DayOfMonth == dailyOverview.DayOfMonth);
+                                    DailyOverview? dbDailyOverview = dbMonthlyOverview.DailyOverviews.FirstOrDefault(d => d.DayOfMonth == dailyOverview.DayOfMonth);
 
                                     if (dbDailyOverview != null)
                                     {
@@ -144,7 +144,7 @@ namespace ManagmentService.Controllers
                             }
                         }
                     }
-                    context.MonthlyOverview.AddRange(newMonthlyOverviews);
+                    context.MonthlyOverviews.AddRange(newMonthlyOverviews);
                 }
                 context.SaveChanges();
                 transaction.Commit();
@@ -170,16 +170,16 @@ namespace ManagmentService.Controllers
         {
             try
             {
-                MonthlyOverview? monthlyOverview = context.MonthlyOverview.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
-                                                                                          m.Year == monthOfTheYear.Year &&
-                                                                                          m.Month == monthOfTheYear.Month);
-                if (monthlyOverview == null)
+                MonthlyOverview? dbMonthlyOverview = context.MonthlyOverviews.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
+                                                                                           m.Year == monthOfTheYear.Year &&
+                                                                                           m.Month == monthOfTheYear.Month);
+                if (dbMonthlyOverview == null)
                 {
                     return NotFound();
                 }
                 else
                 {
-                    return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
+                    return Ok(mapper.Map<DTOMonthlyDelivery>(dbMonthlyOverview));
                 }
             }
             catch (ValidationException e)

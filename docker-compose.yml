@@ -1,4 +1,34 @@
 services:
+  NoPersaPostgresDb:
+    image: postgres:latest
+    container_name: NoPersaPostgresDb
+    ports:
+        - "5432:5432"
+    restart: always
+    environment:
+        - POSTGRES_DB=${DB_NAME}
+        - POSTGRES_USER=${DB_USER}
+        - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+        - NoPersaPostgresDb-data:/var/lib/postgresql/data
+
+  migrationservice:
+    image: ${DOCKER_REGISTRY-}migrationservice
+    container_name: MigrationService
+    build:
+      context: .
+      dockerfile: MigrationService/Dockerfile
+    pull_policy: always
+    restart: always
+    depends_on:
+      - NoPersaPostgresDb
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
   managmentservice:
     image: ${DOCKER_REGISTRY-}managmentservice
     container_name: ManagmentService
@@ -11,6 +41,13 @@ services:
     restart: always
     depends_on:
       - NoPersaPostgresDb
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+
   deliveryservice:
     image: ${DOCKER_REGISTRY-}deliveryservice
     container_name: DeliveryService
@@ -23,6 +60,13 @@ services:
     restart: always
     depends_on:
       - NoPersaPostgresDb
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - HOLIDAY_API=${HOLIDAY_API}
 
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver
@@ -33,19 +77,6 @@ services:
     ports:
       - "7039:7039"
     restart: always
-
-  NoPersaPostgresDb:
-    image: postgres:latest
-    container_name: NoPersaPostgresDb
-    ports:
-        - "5432:5432"
-    restart: always
-    environment:
-        - POSTGRES_DB=NoPersaDb
-        - POSTGRES_USER=admin
-        - POSTGRES_PASSWORD=myStong_Password123#
-    volumes:
-        - NoPersaPostgresDb-data:/var/lib/postgresql/data
 
 volumes:
   NoPersaPostgresDb-data:

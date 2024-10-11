@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SharedLibrary.Models;
 using Route = SharedLibrary.Models.Route;
 
 namespace DeliveryService.Database
@@ -11,11 +12,17 @@ namespace DeliveryService.Database
 
         public DbSet<Route> Routes { get; set; }
 
+        public DbSet<Holiday> Holidays { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Route>()
-                      .ToTable("Route")
-                      .HasKey(r => r.Id);
+                        .ToTable("Route")
+                        .HasKey(r => r.Id);
+
+            modelBuilder.Entity<Holiday>()
+                        .ToTable("Holiday")
+                        .HasKey(r => r.Id);
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Website.Client.Pages
             {
                 RouteDetails = [],
                 Year = dateTime.Year,
-                Month = (Enums.Months)(dateTime.Month-1),
+                Month = (Enums.Months)(dateTime.Month),
                 Day = dateTime.Day,
             };
             TabIndex = 0;         
