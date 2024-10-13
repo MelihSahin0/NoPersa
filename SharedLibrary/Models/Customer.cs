@@ -1,4 +1,5 @@
-﻿using SharedLibrary.Validations;
+﻿using Microsoft.EntityFrameworkCore;
+using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

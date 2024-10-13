@@ -41,8 +41,6 @@ namespace ManagementService.Controllers
                 }
                 else
                 {
-                    CheckMonthlyOverview.CheckAndAdd(dbCustomer);
-
                     return Ok(mapper.Map<DTOCustomer>(dbCustomer));
                 }
             }

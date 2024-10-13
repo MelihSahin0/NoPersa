@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Models;
+using System.Xml;
 using Route = SharedLibrary.Models.Route;
 
 namespace MaintenanceService.Database
@@ -10,6 +11,7 @@ namespace MaintenanceService.Database
         {
         }
 
+        public DbSet<Maintenance> Maintenance { get; set; }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Weekday> Weekday { get; set; }
         public DbSet<MonthlyOverview> MonthlyOverview { get; set; }
@@ -56,7 +58,19 @@ namespace MaintenanceService.Database
                        Name = "Archive",
                        Position = int.MaxValue,
                    }
-               );
+            );
+
+            modelBuilder.Entity<Maintenance>()
+                .Property(e => e.NextDailyDeliverySave)
+                .HasColumnType("date");
+
+            modelBuilder.Entity<Maintenance>().HasData(
+                    new Maintenance
+                    {
+                        Id = 1,
+                        NextDailyDeliverySave = DateTime.Today.Date
+                    }
+            );
         }
     }
 }

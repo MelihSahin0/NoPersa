@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MaintenanceService.Database;
+using MaintenanceService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,13 +13,13 @@ var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username=
 
 builder.Services.AddDbContext<NoPersaDbContext>(options =>
     options.UseNpgsql(connectionString));
-
+builder.Services.AddHostedService<DailyDelivery>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

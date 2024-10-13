@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
+using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using Holiday = SharedLibrary.Models.Holiday;
 using Route = SharedLibrary.Models.Route;
 
@@ -18,17 +18,15 @@ namespace DeliveryService.Controllers
     public class DeliveryManagementController : ControllerBase
     {
         private readonly NoPersaDbContext context;
-        private readonly HttpClient httpClient;
         private readonly ILogger<DeliveryManagementController> logger;
         private readonly IMapper mapper;
         private readonly string currentCountry = "at"; //TODO: Will be removed in the future
 
-        public DeliveryManagementController(ILogger<DeliveryManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper, HttpClient httpClient)
+        public DeliveryManagementController(ILogger<DeliveryManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
         {
             this.context = noPersaDbContext;
             this.logger = logger;
             this.mapper = mapper;
-            this.httpClient = httpClient;
         }
 
         [HttpGet("GetRoutesOverview", Name = "GetRoutesOverview")]
@@ -135,13 +133,11 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                await CheckHolidays(dTOSelectedDay);
-
                 DTODeliveryStatus dTODeliveryStatus = new();
                 List<DTORouteDetails> routes = [];
 
                 //Without Archive
-                List<Route> dbRoutes = await context.Routes.Where(r => r.Id != int.MinValue).Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                List<Route> dbRoutes = await context.Routes.AsNoTracking().Where(r => r.Id != int.MinValue).Include(r => r.Customers).ThenInclude(c => c.Workdays)
                                           .Include(r => r.Customers).ThenInclude(c => c.Holidays)
                                           .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month))
                                                                     .ThenInclude(d=>d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDay.Day))
@@ -154,17 +150,17 @@ namespace DeliveryService.Controllers
                     {
                         DTOCustomerRoute dTOCustomerRoutes = mapper.Map<DTOCustomerRoute>(dbCustomer);
 
-                        MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x =>
-                                                                                                      x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
+                        MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
+                        Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
 
                         if (dbFoundOverview != null)
                         {
                             int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
-                            dTOCustomerRoutes.ToDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && SetDeliveryToTrueOrFalse(dbCustomer, dTOSelectedDay));
+                            dTOCustomerRoutes.ToDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day));
                         }
-                        else
+                        else //Safety Measure
                         {
-                            dTOCustomerRoutes.ToDeliver = SetDeliveryToTrueOrFalse(dbCustomer, dTOSelectedDay);
+                            dTOCustomerRoutes.ToDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
                         }
 
                         customerRoutes.Add(dTOCustomerRoutes);
@@ -227,13 +223,25 @@ namespace DeliveryService.Controllers
 
                         if (dbCustomer != null)
                         {
+                            if (route.Id == int.MinValue && dbCustomer.RouteId != route.Id)
+                            {
+                                CheckMonthlyOverview.CheckAndAdd(dbCustomer);
+                            }
+
                             dbCustomer.RouteId = route.Id;
                             dbCustomer.Position = customer.Position;
                             customersToUpdate.Add(dbCustomer);
                         }
                     }
                 }
-                context.BulkUpdate(customersToUpdate);
+
+                const int batchSize = 1000;
+                for (int i = 0; i < customersToUpdate.Count; i += batchSize)
+                {
+                    var batch = customersToUpdate.Skip(i).Take(batchSize).ToList();
+                    context.BulkUpdate(batch);
+                }
+
                 transaction.Commit();
 
                 return Ok();
@@ -250,79 +258,6 @@ namespace DeliveryService.Controllers
                 logger.LogError(e.Message);
                 return BadRequest("An error occurred while processing your request.");
             }
-        }
-
-        private bool SetDeliveryToTrueOrFalse(Customer dbCustomer, DTOSelectedDay dTOSelectedDay)
-        {
-            DateTime date = new(dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
-            string propertyName = date.DayOfWeek.ToString();
-
-            if (dbCustomer.TemporaryDelivery)
-            {
-                return true;
-            }
-            if (dbCustomer.TemporaryNoDelivery)
-            {
-                return false;
-            }
-
-            Holiday? holiday = context.Holidays.FirstOrDefault(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
-
-            if (holiday == null)
-            {
-                var propertyInfo = typeof(Weekday).GetProperty(propertyName);
-
-                if (propertyInfo == null || !propertyInfo.CanRead)
-                {
-                    throw new InvalidOperationException($"Property '{propertyName}' does not exist or cannot be read.");
-                }
-
-                return (bool)(propertyInfo.GetValue(dbCustomer.Workdays) ?? true);  
-            }
-            else
-            {
-                var propertyInfo = typeof(Weekday).GetProperty(propertyName);
-
-                if (propertyInfo == null || !propertyInfo.CanRead)
-                {
-                    throw new InvalidOperationException($"Property '{propertyName}' does not exist or cannot be read.");
-                }
-
-                return (bool)(propertyInfo.GetValue(dbCustomer.Holidays) ?? true);
-            }
-        }
-
-        private async Task CheckHolidays(DTOSelectedDay dTOSelectedDay)
-        {
-            if (!context.Holidays.Any(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year))
-            {
-                using var transaction = await context.Database.BeginTransactionAsync();
-
-                var response = await httpClient.GetAsync($"https://calendarific.com/api/v2/holidays?&api_key={Environment.GetEnvironmentVariable("HOLIDAY_API")}&country={currentCountry}&year={dTOSelectedDay.Year}");
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    DTOYearlyHolidays? apiResponse = JsonSerializer.Deserialize<DTOYearlyHolidays>(await response.Content.ReadAsStringAsync());
-
-                    if (apiResponse != null)
-                    {
-                        List<Holiday> holidays = [];
-                        foreach (var holiday in apiResponse.Response?.Holidays ?? [])
-                        {
-                            if (holiday.Type.Contains("National holiday"))
-                            holidays.Add(new()
-                            {
-                                Country = currentCountry,
-                                Year = holiday.Date.Datetime.Year,
-                                Month = holiday.Date.Datetime.Month,
-                                Day = holiday.Date.Datetime.Day,
-                            });
-                        }
-                        await context.Holidays.AddRangeAsync(holidays);
-                        await context.SaveChangesAsync();
-                    }
-                }
-                await transaction.CommitAsync();
-            }
-        }
+        }  
     }
 }

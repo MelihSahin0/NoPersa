@@ -28,6 +28,7 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - HOLIDAY_API=${HOLIDAY_API}
 
   managementservice:
     image: ${DOCKER_REGISTRY-}managementservice
@@ -66,7 +67,6 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - HOLIDAY_API=${HOLIDAY_API}
 
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver
