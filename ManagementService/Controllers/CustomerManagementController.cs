@@ -1,4 +1,4 @@
-﻿using ManagmentService.Database;
+﻿using ManagementService.Database;
 using Microsoft.AspNetCore.Mvc;
 using SharedLibrary.Models;
 using SharedLibrary.DTOs;
@@ -8,17 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Util;
 
-namespace ManagmentService.Controllers
+namespace ManagementService.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CustomerManagmentController : ControllerBase
+    public class CustomerManagementController : ControllerBase
     {
-        private NoPersaDbContext context;
-        private readonly ILogger<CustomerManagmentController> logger;
+        private readonly NoPersaDbContext context;
+        private readonly ILogger<CustomerManagementController> logger;
         private readonly IMapper mapper;
 
-        public CustomerManagmentController(ILogger<CustomerManagmentController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
+        public CustomerManagementController(ILogger<CustomerManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
         {
             this.context = noPersaDbContext;
             this.logger = logger;
@@ -70,8 +70,10 @@ namespace ManagmentService.Controllers
 
                 if (customer.Id == 0)
                 {
-                    customer.Position = context.Customers.Where(x => x.RouteId == customer.RouteId).Count();
-         
+                    customer.Position = (context.Customers.Where(c => c.RouteId == dTOCustomer.RouteId)
+                                                          .Select(c => (int?)c.Position)  
+                                                          .Max() ?? -1) + 1;
+
                     List<MonthlyOverview> overviewsToRemove = [];
                     foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
                     {
@@ -113,8 +115,20 @@ namespace ManagmentService.Controllers
                     dbCustomer.TemporaryDelivery = customer.TemporaryDelivery;
                     dbCustomer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
 
-                    dbCustomer.Workdays = customer.Workdays;
-                    dbCustomer.Holidays = customer.Holidays;
+                    dbCustomer.Workdays.Monday = customer.Workdays.Monday;
+                    dbCustomer.Workdays.Tuesday = customer.Workdays.Tuesday;
+                    dbCustomer.Workdays.Wednesday = customer.Workdays.Wednesday;
+                    dbCustomer.Workdays.Thursday = customer.Workdays.Thursday;
+                    dbCustomer.Workdays.Friday = customer.Workdays.Friday;
+                    dbCustomer.Workdays.Saturday = customer.Workdays.Saturday;
+                    dbCustomer.Workdays.Sunday = customer.Workdays.Sunday;
+                    dbCustomer.Holidays.Monday = customer.Holidays.Monday;
+                    dbCustomer.Holidays.Tuesday = customer.Holidays.Tuesday;
+                    dbCustomer.Holidays.Wednesday = customer.Holidays.Wednesday;
+                    dbCustomer.Holidays.Thursday = customer.Holidays.Thursday;
+                    dbCustomer.Holidays.Friday = customer.Holidays.Friday;
+                    dbCustomer.Holidays.Saturday = customer.Holidays.Saturday;
+                    dbCustomer.Holidays.Sunday = customer.Holidays.Sunday;
 
                     List<MonthlyOverview> newMonthlyOverviews = [];
                     foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
@@ -170,16 +184,16 @@ namespace ManagmentService.Controllers
         {
             try
             {
-                MonthlyOverview? dbMonthlyOverview = context.MonthlyOverviews.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
+                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
                                                                                            m.Year == monthOfTheYear.Year &&
                                                                                            m.Month == monthOfTheYear.Month);
-                if (dbMonthlyOverview == null)
+                if (monthlyOverview == null)
                 {
                     return NotFound();
                 }
                 else
                 {
-                    return Ok(mapper.Map<DTOMonthlyDelivery>(dbMonthlyOverview));
+                    return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
                 }
             }
             catch (ValidationException e)

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Models;
 
-namespace ManagmentService.Database
+namespace ManagementService.Database
 {
     public class NoPersaDbContext : DbContext
     {
@@ -18,19 +18,19 @@ namespace ManagmentService.Database
         {
             modelBuilder.Entity<Customer>()
                         .ToTable("Customer")
-                        .HasKey(r => r.Id);
+                        .HasKey(c => c.Id);
 
             modelBuilder.Entity<Weekday>()
                         .ToTable("Weekday")
-                        .HasKey(r => r.Id);
+                        .HasKey(w => w.Id);
 
             modelBuilder.Entity<MonthlyOverview>()
                         .ToTable("MonthlyOverview")
-                        .HasKey(r => r.Id);
+                        .HasKey(m => m.Id);
 
             modelBuilder.Entity<DailyOverview>()
                         .ToTable("DailyOverview")
-                        .HasKey(r => r.Id);
+                        .HasKey(d => d.Id);
         }
     }
 }

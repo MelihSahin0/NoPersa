@@ -2,40 +2,39 @@
 @using Website.Client.Styles
 
 <div class="@Class">
-    <div class="w-full">
-        @if (DisplayFilter)
-        {
-            <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black mb-5")"
-                       Placeholder="Filter"
-                       @bind-Value="@StartFilter" />
-        }
-        <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")"
-            ondragover="event.preventDefault();"
-            ondragstart="event.dataTransfer.setData('', event.target.id);">
-            @foreach (var route in Routes.OrderBy(x => x.Position))
+    @for (int i = 0; i < SelectedRouteId?.Count(); i++)
+    {
+        int currentId = SelectedRouteId[i];
+        int j = i;
+
+        <div class="w-1/2 justify-center m-1">
+            @if (DisplayFilter)
             {
-                @if (string.IsNullOrWhiteSpace(StartFilter) || route.Name.ToLower().StartsWith(StartFilter.ToLower()))
-                {
-                    <li @ondrop="()=>HandleDrop(route)" @key="route"
-                        @ondragleave="@(()=> {route.IsDragOver = false;})"
-                        @ondragenter="@(()=>{route.IsDragOver = true;})"
-                        @ondragstart="() => draggedItem = route"
-                        @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
-                        <div class="flex flex-row">
-                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => route.Name)} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation}")"
-                                       Placeholder="@Placeholder"
-                                       @bind-Value="@route.Name"
-                                       ValidationFunction="@ValidationFunction" />
-                            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} min-w-fit ml-1")"
-                                    @onclick="() => DelteRoute(route.Position)">
-                                Delete Route
-                            </button>
-                        </div>
-                        <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => route.Name)" />
-                    </li>
-                }
+                <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black")"
+                           Placeholder="Filter" @bind-Value="@StartFilter![j]" />
             }
-            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddRoute()">Add new Route</button>
-        </ul>
-    </div>
+            <ul class="@($"{MaxHeight} {MinHeight} w-full p-2 space-y-2 flex flex-col overflow-y-auto")"
+                ondragover="event.preventDefault();"
+                ondragstart="event.dataTransfer.setData('', event.target.id);"
+                @ondrop="() => HandleDrop(null, currentId)">
+                @foreach (var customer in Routes.Find(r => r.Id == currentId)?.CustomersRoute.OrderBy(c => c.Position).ToList() ?? [])
+                {
+                    @if (DisplayFilter == false || string.IsNullOrWhiteSpace(StartFilter![j]) || customer.Name.ToLower().StartsWith(StartFilter[j]!.ToLower()))
+                    {
+                        <li @ondrop="()=>HandleDrop(customer, currentId)" @key="customer"
+                            @ondragleave="@(()=> {customer.IsDragOver = false;})"
+                            @ondragenter="@(()=>{customer.IsDragOver = true;})"
+                            @ondragstart="() => draggedItem = customer"
+                            @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
+                            <div class="flex flex-row">
+                                <label class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black select-none")">
+                                    @customer.Name
+                                </label>
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    }
 </div>

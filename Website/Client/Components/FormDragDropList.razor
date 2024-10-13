@@ -33,7 +33,7 @@
                                        @bind-Value="@route.Name"
                                        ValidationFunction="@ValidationFunction"/>
                             <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} min-w-fit ml-1")"
-                                    @onclick="() => DelteRoute(route.Position)">Delete Route</button>
+                                    @onclick="() => DeleteRoute(route.Position)">Delete Route</button>
                         </div>
                         <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => route.Name)" />
                     </li>

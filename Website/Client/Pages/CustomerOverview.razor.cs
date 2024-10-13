@@ -69,7 +69,7 @@ namespace Website.Client.Pages
                     {
                         MonthOfTheYear = new MonthOfTheYear()
                         {
-                                Month = (Months)(dateTime.Month - 1),
+                                Month = (Months)(dateTime.Month),
                                 Year = dateTime.Year
                         },
                         DailyDeliveries = dailyOverviews
@@ -80,7 +80,7 @@ namespace Website.Client.Pages
                 Workdays = new Weekdays(),
                 Holidays = new Weekdays(),
                 ContactInformation = string.Empty,
-                RouteId = null,
+                RouteId = int.MinValue,
                 RouteDetails = []
             };
         }
@@ -97,7 +97,7 @@ namespace Website.Client.Pages
                     };
                     NavigationContainer.CustomerId = null;
 
-                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagmentService")}/CustomerManagment/GetCustomer", data, JsonSerializerOptions)!;
+                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomer", data, JsonSerializerOptions)!;
 
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
@@ -105,11 +105,12 @@ namespace Website.Client.Pages
 
                         Customer.Id = customer.Id;
                         Customer.SerialNumber = customer.SerialNumber;
-                        Customer.Name = customer.Name;
                         Customer.Title = customer.Title;
+                        Customer.Name = customer.Name;
                         Customer.Address = customer.Address;
                         Customer.Region = customer.Region;
                         Customer.GeoLocation = customer.GeoLocation;
+                        Customer.ContactInformation = customer.ContactInformation;
                         Customer.Article = customer.Article;
                         Customer.DefaultPrice = customer.DefaultPrice;
                         Customer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
@@ -118,7 +119,6 @@ namespace Website.Client.Pages
                         Customer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
                         Customer.Workdays = customer.Workdays;
                         Customer.Holidays = customer.Holidays;
-                        Customer.ContactInformation = customer.ContactInformation;
                         Customer.RouteId = customer.RouteId;
                     }
                     else if (response1.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -129,7 +129,7 @@ namespace Website.Client.Pages
                     }
                 }
 
-                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagment/GetRoutesOverview")!;
+                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRoutesOverview")!;
 
                 if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -148,7 +148,7 @@ namespace Website.Client.Pages
 
         private async Task Submit(EditContext editContext)
         {
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagmentService")}/CustomerManagment/UpdateCustomer", Customer, JsonSerializerOptions);
+            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", Customer, JsonSerializerOptions);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

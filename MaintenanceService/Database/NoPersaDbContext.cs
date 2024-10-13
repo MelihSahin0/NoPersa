@@ -2,7 +2,7 @@
 using SharedLibrary.Models;
 using Route = SharedLibrary.Models.Route;
 
-namespace MigrationService.Database
+namespace MaintenanceService.Database
 {
     public class NoPersaDbContext : DbContext
     {
@@ -48,6 +48,15 @@ namespace MigrationService.Database
                 .WithMany(r => r.Customers)
                 .HasForeignKey(c => c.RouteId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Route>().HasData(
+                   new Route
+                   {
+                       Id = int.MinValue,
+                       Name = "Archive",
+                       Position = int.MaxValue,
+                   }
+               );
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DeliveryService.Database;
+using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs;
@@ -14,15 +15,15 @@ namespace DeliveryService.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class DeliveryManagmentController : ControllerBase
+    public class DeliveryManagementController : ControllerBase
     {
-        private NoPersaDbContext context;
+        private readonly NoPersaDbContext context;
         private readonly HttpClient httpClient;
-        private readonly ILogger<DeliveryManagmentController> logger;
+        private readonly ILogger<DeliveryManagementController> logger;
         private readonly IMapper mapper;
         private readonly string currentCountry = "at"; //TODO: Will be removed in the future
 
-        public DeliveryManagmentController(ILogger<DeliveryManagmentController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper, HttpClient httpClient)
+        public DeliveryManagementController(ILogger<DeliveryManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper, HttpClient httpClient)
         {
             this.context = noPersaDbContext;
             this.logger = logger;
@@ -36,12 +37,10 @@ namespace DeliveryService.Controllers
             try
             {
                 DTORoutes dTORoutes = new();
+                
                 List<DTORouteOverview> routes = [];
-
-                foreach (Route dbRoute in context.Routes.Include(r => r.Customers))
-                {
-                    routes.Add(mapper.Map<DTORouteOverview>(dbRoute));
-                }
+                routes.AddRange(mapper.Map<List<DTORouteOverview>>(context.Routes.Include(r => r.Customers)));
+             
                 dTORoutes.RouteOverview = [.. routes];
 
                 return Ok(dTORoutes);
@@ -94,12 +93,18 @@ namespace DeliveryService.Controllers
                     }
                 }
 
-                var dbNotFoundRoutes = context.Routes.Where(er => !oldRoutes.Select(or => or.Id).Contains(er.Id)).Include(r => r.Customers).ToList();
+                //without Archive
+                var dbNotFoundRoutes = context.Routes.Where(er => !oldRoutes.Select(or => or.Id).Contains(er.Id) && er.Id != int.MinValue).Include(r => r.Customers).ToList();
+                int i = (context.Customers.Where(c => c.RouteId == int.MinValue)
+                                          .Select(c => (int?)c.Position)
+                                          .Max() ?? -1) + 1;
                 foreach (var dbObsoleteRoute in dbNotFoundRoutes)
                 {
                     foreach (Customer dbCustomer in dbObsoleteRoute.Customers)
                     {
-                        dbCustomer.Position = null;
+                        dbCustomer.RouteId = int.MinValue;
+                        dbCustomer.Position = i;
+                        i++;
                     }
                     context.Routes.Remove(dbObsoleteRoute);
                 }
@@ -135,7 +140,8 @@ namespace DeliveryService.Controllers
                 DTODeliveryStatus dTODeliveryStatus = new();
                 List<DTORouteDetails> routes = [];
 
-                List<Route> dbRoutes = await context.Routes.Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                //Without Archive
+                List<Route> dbRoutes = await context.Routes.Where(r => r.Id != int.MinValue).Include(r => r.Customers).ThenInclude(c => c.Workdays)
                                           .Include(r => r.Customers).ThenInclude(c => c.Holidays)
                                           .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month))
                                                                     .ThenInclude(d=>d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDay.Day))
@@ -184,12 +190,14 @@ namespace DeliveryService.Controllers
             }
         }
 
-        [HttpPost("GetRouteDetails", Name = "GetRouteDetails")]
-        public IActionResult GetRouteDetails([FromBody] DTOSelectedDay dTOSelectedDay)
+        [HttpGet("GetRouteDetails", Name = "GetRouteDetails")]
+        public IActionResult GetRouteDetails()
         {
             try
             {
-                return Ok();
+                List<Route> dbRoutes = [.. context.Routes.Include(r => r.Customers)];
+
+                return Ok(mapper.Map<List<DTOSequenceDetails>>(dbRoutes));
             }
             catch (ValidationException e)
             {
@@ -203,6 +211,46 @@ namespace DeliveryService.Controllers
             }
         }
 
+        [HttpPost("UpdateCustomerSequence", Name = "UpdateCustomerSequence")]
+        public IActionResult UpdateCustomerSequence([FromBody] List<DTOSequenceDetails> dTOSequenceDetails)
+        {
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                List<Customer> customersToUpdate = [];
+                foreach (DTOSequenceDetails route in dTOSequenceDetails)
+                {
+                    foreach (DTOCustomerSequence customer in route.CustomersRoute ?? [])
+                    {
+                        Customer? dbCustomer = context.Customers.FirstOrDefault(c => c.Id == customer.Id);
+
+                        if (dbCustomer != null)
+                        {
+                            dbCustomer.RouteId = route.Id;
+                            dbCustomer.Position = customer.Position;
+                            customersToUpdate.Add(dbCustomer);
+                        }
+                    }
+                }
+                context.BulkUpdate(customersToUpdate);
+                transaction.Commit();
+
+                return Ok();
+            }
+            catch (ValidationException e)
+            {
+                transaction.Rollback();
+                logger.LogError(e.Message);
+                return ValidationProblem(e.Message);
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+                logger.LogError(e.Message);
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
 
         private bool SetDeliveryToTrueOrFalse(Customer dbCustomer, DTOSelectedDay dTOSelectedDay)
         {

@@ -2,22 +2,19 @@
 
 namespace Website.Client.Models
 {
-    public class RouteDetails
+    public class SequenceDetails
     {
         [Required]
         public required int Id { get; set; }
 
         [Required]
-        public required int Position { get; set; }
-
-        [Required]
         public required string Name { get; set; }
 
         [Required]
-        public required List<CustomersRoute> CustomersRoute { get; set; }
+        public required List<CustomersSequence> CustomersRoute { get; set; }
     }
 
-    public class CustomersRoute
+    public class CustomersSequence
     {
         [Required]
         public required int Id { get; set; }
@@ -27,9 +24,6 @@ namespace Website.Client.Models
 
         [Required]
         public required string Name { get; set; }
-
-        [Required]
-        public required bool ToDeliver { get; set; }
 
         public bool IsDragOver { get; set; }
     }

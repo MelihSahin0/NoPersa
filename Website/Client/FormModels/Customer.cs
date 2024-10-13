@@ -95,8 +95,8 @@ namespace Website.Client.FormModels
         [JsonIgnore]
         public bool ModifyMonthlyDelivery => DateTimeCalc.MonthDifferenceMax1(DateTime.Today.Year, MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Year, DateTime.Today.Month, (int)MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Month);
 
-        [IntType(min: 0)]
-        public int? RouteId { get; set; }
+        [IntType]
+        public int RouteId { get; set; }
 
         [JsonIgnore]
         public List<RouteOverview>? RouteDetails { get; set; }
@@ -117,7 +117,7 @@ namespace Website.Client.FormModels
                 i++;
             }
 
-            using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagmentService")}/CustomerManagment/GetCustomerDailyDelivery",
+            using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomerDailyDelivery",
                                      new
                                      {
                                          ReferenceId = Id,

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
+using System.Xml.Serialization;
 
 namespace SharedLibrary.MappingProfiles
 {
@@ -22,9 +23,20 @@ namespace SharedLibrary.MappingProfiles
             CreateMap<Route, DTORouteDetails>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position))
+                .ForMember(dest => dest.CustomersRoute, opt => opt.MapFrom(src => src.Customers));
 
             CreateMap<Customer, DTOCustomerRoute>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
+
+            CreateMap<Route, DTOSequenceDetails>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.CustomersRoute, opt => opt.MapFrom(src => src.Customers));
+
+            CreateMap<Customer, DTOCustomerSequence>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));

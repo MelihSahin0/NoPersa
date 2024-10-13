@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ManagmentService.Database;
+using ManagementService.Database;
 using SharedLibrary.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);

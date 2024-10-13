@@ -1,0 +1,28 @@
+﻿@page "/customerSequence"
+@using Website.Client.Components
+@using Website.Client.FormModels
+@using Website.Client.Models
+@using Website.Client.Styles
+
+<EditForm Model="CustomerSeq" OnValidSubmit="@Submit" class="w-full flex flex-col">
+    <ObjectGraphDataAnnotationsValidator />
+
+    <div class="flex flex-col justify-between self-center w-4/6">
+        <div class="flex flex-row justify-center mb-2">
+            @for (int i = 0; i < CustomerSeq.SelectedRouteDetailsId.Count(); i++)
+            {
+                int j = i;
+                <FormInputSelect Class="w-1/2 justify-center" List="@([.. CustomerSeq.RouteOverview.Where(r => r.Id != CustomerSeq.SelectedRouteDetailsId[CustomerSeq.SelectedRouteDetailsId.Count() - 1 - j])])"
+                                 @bind-Value="CustomerSeq.SelectedRouteDetailsId[j]"/>
+            }
+        </div>
+        <div>
+            <FormDragDropMultipleList Class="flex flex-row justify-center" MaxHeight="max-h-96" MinHeight="min-h-64" DisplayFilter="true" StartFilter="@([.. Enumerable.Repeat(string.Empty, 2).ToList()])"
+                                      SelectedRouteId="CustomerSeq.SelectedRouteDetailsId" @bind-Routes="CustomerSeq.RouteDetails" />
+        </div>
+    </div>
+    <div class="flex flex-row self-center mt-5">
+        <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightRed w-20 mx-2")" @onclick="() => Cancel()">Cancel</button>
+        <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
+    </div>
+</EditForm>

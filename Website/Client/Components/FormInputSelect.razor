@@ -1,13 +1,13 @@
 ﻿@using Website.Client.Models
 @using Website.Client.Styles
 
-<div class="flex flex-row">
+<div class="@($"{Class} flex flex-row")">
     <label class="@($"{Scaling.GetTextScaling()} text-center select-none mr-2")">@Label</label>
-    <InputSelect class="@($"{Scaling.GetTextScaling()} ring-black ring-1 rounded-md hover:ring-skyHover text-center select-none")" @bind-Value="Value" @oninput="OnValueChanged">
-        @foreach (RouteOverview route in List)
+    <InputSelect class="@($"{Scaling.GetTextScaling()} ring-black ring-1 rounded-md hover:ring-skyHover text-center select-none")" 
+                @bind-Value="Value" @oninput="OnValueChanged">
+        @foreach (RouteOverview route in List ?? [])
         {
-            <option class="rounded-md bg-gray-700 hover:bg-skyHover text-white" value="@route.Id">@route.Name</option>
+            <option @key="route" class="rounded-md bg-gray-700 hover:bg-skyHover text-white" value="@route.Id">@route.Name</option>
         }
-        <option class="rounded-md bg-gray-700 hover:bg-skyHover text-white" value="null">Archive</option>
     </InputSelect>
 </div>

@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
-using System.Linq.Expressions;
 using Website.Client.Models;
-using Website.Client.Styles;
 
 namespace Website.Client.Components
 {
@@ -15,116 +13,103 @@ namespace Website.Client.Components
         public string MaxHeight { get; set; } = string.Empty;
 
         [Parameter]
+        public string MinHeight { get; set; } = string.Empty;
+
+        [Parameter]
         public string TextOrientation { get; set; } = "text-left";
 
         [Parameter]
         public string Class { get; set; } = string.Empty;
 
         [Parameter]
-        public string? Placeholder { get; set; }
-
-        [Parameter]
-        public Func<string?, bool>? ValidationFunction { get; set; }
-
-        [Parameter]
         public bool Draggable { get; set; } = true;
-
-        private bool Filtering => !string.IsNullOrWhiteSpace(StartFilter);
 
         [Parameter]
         public bool DisplayFilter { get; set; } = false;
 
         [Parameter]
-        public string StartFilter { get; set; } = string.Empty;
+        public string[]? StartFilter { get; set; }
 
         [Parameter]
-        public required List<RouteOverview> Routes { get; set; }
+        public required List<SequenceDetails> Routes { get; set; } = [];
 
         [Parameter]
-        public EventCallback<List<RouteOverview>> RoutesChanged { get; set; }
+        public EventCallback<List<SequenceDetails>> RoutesChanged { get; set; }
 
-        private RouteOverview? draggedItem;
-        private void HandleDrop(RouteOverview landingModel)
+        [Parameter]
+        public required int[]? SelectedRouteId { get; set; }
+
+        private CustomersSequence? draggedItem;
+        private void HandleDrop(CustomersSequence landingModel, int targetId)
         {
             if (draggedItem is null)
             {
                 return;
             }
 
-            int originalOrderLanding = landingModel.Position;
+            var sourceRoute = Routes.Find(r => r.CustomersRoute.Contains(draggedItem));
+            var targetRoute = Routes.Find(r => r.CustomersRoute.Contains(landingModel));
 
-            Routes.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
-
-            draggedItem.Position = originalOrderLanding;
-
-            int i = 0;
-            foreach (var route in Routes.OrderBy(x => x.Position).ToList())
+            int originalLanding = 0;
+            if (sourceRoute == null)
             {
-                route.Position = i++;
-
-                route.IsDragOver = false;
+                return;
             }
-        }
-
-        private bool IsPopupVisible = false;
-        private int? toDeletePosition;
-        private void DelteRoute(int position)
-        {
-            toDeletePosition = position;
-
-            if (Routes[position].NumberOfCustomers > 0)
+            if (targetRoute == null)
             {
-                IsPopupVisible = true;
+                foreach (var routeId in SelectedRouteId ?? [])
+                {
+                    if (Routes.FirstOrDefault(r => r.Id == routeId)!.CustomersRoute.Count == 0)
+                    {
+                        targetRoute = Routes.FirstOrDefault(r => r.Id == routeId);
+                        break;
+                    }
+                }
+                
+                if (targetRoute == null)
+                {
+                    return;
+                }
+
+                if (targetId == sourceRoute.Id && targetRoute.CustomersRoute.Count == 0)
+                {
+                    return;
+                }
             }
             else
             {
-                DeleteRouteConfirmed();
-            }
-        }
-
-        private void AddRoute()
-        {
-            Routes.Add(new RouteOverview() { Id = 0, Position = Routes.Count, Name = "", NumberOfCustomers = 0 });
-        }
-
-        public string ValidStateCss(Expression<Func<string>>? For)
-        {
-            if (For == null)
-            {
-                InputStyles.GetBorderDefaultStyle(false);
+                originalLanding = landingModel.Position;
             }
 
-            var fieldIdentifier = FieldIdentifier.Create(For);
-            var isInvalid = CascadedEditContext!.GetValidationMessages(fieldIdentifier).Any();
-
-            return InputStyles.GetBorderDefaultStyle(isInvalid);
-        }
-
-        private void HandlePopupClose(bool result)
-        {
-            IsPopupVisible = false;
-
-            if (result)
+            if (sourceRoute.Id == targetRoute.Id)
             {
-                DeleteRouteConfirmed();
+                sourceRoute.CustomersRoute.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
+
+                draggedItem.Position = originalLanding;
             }
-        }
-
-        private void DeleteRouteConfirmed()
-        {
-            if (toDeletePosition != null)
+            else
             {
-                Routes.Remove(Routes.FirstOrDefault(r => r.Position == toDeletePosition)!);
+                Console.WriteLine("test");
+                sourceRoute.CustomersRoute.Remove(draggedItem);
+
+                targetRoute.CustomersRoute.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
+
+                draggedItem.Position = originalLanding;
+                targetRoute.CustomersRoute.Add(draggedItem);
 
                 int i = 0;
-                foreach (var route in Routes.OrderBy(x => x.Position).ToList())
+                foreach (var customer in sourceRoute.CustomersRoute.OrderBy(c => c.Position).ToList())
                 {
-                    route.Position = i++;
-
-                    route.IsDragOver = false;
+                    customer.Position = i++;
+                    customer.IsDragOver = false;
                 }
+            }
 
-                toDeletePosition = null;
+            int j = 0;
+            foreach (var customer in targetRoute.CustomersRoute.OrderBy(c => c.Position).ToList())
+            {
+                customer.Position = j++;
+                customer.IsDragOver = false;
             }
         }
     }

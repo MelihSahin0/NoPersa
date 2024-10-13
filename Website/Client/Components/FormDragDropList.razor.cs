@@ -27,9 +27,7 @@ namespace Website.Client.Components
         public Func<string?, bool>? ValidationFunction { get; set; }
 
         [Parameter]
-        public bool Draggable { get; set; } = true;
-
-        private bool Filtering => !string.IsNullOrWhiteSpace(StartFilter);       
+        public bool Draggable { get; set; } = true;  
 
         [Parameter]
         public bool DisplayFilter { get; set; } = false;
@@ -68,7 +66,7 @@ namespace Website.Client.Components
 
         private bool IsPopupVisible = false;
         private int? toDeletePosition;
-        private void DelteRoute(int position)
+        private void DeleteRoute(int position)
         {
             toDeletePosition = position;
 

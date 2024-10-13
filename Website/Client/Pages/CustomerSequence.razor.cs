@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 using Website.Client.Exceptions;
-using Blazored.LocalStorage;
-using System.Net.Http.Json;
-using Website.Client.FormModels;
 using Website.Client.Services;
+using Website.Client.FormModels;
+using Website.Client.Models;
+using System.Net.Http.Json;
 
 namespace Website.Client.Pages
 {
-    public partial class ModifyRoutes
+    public partial class CustomerSequence
     {
         [Inject]
         public required ILocalStorageService LocalStorage { get; set; }
@@ -26,21 +27,22 @@ namespace Website.Client.Pages
         [Inject]
         public required NotificationService NotificationService { get; set; }
 
-        public required Route Routes { get; set; }
+        public required CustomerSeq CustomerSeq { get; set; }
 
         protected override void OnInitialized()
         {
-            Routes = new Route() { RouteOverview = [] };
+            CustomerSeq = new CustomerSeq() {  RouteDetails = [], SelectedRouteDetailsId = [], RouteOverview = [] };
         }
 
         protected override async Task OnInitializedAsync()
         {
-            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRoutesOverview")!;
-           
+            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRouteDetails")!;
+
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                Routes = JsonSerializer.Deserialize<Route>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-                Routes.RouteOverview.RemoveAll(r => r.Id == int.MinValue);
+                CustomerSeq.RouteDetails = [.. JsonSerializer.Deserialize<List<SequenceDetails>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(r => r.Name)];
+                CustomerSeq.SelectedRouteDetailsId = CustomerSeq.RouteDetails.Take(2).Select(r => r.Id).ToArray();
+                CustomerSeq.RouteOverview = [.. CustomerSeq.RouteDetails.Select(r => new RouteOverview() { Id = r.Id, Name = r.Name, Position = 0, NumberOfCustomers = 0}).OrderBy(r => r.Name)];
             }
             else
             {
@@ -50,11 +52,12 @@ namespace Website.Client.Pages
 
         private async Task Submit(EditContext editContext)
         {
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateRoutes", Routes, JsonSerializerOptions);
+
+            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateCustomerSequence", CustomerSeq.RouteDetails, JsonSerializerOptions);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                NotificationService.SetSuccess("Successfully added/updated route(s)");
+                NotificationService.SetSuccess("Successfully updated customer sequence");
                 NavigationManager.NavigateTo("/");
             }
             else

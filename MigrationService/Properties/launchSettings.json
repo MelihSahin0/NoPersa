@@ -1,25 +1,12 @@
 {
   "profiles": {
-    "MigrationService": {
-      "commandName": "Project"
-    },
-    "Container (Dockerfile)": {
-      "commandName": "Docker",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+    "MaintenanceService": {
+      "commandName": "Project",
+      "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "publishAllPorts": true,
-      "useSSL": false
-    }
-  },
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:55262",
-      "sslPort": 0
+      "applicationUrl": "https://localhost:64838;http://localhost:64839"
     }
   }
 }

@@ -47,7 +47,7 @@ namespace SharedLibrary.Models
         public ICollection<MonthlyOverview> MonthlyOverviews { get; set; } = [];
 
         [IntType(min: 0)]
-        public int? Position { get; set; }
+        public int Position { get; set; }
 
         [Required]
         public bool TemporaryDelivery { get; set; }

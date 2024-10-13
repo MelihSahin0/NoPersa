@@ -1,7 +1,7 @@
 services:
   NoPersaPostgresDb:
     image: postgres:latest
-    container_name: NoPersaPostgresDb
+    container_name: PostgresDb
     ports:
         - "5432:5432"
     restart: always
@@ -12,12 +12,12 @@ services:
     volumes:
         - NoPersaPostgresDb-data:/var/lib/postgresql/data
 
-  migrationservice:
-    image: ${DOCKER_REGISTRY-}migrationservice
-    container_name: MigrationService
+  maintenanceservice:
+    image: ${DOCKER_REGISTRY-}maintenanceservice
+    container_name: MaintenanceService
     build:
       context: .
-      dockerfile: MigrationService/Dockerfile
+      dockerfile: MaintenanceService/Dockerfile
     pull_policy: always
     restart: always
     depends_on:
@@ -29,12 +29,12 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
 
-  managmentservice:
-    image: ${DOCKER_REGISTRY-}managmentservice
-    container_name: ManagmentService
+  managementservice:
+    image: ${DOCKER_REGISTRY-}managementservice
+    container_name: ManagementService
     build:
       context: .
-      dockerfile: ManagmentService/Dockerfile
+      dockerfile: ManagementService/Dockerfile
     ports:
       - "8081:8081"
     pull_policy: always
