@@ -5,7 +5,7 @@ namespace Website.Client.Components
     public partial class Popup
     {
         [Parameter]
-        public string? Titel { get; set; }
+        public string? Title { get; set; }
 
         [Parameter]
         public string? Message { get; set; }

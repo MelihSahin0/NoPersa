@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaintenanceService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    [Migration("20241013194234_V1")]
-    partial class V1
+    [Migration("20231015115027_V0")]
+    partial class V0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,13 +171,6 @@ namespace MaintenanceService.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Maintenance");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            NextDailyDeliverySave = new DateTime(2024, 10, 13, 0, 0, 0, 0, DateTimeKind.Local)
-                        });
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.MonthlyOverview", b =>

@@ -5,7 +5,7 @@
     <label class="@($"{Scaling.GetTextScaling()} text-center select-none mr-2")">@Label</label>
     <InputSelect class="@($"{Scaling.GetTextScaling()} ring-black ring-1 rounded-md hover:ring-skyHover text-center select-none")" 
                 @bind-Value="Value" @oninput="OnValueChanged">
-        @foreach (RouteOverview route in List ?? [])
+        @foreach (RouteOverview route in RouteOverviews ?? [])
         {
             <option @key="route" class="rounded-md bg-gray-700 hover:bg-skyHover text-white" value="@route.Id">@route.Name</option>
         }

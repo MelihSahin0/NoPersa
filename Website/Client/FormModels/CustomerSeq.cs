@@ -6,7 +6,7 @@ namespace Website.Client.FormModels
     public class CustomerSeq
     {
         [Required]
-        public required List<SequenceDetails> RouteDetails { get; set; }
+        public required List<SequenceDetail> SequenceDetails { get; set; }
 
         [Required]
         public required int[] SelectedRouteDetailsId { get; set; }

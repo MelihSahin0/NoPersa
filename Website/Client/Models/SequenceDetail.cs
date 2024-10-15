@@ -2,7 +2,7 @@
 
 namespace Website.Client.Models
 {
-    public class SequenceDetails
+    public class SequenceDetail
     {
         [Required]
         public required int Id { get; set; }

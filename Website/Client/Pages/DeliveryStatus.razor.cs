@@ -31,7 +31,7 @@ namespace Website.Client.Pages
         public required int TabIndex { get; set; }
         protected override void OnInitialized()
         {
-            DateTime dateTime = DateTime.Now;
+            DateTime dateTime = DateTime.Today;
             DeliveryStats = new DeliveryStats(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
                 RouteDetails = [],

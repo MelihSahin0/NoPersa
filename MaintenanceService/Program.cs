@@ -30,6 +30,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<NoPersaDbContext>();
     db.Database.Migrate();
+    db.SeedData();
 }
 
 app.Run();

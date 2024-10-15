@@ -30,11 +30,13 @@ namespace Website.Client.Pages
         [Inject]
         public required NavigationContainer NavigationContainer { get; set; }
 
+        public bool IsSubmitting { get; set; } = false;
+
         public required Customer Customer { get; set; }
 
         protected override void OnInitialized()
         {
-            DateTime dateTime = DateTime.Now;
+            DateTime dateTime = DateTime.Today;
 
             List<DailyDelivery> dailyOverviews = [];
             for (int day = 1; day <= 31; day++)
@@ -148,17 +150,26 @@ namespace Website.Client.Pages
 
         private async Task Submit(EditContext editContext)
         {
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", Customer, JsonSerializerOptions);
+            IsSubmitting = true;
+            try
+            {
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", Customer, JsonSerializerOptions);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                NotificationService.SetSuccess("Successfully added/updated customer");
-                NavigationManager.NavigateTo("/");
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    NotificationService.SetSuccess("Successfully added/updated customer");
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                }
             }
-            else
+            catch
             {
-                NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                NotificationService.SetError("Server is not reachable.");
             }
+            IsSubmitting = false;
         }
     }
 }

@@ -3,7 +3,7 @@
 
 <div class="@Class">
     <Popup IsVisible="@IsPopupVisible"
-           Titel="Warning"
+           Title="Warning"
            FalseButton="Cancel"
            TrueButton="Proceed"
            Message="This route still has customers left. All customers will be archived after the route is deleted. Do you whish to proceed?"
@@ -18,7 +18,7 @@
         <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")"
             ondragover="event.preventDefault();"
             ondragstart="event.dataTransfer.setData('', event.target.id);">
-            @foreach (var route in Routes.OrderBy(x => x.Position))
+            @foreach (var route in RouteOverviews.OrderBy(x => x.Position))
             {
                 @if (string.IsNullOrWhiteSpace(StartFilter) || route.Name.ToLower().StartsWith(StartFilter.ToLower()))
                 {

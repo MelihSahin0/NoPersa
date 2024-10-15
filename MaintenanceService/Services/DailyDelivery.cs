@@ -2,12 +2,10 @@
 using SharedLibrary.Models;
 using System.Text.Json;
 using EFCore.BulkExtensions;
-using Route = SharedLibrary.Models.Route;
 using SharedLibrary.DTOs;
 using Holiday = SharedLibrary.Models.Holiday;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Util;
-using SharedLibrary.DTOs.GetDTOs;
 
 namespace MaintenanceService.Services
 {
@@ -28,8 +26,8 @@ namespace MaintenanceService.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var now = DateTime.Now;
-            var targetTime = DateTime.Today.AddHours(18);
+            var now =  DateTime.Now;
+            var targetTime = DateTime.Today.AddHours(8);
 
             var initialDelay = targetTime - now;
             if (initialDelay < TimeSpan.Zero)
@@ -49,6 +47,14 @@ namespace MaintenanceService.Services
             try
             {
                 await CheckHolidays(context, DateTime.Today.Year);
+
+                Random random = new();
+                double randomDay = random.NextDouble() * 364 + 1;
+                if (randomDay < DateTime.Today.DayOfYear)
+                {
+                    await CheckHolidays(context, DateTime.Today.AddYears(1).Year);
+                }
+
                 await transaction.CommitAsync();
             }
             catch (Exception e)
@@ -66,14 +72,14 @@ namespace MaintenanceService.Services
                 List<Customer> dbCustomers = await context.Customer.Where(m => m.MonthlyOverviews.Any(x => x.Year > maintenance.NextDailyDeliverySave.Year || (x.Year == maintenance.NextDailyDeliverySave.Year && x.Month >= maintenance.NextDailyDeliverySave.Month)))
                                                                    .Include(w => w.Workdays)
                                                                    .Include(h => h.Holidays)
-                                                                   .Include(m => m.MonthlyOverviews.Where(x => x.Year >= maintenance.NextDailyDeliverySave.Year || (x.Year == maintenance.NextDailyDeliverySave.Year && x.Month >= maintenance.NextDailyDeliverySave.Month)))
+                                                                   .Include(m => m.MonthlyOverviews.Where(x => x.Year > maintenance.NextDailyDeliverySave.Year || (x.Year == maintenance.NextDailyDeliverySave.Year && x.Month >= maintenance.NextDailyDeliverySave.Month)))
                                                                        .ThenInclude(d => d.DailyOverviews)
                                                                    .ToListAsync();
 
                 foreach (Customer dbCustomer in dbCustomers)
                 {
                     DateTime time = new(maintenance.NextDailyDeliverySave.Year, maintenance.NextDailyDeliverySave.Month, maintenance.NextDailyDeliverySave.Day);
-                    while (DateTime.Now.Date >= time.Date)
+                    while (DateTime.Today.Date >= time.Date)
                     {
                         MonthlyOverview? dbMonthlyOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == time.Year && x.Month == time.Month);
 
@@ -119,7 +125,7 @@ namespace MaintenanceService.Services
                     await context.BulkInsertOrUpdateAsync(batch);
                 }
 
-                (await context.Maintenance.FirstAsync(m => m.Id == 1)).NextDailyDeliverySave = DateTime.Now.AddDays(1).Date;
+                (await context.Maintenance.FirstAsync(m => m.Id == 1)).NextDailyDeliverySave = DateTime.Today.AddDays(1).Date;
                 await context.SaveChangesAsync();
 
                 await transaction2.CommitAsync();
@@ -127,7 +133,7 @@ namespace MaintenanceService.Services
             catch (Exception e)
             {
                 transaction2.Rollback();
-                logger.LogError(e.Message);
+                logger.LogError(e, "DailyDelivery daily save failed");
             }
         }
 
@@ -142,7 +148,7 @@ namespace MaintenanceService.Services
                     var maintenance = await context.Maintenance.FirstOrDefaultAsync(m => m.Id == 1);
                     if (maintenance != null)
                     {
-                        if (DateTime.Now.Date >= maintenance.NextDailyDeliverySave)
+                        if (DateTime.Today.Date >= maintenance.NextDailyDeliverySave)
                         {
                             await CatchUp(context, maintenance);
                         }
@@ -174,7 +180,7 @@ namespace MaintenanceService.Services
 
         private async Task CheckHolidays(NoPersaDbContext context, int year)
         {
-            if (!await context.Holiday.AnyAsync(h => h.Country.Equals(currentCountry) && h.Year == year))
+            if (!await context.Holiday.AsNoTracking().AnyAsync(h => h.Country.Equals(currentCountry) && h.Year == year))
             {
                 var response = await httpClient.GetAsync($"https://calendarific.com/api/v2/holidays?&api_key={Environment.GetEnvironmentVariable("HOLIDAY_API")}&country={currentCountry}&year={year}");
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)

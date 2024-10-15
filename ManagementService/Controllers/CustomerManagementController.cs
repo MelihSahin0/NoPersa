@@ -30,7 +30,7 @@ namespace ManagementService.Controllers
         {
             try
             {
-                Customer? dbCustomer = context.Customers.Where(c => c.Id == dTOSelectedCustomer.Id)
+                Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == dTOSelectedCustomer.Id)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                         .First();
@@ -46,12 +46,12 @@ namespace ManagementService.Controllers
             }
             catch (ValidationException e)
             {
-                logger.LogError(e.Message);
-                return ValidationProblem(e.Message);
+                logger.LogError(e, "Could not map customer");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                logger.LogError(e, "Failed getting customer");
                 return BadRequest("An error occurred while processing your request.");
             }
         }
@@ -166,13 +166,13 @@ namespace ManagementService.Controllers
             catch (ValidationException e)
             {
                 transaction.Rollback();
-                logger.LogError(e.Message);
-                return ValidationProblem(e.Message);
+                logger.LogError(e, "Could not map customer");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
                 transaction.Rollback();
-                logger.LogError(e.Message);
+                logger.LogError(e, "Failed updating customer");
                 return BadRequest("An error occurred while processing your request.");
             }
         }
@@ -182,9 +182,9 @@ namespace ManagementService.Controllers
         {
             try
             {
-                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
-                                                                                           m.Year == monthOfTheYear.Year &&
-                                                                                           m.Month == monthOfTheYear.Month);
+                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.AsNoTracking().FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
+                                                                                                          m.Year == monthOfTheYear.Year &&
+                                                                                                          m.Month == monthOfTheYear.Month);
                 if (monthlyOverview == null)
                 {
                     return NotFound();
@@ -196,12 +196,12 @@ namespace ManagementService.Controllers
             }
             catch (ValidationException e)
             {
-                logger.LogError(e.Message);
-                return ValidationProblem(e.Message);
+                logger.LogError(e, "Could not map customer daily delivery");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                logger.LogError(e, "failed getting customer daily delivery");
                 return BadRequest("An error occurred while processing your request.");
             }
         }

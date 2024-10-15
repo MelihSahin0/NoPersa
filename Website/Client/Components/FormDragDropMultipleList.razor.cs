@@ -31,10 +31,10 @@ namespace Website.Client.Components
         public string[]? StartFilter { get; set; }
 
         [Parameter]
-        public required List<SequenceDetails> Routes { get; set; } = [];
+        public required List<SequenceDetail> SequenceDetails { get; set; } = [];
 
         [Parameter]
-        public EventCallback<List<SequenceDetails>> RoutesChanged { get; set; }
+        public EventCallback<List<SequenceDetail>> SequenceDetailsChanged { get; set; }
 
         [Parameter]
         public required int[]? SelectedRouteId { get; set; }
@@ -47,8 +47,8 @@ namespace Website.Client.Components
                 return;
             }
 
-            var sourceRoute = Routes.Find(r => r.CustomersRoute.Contains(draggedItem));
-            var targetRoute = Routes.Find(r => r.CustomersRoute.Contains(landingModel));
+            var sourceRoute = SequenceDetails.Find(r => r.CustomersRoute.Contains(draggedItem));
+            var targetRoute = SequenceDetails.Find(r => r.CustomersRoute.Contains(landingModel));
 
             int originalLanding = 0;
             if (sourceRoute == null)
@@ -59,9 +59,9 @@ namespace Website.Client.Components
             {
                 foreach (var routeId in SelectedRouteId ?? [])
                 {
-                    if (Routes.FirstOrDefault(r => r.Id == routeId)!.CustomersRoute.Count == 0)
+                    if (SequenceDetails.FirstOrDefault(r => r.Id == routeId)!.CustomersRoute.Count == 0)
                     {
-                        targetRoute = Routes.FirstOrDefault(r => r.Id == routeId);
+                        targetRoute = SequenceDetails.FirstOrDefault(r => r.Id == routeId);
                         break;
                     }
                 }
@@ -89,7 +89,6 @@ namespace Website.Client.Components
             }
             else
             {
-                Console.WriteLine("test");
                 sourceRoute.CustomersRoute.Remove(draggedItem);
 
                 targetRoute.CustomersRoute.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);

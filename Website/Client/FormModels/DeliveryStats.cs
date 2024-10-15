@@ -62,10 +62,10 @@ namespace Website.Client.FormModels
                     NotificationService.SetError(await response.Content.ReadAsStringAsync());
                 }
             }
-            catch (Exception e)
+            catch
             {
-                NotificationService.SetError(e.Message);
-            }
+                NotificationService.SetError("Server is not reachable.");
+            }     
         }
     }
 }

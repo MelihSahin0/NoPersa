@@ -3,11 +3,12 @@
 @using Website.Client.FormModels
 @using Website.Client.Styles
 
+<LoadingPopup IsVisible="@IsSubmitting" />
 <EditForm Model="Routes" OnValidSubmit="@Submit" class="w-full flex flex-col">
     <ObjectGraphDataAnnotationsValidator />
 
     <FormDragDropList Class="w-2/6 flex self-center justify-center items-center" MaxHeight="max-h-96" 
-                      @bind-Routes="Routes.RouteOverview" Placeholder="Routename"/>
+                      @bind-RouteOverviews="Routes.RouteOverview" Placeholder="Route name"/>
    
    <div class="flex flex-row self-center mt-5">
         <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightRed w-20 mx-2")" @onclick="() => Cancel()">Cancel</button>

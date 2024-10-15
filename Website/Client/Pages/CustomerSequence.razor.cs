@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
-using Website.Client.Exceptions;
 using Website.Client.Services;
 using Website.Client.FormModels;
 using Website.Client.Models;
@@ -27,43 +26,59 @@ namespace Website.Client.Pages
         [Inject]
         public required NotificationService NotificationService { get; set; }
 
+        public bool IsSubmitting { get; set; } = false;
         public required CustomerSeq CustomerSeq { get; set; }
 
         protected override void OnInitialized()
         {
-            CustomerSeq = new CustomerSeq() {  RouteDetails = [], SelectedRouteDetailsId = [], RouteOverview = [] };
+            CustomerSeq = new CustomerSeq() {  SequenceDetails = [], SelectedRouteDetailsId = [], RouteOverview = [] };
         }
 
         protected override async Task OnInitializedAsync()
         {
-            using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRouteDetails")!;
+            try 
+            {
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRouteDetails")!;
 
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                CustomerSeq.RouteDetails = [.. JsonSerializer.Deserialize<List<SequenceDetails>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(r => r.Name)];
-                CustomerSeq.SelectedRouteDetailsId = CustomerSeq.RouteDetails.Take(2).Select(r => r.Id).ToArray();
-                CustomerSeq.RouteOverview = [.. CustomerSeq.RouteDetails.Select(r => new RouteOverview() { Id = r.Id, Name = r.Name, Position = 0, NumberOfCustomers = 0}).OrderBy(r => r.Name)];
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    CustomerSeq.SequenceDetails = [.. JsonSerializer.Deserialize<List<SequenceDetail>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(r => r.Name)];
+                    CustomerSeq.SelectedRouteDetailsId = CustomerSeq.SequenceDetails.Take(2).Select(r => r.Id).ToArray();
+                    CustomerSeq.RouteOverview = [.. CustomerSeq.SequenceDetails.Select(r => new RouteOverview() { Id = r.Id, Name = r.Name, Position = 0, NumberOfCustomers = 0 }).OrderBy(r => r.Name)];
+                }
+                else
+                {
+                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                }
             }
-            else
+            catch
             {
-                throw new ServiceNotReachableException();
+                NotificationService.SetError("Server is not reachable.");
             }
         }
 
         private async Task Submit(EditContext editContext)
         {
-
-            using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateCustomerSequence", CustomerSeq.RouteDetails, JsonSerializerOptions);
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            IsSubmitting = true;
+            try
             {
-                NotificationService.SetSuccess("Successfully updated customer sequence");
-                NavigationManager.NavigateTo("/");
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateCustomerSequence", CustomerSeq.SequenceDetails, JsonSerializerOptions);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    NotificationService.SetSuccess("Successfully updated customer sequence");
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                }
             }
-            else
+            catch
             {
-                NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                NotificationService.SetError("Server is not reachable.");
             }
+            IsSubmitting = false;
         }
 
         private void Cancel()

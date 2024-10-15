@@ -1,0 +1,13 @@
+﻿@using Website.Client.Styles;
+
+@if (IsVisible)
+{
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-40"></div>
+
+    <div class="fixed inset-0 flex items-center justify-center z-50">    
+        <div class="flex flex-col justify-center items-center h-screen">
+            <div class="h-20 w-20 animate-spin rounded-full border-8 border-t-sky"></div>
+            <strong class="text-2xl text-white">Loading...</strong>
+        </div>
+    </div>
+}

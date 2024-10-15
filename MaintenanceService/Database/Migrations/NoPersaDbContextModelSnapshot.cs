@@ -168,13 +168,6 @@ namespace MaintenanceService.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Maintenance");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            NextDailyDeliverySave = new DateTime(2024, 10, 13, 0, 0, 0, 0, DateTimeKind.Local)
-                        });
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.MonthlyOverview", b =>

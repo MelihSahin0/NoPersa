@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Website.Client.Exceptions;
 using Website.Client.Models;
 using Website.Client.Services;
 
@@ -117,42 +116,49 @@ namespace Website.Client.FormModels
                 i++;
             }
 
-            using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomerDailyDelivery",
-                                     new
-                                     {
-                                         ReferenceId = Id,
-                                         Month = DisplayMonth.Month,
-                                         Year = DisplayMonth.Year,
-                                     }, JsonSerializerOptions)!;
-
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            try
             {
-                MonthlyDeliveries.Add(JsonSerializer.Deserialize<MonthlyDelivery>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!);
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                DateTime dateTime = DateTime.Today;
+                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomerDailyDelivery",
+                                         new
+                                         {
+                                             ReferenceId = Id,
+                                             Month = DisplayMonth.Month,
+                                             Year = DisplayMonth.Year,
+                                         }, JsonSerializerOptions)!;
 
-                List<DailyDelivery> dailyOverviews = [];
-                for (int day = 1; day <= 31; day++)
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    dailyOverviews.Add(new DailyDelivery() 
-                    { 
-                        DayOfMonth = day, 
-                        Price = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
-                        NumberOfBoxes = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
+                    MonthlyDeliveries.Add(JsonSerializer.Deserialize<MonthlyDelivery>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!);
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    DateTime dateTime = DateTime.Today;
+
+                    List<DailyDelivery> dailyOverviews = [];
+                    for (int day = 1; day <= 31; day++)
+                    {
+                        dailyOverviews.Add(new DailyDelivery()
+                        {
+                            DayOfMonth = day,
+                            Price = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
+                            NumberOfBoxes = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
+                        });
+                    }
+
+                    MonthlyDeliveries.Add(new MonthlyDelivery()
+                    {
+                        MonthOfTheYear = new MonthOfTheYear() { Month = DisplayMonth.Month, Year = DisplayMonth.Year },
+                        DailyDeliveries = dailyOverviews
                     });
                 }
-
-                MonthlyDeliveries.Add(new MonthlyDelivery()
+                else
                 {
-                    MonthOfTheYear = new MonthOfTheYear() { Month = DisplayMonth.Month, Year = DisplayMonth.Year },
-                    DailyDeliveries = dailyOverviews
-                });
-            }
-            else
+                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                }
+            }     
+            catch
             {
-                throw new ServiceNotReachableException();
+                NotificationService.SetError("Server is not reachable.");
             }
 
             selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;

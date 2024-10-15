@@ -63,14 +63,19 @@ namespace MaintenanceService.Database
             modelBuilder.Entity<Maintenance>()
                 .Property(e => e.NextDailyDeliverySave)
                 .HasColumnType("date");
+        }
 
-            modelBuilder.Entity<Maintenance>().HasData(
-                    new Maintenance
-                    {
-                        Id = 1,
-                        NextDailyDeliverySave = DateTime.Today.Date
-                    }
-            );
+        public void SeedData()
+        {
+            if (!Maintenance.Any(m => m.Id == 1))
+            {
+                Maintenance.Add(new Maintenance
+                {
+                    Id = 1,
+                    NextDailyDeliverySave = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1)
+                });
+                SaveChanges();
+            }
         }
     }
 }

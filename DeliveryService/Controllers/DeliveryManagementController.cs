@@ -34,23 +34,21 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                DTORoutes dTORoutes = new();
-                
-                List<DTORouteOverview> routes = [];
-                routes.AddRange(mapper.Map<List<DTORouteOverview>>(context.Routes.Include(r => r.Customers)));
-             
-                dTORoutes.RouteOverview = [.. routes];
+                DTORoutes dTORoutes = new()
+                {
+                    RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(context.Routes.AsNoTracking().Include(r => r.Customers))]
+                };
 
                 return Ok(dTORoutes);
             }
             catch (ValidationException e)
             {
-                logger.LogError(e.Message);
-                return ValidationProblem(e.Message);
+                logger.LogError(e, "Could not map routes");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                logger.LogError(e, "Getting routes overview failed");
                 return BadRequest("An error occurred while processing your request.");
             }
         }
@@ -105,6 +103,14 @@ namespace DeliveryService.Controllers
                         i++;
                     }
                     context.Routes.Remove(dbObsoleteRoute);
+                }                
+
+                //dbNotFoundRoutes can update many customers
+                const int batchSize = 1000;
+                for (int j = 0; j < dbNotFoundRoutes.Count; j += batchSize)
+                {
+                    var batch = dbNotFoundRoutes.Skip(j).Take(batchSize).ToList();
+                    context.BulkInsertOrUpdate(batch);
                 }
 
                 context.Routes.AddRange(newRoutes);
@@ -117,13 +123,13 @@ namespace DeliveryService.Controllers
             catch (ValidationException e)
             {
                 transaction.Rollback();
-                logger.LogError(e.Message);
-                return ValidationProblem(e.Message);
+                logger.LogError(e, "Could not map customer");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
                 transaction.Rollback();
-                logger.LogError(e.Message);
+                logger.LogError(e, "Updating routes failed");
                 return BadRequest("An error occurred while processing your request.");
             }
         }
@@ -176,12 +182,12 @@ namespace DeliveryService.Controllers
             }
             catch (ValidationException e)
             {
-                logger.LogError(e.Message);
-                return ValidationProblem(e.Message);
+                logger.LogError(e, "Could not map deliveryStatus");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                logger.LogError(e, "Getting delivery status failed");
                 return BadRequest("An error occurred while processing your request.");
             }
         }
@@ -191,18 +197,18 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                List<Route> dbRoutes = [.. context.Routes.Include(r => r.Customers)];
+                List<Route> dbRoutes = [.. context.Routes.AsNoTracking().Include(r => r.Customers)];
 
                 return Ok(mapper.Map<List<DTOSequenceDetails>>(dbRoutes));
             }
             catch (ValidationException e)
             {
-                logger.LogError(e.Message);
+                logger.LogError(e, "Could not map route details");
                 return ValidationProblem(e.Message);
             }
             catch (Exception e)
             {
-                logger.LogError(e.Message);
+                logger.LogError(e, "Failed getting route details");
                 return BadRequest("An error occurred while processing your request.");
             }
         }
@@ -249,13 +255,13 @@ namespace DeliveryService.Controllers
             catch (ValidationException e)
             {
                 transaction.Rollback();
-                logger.LogError(e.Message);
+                logger.LogError(e, "Could not map customer sequence");
                 return ValidationProblem(e.Message);
             }
             catch (Exception e)
             {
                 transaction.Rollback();
-                logger.LogError(e.Message);
+                logger.LogError(e, "Failed getting customer sequence");
                 return BadRequest("An error occurred while processing your request.");
             }
         }  

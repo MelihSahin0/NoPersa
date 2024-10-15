@@ -17,7 +17,7 @@
                 ondragover="event.preventDefault();"
                 ondragstart="event.dataTransfer.setData('', event.target.id);"
                 @ondrop="() => HandleDrop(null, currentId)">
-                @foreach (var customer in Routes.Find(r => r.Id == currentId)?.CustomersRoute.OrderBy(c => c.Position).ToList() ?? [])
+                @foreach (var customer in SequenceDetails.Find(r => r.Id == currentId)?.CustomersRoute.OrderBy(c => c.Position).ToList() ?? [])
                 {
                     @if (DisplayFilter == false || string.IsNullOrWhiteSpace(StartFilter![j]) || customer.Name.ToLower().StartsWith(StartFilter[j]!.ToLower()))
                     {

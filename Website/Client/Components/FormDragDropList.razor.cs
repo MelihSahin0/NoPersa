@@ -36,10 +36,10 @@ namespace Website.Client.Components
         public string StartFilter { get; set; } = string.Empty;
 
         [Parameter]
-        public required List<RouteOverview> Routes { get; set; }
+        public required List<RouteOverview> RouteOverviews { get; set; }
 
         [Parameter]
-        public EventCallback<List<RouteOverview>> RoutesChanged { get; set; }
+        public EventCallback<List<RouteOverview>> RouteOverviewsChanged { get; set; }
 
         private RouteOverview? draggedItem;
         private void HandleDrop(RouteOverview landingModel)
@@ -51,12 +51,12 @@ namespace Website.Client.Components
 
             int originalOrderLanding = landingModel.Position;
 
-            Routes.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
+            RouteOverviews.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
 
             draggedItem.Position = originalOrderLanding;
 
             int i = 0;
-            foreach (var route in Routes.OrderBy(x => x.Position).ToList())
+            foreach (var route in RouteOverviews.OrderBy(x => x.Position).ToList())
             {
                 route.Position = i++;
 
@@ -70,7 +70,7 @@ namespace Website.Client.Components
         {
             toDeletePosition = position;
 
-            if (Routes[position].NumberOfCustomers > 0)
+            if (RouteOverviews[position].NumberOfCustomers > 0)
             {
                 IsPopupVisible = true;
             }
@@ -82,7 +82,7 @@ namespace Website.Client.Components
 
         private void AddRoute()
         {
-            Routes.Add(new RouteOverview() { Id = 0, Position = Routes.Count, Name = "", NumberOfCustomers = 0 });
+            RouteOverviews.Add(new RouteOverview() { Id = 0, Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0 });
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)
@@ -112,10 +112,10 @@ namespace Website.Client.Components
         {
             if (toDeletePosition != null)
             {
-                Routes.Remove(Routes.FirstOrDefault(r => r.Position == toDeletePosition)!);
+                RouteOverviews.Remove(RouteOverviews.FirstOrDefault(r => r.Position == toDeletePosition)!);
 
                 int i = 0;
-                foreach (var route in Routes.OrderBy(x => x.Position).ToList())
+                foreach (var route in RouteOverviews.OrderBy(x => x.Position).ToList())
                 {
                     route.Position = i++;
 

@@ -5,6 +5,7 @@
 @using Website.Client.Styles
 @using Website.Client.Validations;
 
+<LoadingPopup IsVisible="@IsSubmitting" />
 <EditForm Model="Customer" OnValidSubmit="@Submit">
     <ObjectGraphDataAnnotationsValidator />
 
@@ -30,7 +31,7 @@
             <div class="mt-6 p-4 bg-gray-100 w-4/6 rounded-md">
                 <h3 class="text-lg font-semibold mb-4 select-none">Delivery Information</h3>
 
-                <FormMonthYearPicker Label="Monthpicker" OnMonthYearSelected="@(() => Customer.OnMonthYearSelected())" @bind-Year="@Customer.DisplayMonth.Year" @bind-Month="@Customer.DisplayMonth.Month" />
+                <FormMonthYearPicker Label="Month picker" OnMonthYearSelected="@(() => Customer.OnMonthYearSelected())" @bind-Year="@Customer.DisplayMonth.Year" @bind-Month="@Customer.DisplayMonth.Month" />
                 
                 <div class="flex flex-col mt-1">
                     <div class="grid grid-cols-5 gap-4">
@@ -60,7 +61,7 @@
         <!-- Workdays and Holidays Section -->
         <div class="w-1/2">
             <div class="bg-gray-100 rounded-md p-4">
-                <h3 class="text-lg font-semibold mb-4">Deliverydays</h3>
+                <h3 class="text-lg font-semibold mb-4">Delivery days</h3>
 
                 <div class="grid grid-row gap-4">
                     <div>
@@ -97,7 +98,7 @@
             </div>
             <div>
                 @if(Customer.Id == 0){
-                    <FormInputSelect Label="Select Route" @bind-Value="Customer.RouteId" List="Customer.RouteDetails"/>
+                    <FormInputSelect Label="Select Route" @bind-Value="Customer.RouteId" RouteOverviews="Customer.RouteDetails"/>
                 }
                 <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
             </div>

@@ -15,7 +15,7 @@ namespace Website.Client.Components
         public int Value { get; set; }
 
         [Parameter]
-        public List<RouteOverview>? List { get; set; }
+        public List<RouteOverview>? RouteOverviews { get; set; }
 
         [Parameter]
         public EventCallback<int> ValueChanged { get; set; }
@@ -24,9 +24,9 @@ namespace Website.Client.Components
 
         protected override async Task OnParametersSetAsync()
         {
-            if (!ListComparer(previousList, List))
+            if (!ListComparer(previousList, RouteOverviews))
             {
-                previousList = List?.Select(x => new RouteOverview() { Id = x.Id, Name = x.Name, Position = x.Position, NumberOfCustomers = x.NumberOfCustomers }).ToList(); 
+                previousList = RouteOverviews?.Select(x => new RouteOverview() { Id = x.Id, Name = x.Name, Position = x.Position, NumberOfCustomers = x.NumberOfCustomers }).ToList(); 
                 await ValueChanged.InvokeAsync(Value);
             }
         }
