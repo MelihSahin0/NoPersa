@@ -40,7 +40,7 @@ namespace MaintenanceService.Services
             return Task.CompletedTask;
         }
 
-        private async Task CatchUp(NoPersaDbContext context, Maintenance maintenance)
+        public async Task CatchUp(NoPersaDbContext context, Maintenance maintenance)
         {
             //HOLIDAY
             using var transaction = await context.Database.BeginTransactionAsync();
@@ -102,12 +102,13 @@ namespace MaintenanceService.Services
                                     && dbCustomer.RouteId != int.MinValue)
                                 {
                                     dbDailyOverview.NumberOfBoxes = dbCustomer.DefaultNumberOfBoxes;
+                                    dbDailyOverview.Price = dbCustomer.DefaultPrice;
                                 }
                                 else
                                 {
                                     dbDailyOverview.NumberOfBoxes = 0;
+                                    dbDailyOverview.Price = 0;
                                 }
-                                dbDailyOverview.Price = dbCustomer.DefaultPrice;
                             }
                             else if (dbDailyOverview.Price == null)
                             {

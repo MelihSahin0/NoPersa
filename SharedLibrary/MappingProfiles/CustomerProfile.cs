@@ -14,7 +14,7 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address))
                 .ForMember(dest => dest.Region, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Region) ? null : src.Region))
                 .ForMember(dest => dest.Article, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Article) ? (int?)null : int.Parse(src.Article)))
-                .ForMember(dest => dest.DefaultPrice, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.DefaultPrice) ? (int?)null : int.Parse(src.DefaultPrice)))
+                .ForMember(dest => dest.DefaultPrice, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.DefaultPrice) ? (double?)null : double.Parse(src.DefaultPrice.Replace(",", "."))))
                 .ForMember(dest => dest.DefaultNumberOfBoxes, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.DefaultNumberOfBoxes) ? (int?)null : int.Parse(src.DefaultNumberOfBoxes)))
                 .ForMember(dest => dest.MonthlyOverviews, opt => opt.MapFrom(src => src.MonthlyDeliveries))
                 .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId ?? (int?)null));

@@ -107,10 +107,10 @@ namespace DeliveryService.Controllers
 
                 //dbNotFoundRoutes can update many customers
                 const int batchSize = 1000;
-                for (int j = 0; j < dbNotFoundRoutes.Count; j += batchSize)
+                for (int j = 0; j < dbNotFoundRoutes.SelectMany(r => r.Customers).ToList().Count; j += batchSize)
                 {
-                    var batch = dbNotFoundRoutes.Skip(j).Take(batchSize).ToList();
-                    context.BulkInsertOrUpdate(batch);
+                    var batch = dbNotFoundRoutes.SelectMany(r => r.Customers).ToList().Skip(j).Take(batchSize).ToList();
+                    context.BulkUpdate(batch);
                 }
 
                 context.Routes.AddRange(newRoutes);
