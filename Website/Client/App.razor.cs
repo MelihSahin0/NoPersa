@@ -12,6 +12,7 @@ namespace Website.Client
         {
             await LocalStorage.SetItemAsync("ManagementService", "localhost:8081");
             await LocalStorage.SetItemAsync("DeliveryService", "localhost:8082");
+            await LocalStorage.SetItemAsync("GastronomyService", "localhost:8083");
         }
     }
 }

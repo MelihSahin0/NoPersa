@@ -68,6 +68,24 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
 
+  gastronomyservice:
+    image: ${DOCKER_REGISTRY-}gastronomyservice
+    container_name: GastronomyService
+    build:
+      context: .
+      dockerfile: GastronomyService/Dockerfile
+    ports: 
+      - "8083:8083"
+    pull_policy: always
+    depends_on:
+      - NoPersaPostgresDb
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD} 
+
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver
     container_name: Website

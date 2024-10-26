@@ -123,7 +123,7 @@ namespace DeliveryService.Controllers
             catch (ValidationException e)
             {
                 transaction.Rollback();
-                logger.LogError(e, "Could not map customer");
+                logger.LogError(e, "Could not map route");
                 return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)

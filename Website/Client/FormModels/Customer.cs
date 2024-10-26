@@ -94,11 +94,16 @@ namespace Website.Client.FormModels
         [JsonIgnore]
         public bool ModifyMonthlyDelivery => DateTimeCalc.MonthDifferenceMax1(DateTime.Today.Year, MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Year, DateTime.Today.Month, (int)MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Month);
 
+        [Required]
         [IntType]
-        public int RouteId { get; set; }
+        public required int RouteId { get; set; }
 
         [JsonIgnore]
         public List<RouteOverview>? RouteDetails { get; set; }
+
+        [ValidateComplexType]
+        [Required]
+        public required List<SelectedLightDiet> LightDietOverviews { get; set; }
 
         [JsonIgnore]
         public int selectedMonthlyDeliveries = 0;

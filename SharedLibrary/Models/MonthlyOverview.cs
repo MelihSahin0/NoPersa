@@ -17,7 +17,7 @@ namespace SharedLibrary.Models
         public int Year { get; set; }
 
         [ExactChildren(31)]
-        public ICollection<DailyOverview> DailyOverviews { get; set; } = [];
+        public List<DailyOverview> DailyOverviews { get; set; } = [];
 
         [ForeignKey("CustomerId")]
         public int CustomerId { get; set; }

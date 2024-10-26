@@ -22,7 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagementService", "Manage
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MaintenanceService", "MaintenanceService\MaintenanceService.csproj", "{1F04115D-EFB0-4435-AE8A-B8A0EC77E8C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoPersa.Tests", "NoPersa.Tests\NoPersa.Tests.csproj", "{E320AFBB-0BC3-4FD8-BDF2-7C4BD1E4E52F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoPersa.Tests", "NoPersa.Tests\NoPersa.Tests.csproj", "{E320AFBB-0BC3-4FD8-BDF2-7C4BD1E4E52F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GastronomyService", "GastronomyService\GastronomyService.csproj", "{EE09175A-94A2-40F3-A276-D4D6AC86F462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -66,6 +68,10 @@ Global
 		{E320AFBB-0BC3-4FD8-BDF2-7C4BD1E4E52F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E320AFBB-0BC3-4FD8-BDF2-7C4BD1E4E52F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E320AFBB-0BC3-4FD8-BDF2-7C4BD1E4E52F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE09175A-94A2-40F3-A276-D4D6AC86F462}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE09175A-94A2-40F3-A276-D4D6AC86F462}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE09175A-94A2-40F3-A276-D4D6AC86F462}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE09175A-94A2-40F3-A276-D4D6AC86F462}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -16,6 +16,6 @@ namespace SharedLibrary.Models
         [MaxLength(64)]
         public required string Name { get; set; }
 
-        public ICollection<Customer> Customers { get; set; } = [];
+        public List<Customer> Customers { get; set; } = [];
     }
 }

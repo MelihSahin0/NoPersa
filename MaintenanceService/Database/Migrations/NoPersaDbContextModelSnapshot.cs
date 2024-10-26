@@ -101,6 +101,24 @@ namespace MaintenanceService.Database.Migrations
                     b.ToTable("Customer");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.CustomersLightDiet", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LightDietId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Selected")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("CustomerId", "LightDietId");
+
+                    b.HasIndex("LightDietId");
+
+                    b.ToTable("CustomersLightDiet");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.DailyOverview", b =>
                 {
                     b.Property<int>("Id")
@@ -152,6 +170,23 @@ namespace MaintenanceService.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Holiday");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.LightDiet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LightDiet");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Maintenance", b =>
@@ -213,14 +248,6 @@ namespace MaintenanceService.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Route");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -2147483648,
-                            Name = "Archive",
-                            Position = 2147483647
-                        });
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Weekday", b =>
@@ -283,6 +310,25 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("Workdays");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.CustomersLightDiet", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Customer", "Customer")
+                        .WithMany("CustomersLightDiets")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.LightDiet", "LightDiet")
+                        .WithMany("CustomersLightDiets")
+                        .HasForeignKey("LightDietId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("LightDiet");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.DailyOverview", b =>
                 {
                     b.HasOne("SharedLibrary.Models.MonthlyOverview", "MonthlyOverview")
@@ -307,7 +353,14 @@ namespace MaintenanceService.Database.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
+                    b.Navigation("CustomersLightDiets");
+
                     b.Navigation("MonthlyOverviews");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.LightDiet", b =>
+                {
+                    b.Navigation("CustomersLightDiets");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.MonthlyOverview", b =>

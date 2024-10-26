@@ -96,6 +96,20 @@
                     </div>
                 </div>
             </div>
+
+            <div class="bg-gray-100 rounded-md p-4 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Light diet</h3>
+
+                <div class="flex flex-row flex-wrap justify-between">
+                    @foreach(var lightDiet in Customer.LightDietOverviews)
+                    {
+                        <div class="m-2">
+                            <FormInputCheckbox Label="@lightDiet.Name" @bind-Value="@lightDiet.Selected"/>
+                        </div>
+                    }
+                </div>
+            </div>
+
             <div>
                 @if(Customer.Id == 0){
                     <FormInputSelect Label="Select Route" @bind-Value="Customer.RouteId" RouteOverviews="Customer.RouteDetails"/>

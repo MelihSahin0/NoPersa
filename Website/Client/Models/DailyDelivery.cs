@@ -1,9 +1,11 @@
 ﻿using SharedLibrary.Validations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Website.Client.Models
 {
     public class DailyDelivery
     {
+        [Required]
         [IntType(min: 0)]
         public required int DayOfMonth { get; set; }
 

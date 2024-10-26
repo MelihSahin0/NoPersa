@@ -27,7 +27,7 @@ namespace MaintenanceService.Services
         public Task StartAsync(CancellationToken cancellationToken)
         {
             var now =  DateTime.Now;
-            var targetTime = DateTime.Today.AddHours(8);
+            var targetTime = DateTime.Today.AddHours(18);
 
             var initialDelay = targetTime - now;
             if (initialDelay < TimeSpan.Zero)

@@ -1,0 +1,41 @@
+﻿@using Website.Client.Components.Base
+@using Website.Client.Styles
+
+<div class="@Class">
+    <div class="w-full">
+        @if (DisplayFilter)
+        {
+            <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black mb-5")"
+                       Placeholder="Filter"
+                       @bind-Value="@StartFilter" />
+        }
+        <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")"
+            ondragover="event.preventDefault();"
+            ondragstart="event.dataTransfer.setData('', event.target.id);">
+            @foreach (var item in DragDropInputs.OrderBy(x => x.Position))
+            {
+                @if (string.IsNullOrWhiteSpace(StartFilter) || item.Value.ToLower().StartsWith(StartFilter.ToLower()))
+                {
+                    <li @ondrop="()=>HandleDrop(item)" @key="item"
+                        @ondragleave="@(()=> {item.IsDragOver = false;})"
+                        @ondragenter="@(()=>{item.IsDragOver = true;})"
+                        @ondragstart="() => draggedItem = item"
+                        @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
+                        <div class="flex flex-row">
+                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => item.Value)} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation}")"
+                                       Placeholder="@Placeholder"
+                                       @bind-Value="@item.Value"
+                                       ValidationFunction="@ValidationFunction" />
+                            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} min-w-fit ml-1")"
+                                    @onclick="() => DeleteItem(item.Position)">
+                                @RemoveButtonDisplay
+                            </button>
+                        </div>
+                        <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => item.Value)" />
+                    </li>
+                }
+            }
+            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddItem()">@AddButtonDisplay</button>
+        </ul>
+    </div>
+</div>

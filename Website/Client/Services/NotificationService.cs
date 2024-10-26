@@ -26,9 +26,16 @@ namespace Website.Client.Services
             OnError?.Invoke(message);
         }
 
+        private bool secondChange = true;
         private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            OnSuccess?.Invoke(string.Empty);
+            secondChange = !secondChange;
+
+            if (secondChange)
+            {
+                OnSuccess?.Invoke(string.Empty);
+            }
+
             OnError?.Invoke(string.Empty);
         }
         public void Dispose()

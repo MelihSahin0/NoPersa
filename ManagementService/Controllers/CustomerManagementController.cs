@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Util;
+using System.Security.Cryptography.Xml;
 
 namespace ManagementService.Controllers
 {
@@ -25,24 +26,39 @@ namespace ManagementService.Controllers
             this.mapper = mapper;
         }
 
-        [HttpPost("GetCustomer", Name= "GetCustomer")]
+        [HttpPost("GetCustomer", Name = "GetCustomer")]
         public IActionResult GetCustomer([FromBody] DTOSelectedCustomer dTOSelectedCustomer)
         {
             try
             {
                 Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == dTOSelectedCustomer.Id)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
-                                        .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
+                                        .Include(m => m.MonthlyOverviews.Where(n => n.Year == DateTime.Today.Year && n.Month == DateTime.Today.Month)).ThenInclude(d => d.DailyOverviews)
+                                        .Include(cld => cld.CustomersLightDiets).ThenInclude(ld => ld.LightDiet)
                                         .First();
+                if (dbCustomer != null)
+                {
+                    DTOCustomer dTOCustomer = mapper.Map<DTOCustomer>(dbCustomer);
+                    if (dTOCustomer.LightDietOverviews?.Count != context.LightDiets.AsNoTracking().Count())
+                    {
+                        foreach (LightDiet lightDiet in context.LightDiets.AsNoTracking().ToList())
+                        {
+                            if (!dTOCustomer.LightDietOverviews!.Any(ld => ld.Id == lightDiet.Id))
+                            {
+                                dTOCustomer.LightDietOverviews!.Add(new()
+                                {
+                                    Id = lightDiet.Id,
+                                    Name = lightDiet.Name,
+                                    Selected = false
+                                });
+                            }
+                        }
+                    }
 
-                if (dbCustomer == null)
-                {
-                    return NotFound();
+                    return Ok(dTOCustomer);
                 }
-                else
-                {
-                    return Ok(mapper.Map<DTOCustomer>(dbCustomer));
-                }
+
+                return NotFound();
             }
             catch (ValidationException e)
             {
@@ -69,7 +85,7 @@ namespace ManagementService.Controllers
                 if (customer.Id == 0)
                 {
                     customer.Position = (context.Customers.Where(c => c.RouteId == dTOCustomer.RouteId)
-                                                          .Select(c => (int?)c.Position)  
+                                                          .Select(c => (int?)c.Position)
                                                           .Max() ?? -1) + 1;
 
                     List<MonthlyOverview> overviewsToRemove = [];
@@ -93,6 +109,7 @@ namespace ManagementService.Controllers
                     Customer? dbCustomer = context.Customers.Where(c => c.Id == customer.Id)
                                            .Include(w => w.Workdays).Include(h => h.Holidays)
                                            .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
+                                           .Include(cld => cld.CustomersLightDiets)
                                            .FirstOrDefault();
 
                     if (dbCustomer == null)
@@ -157,6 +174,23 @@ namespace ManagementService.Controllers
                         }
                     }
                     context.MonthlyOverviews.AddRange(newMonthlyOverviews);
+
+                    foreach (CustomersLightDiet customersLightDiet in customer.CustomersLightDiets)
+                    {
+                        CustomersLightDiet? dbCustomersLightDiet = dbCustomer.CustomersLightDiets.FirstOrDefault(cld => cld.LightDietId == customersLightDiet.LightDietId);
+
+                        if (dbCustomersLightDiet != null)
+                        {
+                            dbCustomersLightDiet.Selected = customersLightDiet.Selected;
+                        }
+                        else
+                        {
+                            customersLightDiet.Customer = customer;
+                            customersLightDiet.CustomerId = customer.Id;
+                            customersLightDiet.LightDiet = context.LightDiets.FirstOrDefault(d => d.Id == customersLightDiet.LightDietId)!;
+                            dbCustomer.CustomersLightDiets.Add(customersLightDiet);
+                        }
+                    }
                 }
                 context.SaveChanges();
                 transaction.Commit();
@@ -177,6 +211,30 @@ namespace ManagementService.Controllers
             }
         }
 
+        [HttpGet("GetRoutesOverview", Name = "GetRoutesOverview")]
+        public IActionResult GetRoutesOverview()
+        {
+            try
+            {
+                DTORoutes dTORoutes = new()
+                {
+                    RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(context.Routes.AsNoTracking().Include(r => r.Customers))]
+                };
+
+                return Ok(dTORoutes);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map routes");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Getting routes overview failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
         [HttpPost("GetCustomerDailyDelivery", Name = "GetCustomerDailyDelivery")]
         public IActionResult GetCustomerDailyDelivery([FromBody] DTOMonthOfTheYear monthOfTheYear)
         {
@@ -193,6 +251,37 @@ namespace ManagementService.Controllers
                 {
                     return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
                 }
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map customer daily delivery");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "failed getting customer daily delivery");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpPost("GetLightDiets", Name = "GetLightDiets")]
+        public IActionResult GetLightDiets()
+        {
+            try
+            {
+                List<DTOLightDietOverview> dTOLightDietOverview = [];
+
+                foreach (LightDiet lightDiet in context.LightDiets.AsNoTracking().ToList())
+                {
+                    dTOLightDietOverview.Add(new()
+                    {
+                        Id = lightDiet.Id,
+                        Name = lightDiet.Name,
+                        Selected = false
+                    });
+                }
+
+                return Ok(dTOLightDietOverview);
             }
             catch (ValidationException e)
             {

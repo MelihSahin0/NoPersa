@@ -41,5 +41,7 @@ namespace SharedLibrary.DTOs
         public DTOMonthlyDelivery[]? MonthlyDeliveries { get; set; }
 
         public int? RouteId { get; set; }
+
+        public List<DTOLightDietOverview>? LightDietOverviews { get; set; }
     }
 }

@@ -27,6 +27,10 @@ namespace DeliveryService.Database
             modelBuilder.Entity<Holiday>()
                         .ToTable("Holiday")
                         .HasKey(h => h.Id);
+
+            modelBuilder.Entity<CustomersLightDiet>()
+                 .ToTable("CustomersLightDiet")
+                 .HasKey(cld => new { cld.CustomerId, cld.LightDietId });
         }
     }
 }

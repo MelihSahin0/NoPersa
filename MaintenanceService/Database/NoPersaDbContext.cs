@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Models;
-using System.Xml;
 using Route = SharedLibrary.Models.Route;
 
 namespace MaintenanceService.Database
@@ -18,6 +17,8 @@ namespace MaintenanceService.Database
         public DbSet<DailyOverview> DailyOverview { get; set; }
         public DbSet<Route> Route { get; set; }
         public DbSet<Holiday> Holiday { get; set; }
+        public DbSet<CustomersLightDiet> CustomersLightDiet { get; set; }
+        public DbSet<LightDiet> LightDiet { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -51,14 +52,19 @@ namespace MaintenanceService.Database
                 .HasForeignKey(c => c.RouteId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Route>().HasData(
-                   new Route
-                   {
-                       Id = int.MinValue,
-                       Name = "Archive",
-                       Position = int.MaxValue,
-                   }
-            );
+            modelBuilder.Entity<Customer>()
+                .HasMany(c => c.LightDiets)
+                .WithMany(ld => ld.Customers)
+                .UsingEntity<CustomersLightDiet>(
+                    i => i
+                        .HasOne<LightDiet>(cld => cld.LightDiet)
+                        .WithMany(ld => ld.CustomersLightDiets)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<Customer>(cld => cld.Customer)
+                        .WithMany(c => c.CustomersLightDiets)
+                        .OnDelete(DeleteBehavior.Restrict)
+                );
 
             modelBuilder.Entity<Maintenance>()
                 .Property(e => e.NextDailyDeliverySave)
@@ -67,6 +73,17 @@ namespace MaintenanceService.Database
 
         public void SeedData()
         {
+            if (!Route.Any(r => r.Id == int.MinValue))
+            {
+                Route.Add(new Route
+                {
+                    Id = int.MinValue,
+                    Name = "Archive",
+                    Position = int.MaxValue,
+                });
+                SaveChanges();
+            }
+
             if (!Maintenance.Any(m => m.Id == 1))
             {
                 Maintenance.Add(new Maintenance

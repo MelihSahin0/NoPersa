@@ -7,6 +7,7 @@ using Website.Client.Enums;
 using Website.Client.FormModels;
 using Website.Client.Models;
 using Website.Client.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Website.Client.Pages
 {
@@ -83,7 +84,8 @@ namespace Website.Client.Pages
                 Holidays = new Weekdays(),
                 ContactInformation = string.Empty,
                 RouteId = int.MinValue,
-                RouteDetails = []
+                RouteDetails = [],
+                LightDietOverviews = []
             };
         }
 
@@ -122,6 +124,7 @@ namespace Website.Client.Pages
                         Customer.Workdays = customer.Workdays;
                         Customer.Holidays = customer.Holidays;
                         Customer.RouteId = customer.RouteId;
+                        Customer.LightDietOverviews = customer.LightDietOverviews;
                     }
                     else if (response1.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {}
@@ -130,8 +133,22 @@ namespace Website.Client.Pages
                         NotificationService.SetError(await response1.Content.ReadAsStringAsync());
                     }
                 }
+                else
+                {
+                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetLightDiets", "{}", JsonSerializerOptions)!;
 
-                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRoutesOverview")!;
+                    if (response1.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        List<SelectedLightDiet> lightDietOverviews = JsonSerializer.Deserialize<List<SelectedLightDiet>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                        Customer.LightDietOverviews = [.. lightDietOverviews];
+                    }
+                    else
+                    {
+                        NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                    }
+                }
+
+                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetRoutesOverview")!;
 
                 if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {

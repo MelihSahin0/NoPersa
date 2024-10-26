@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SharedLibrary.Validations;
+﻿using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -45,7 +44,7 @@ namespace SharedLibrary.Models
         [IntType(min: 0)]
         public required int DefaultNumberOfBoxes { get; set; }
 
-        public ICollection<MonthlyOverview> MonthlyOverviews { get; set; } = [];
+        public List<MonthlyOverview> MonthlyOverviews { get; set; } = [];
 
         [IntType(min: 0)]
         public int Position { get; set; }
@@ -72,5 +71,9 @@ namespace SharedLibrary.Models
         public int? RouteId { get; set; }
 
         public Route? Route { get; set; }
+
+        public List<CustomersLightDiet> CustomersLightDiets { get; set; } = [];
+
+        public List<LightDiet> LightDiets { get; set; } = [];
     }
 }
