@@ -1,34 +1,20 @@
 ﻿@page "/customer"
 @using Website.Client.Components;
 @using Website.Client.Components.Base;
+@using Website.Client.Components.Default;
 @using Website.Client.Models
 @using Website.Client.Styles
 @using Website.Client.Validations;
 
-<LoadingPopup IsVisible="@IsSubmitting" />
+<LoadingPopup IsVisible="@IsSubmitting"/>
 <EditForm Model="Customer" OnValidSubmit="@Submit">
     <ObjectGraphDataAnnotationsValidator />
 
     <div class="flex flex-row">
         <div class="flex flex-col w-1/2 items-center">
 
-            <!-- General Info Section -->
-            <div class="p-4 bg-gray-100 rounded-md w-4/6 justify-center">
-                <h3 class="text-lg font-semibold mb-4 select-none">General Information</h3>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <FormTextInput Label="Serial Number" @bind-Value="Customer!.SerialNumber" For="@(() => Customer!.SerialNumber)" />
-                    <FormTextInput Label="Title" @bind-Value="Customer.Title" For="@(() => Customer.Title)" />
-                    <FormTextInput Label="Name" @bind-Value="Customer.Name" For="@(() => Customer.Name)" />
-                    <FormTextInput Label="Address" @bind-Value="Customer.Address" For="@(() => Customer.Address)" />
-                    <FormTextInput Label="Contact Information" @bind-Value="Customer.ContactInformation" For="@(() => Customer.ContactInformation)" />
-                    <FormTextInput Label="Region" @bind-Value="Customer.Region" For="@(() => Customer.Region)" />
-                    <FormTextInput Label="Geographical Location" @bind-Value="Customer.GeoLocation" For="@(() => Customer.GeoLocation)" ValidationFunction="OnInputValidation.GeoCoordinates" />
-                </div>
-            </div>
-
             <!-- Delivery Information Section -->
-            <div class="mt-6 p-4 bg-gray-100 w-4/6 rounded-md">
+            <div class="p-4 bg-gray-100 w-4/6 rounded-md">
                 <h3 class="text-lg font-semibold mb-4 select-none">Delivery Information</h3>
 
                 <FormMonthYearPicker Label="Month picker" OnMonthYearSelected="@(() => Customer.OnMonthYearSelected())" @bind-Year="@Customer.DisplayMonth.Year" @bind-Month="@Customer.DisplayMonth.Month" />
@@ -58,9 +44,24 @@
             </div>
         </div>
 
-        <!-- Workdays and Holidays Section -->
-        <div class="w-1/2">
-            <div class="bg-gray-100 rounded-md p-4">
+        <div class="flex flex-col w-1/2 items-center">
+            <!-- General Info Section -->
+            <div class="p-4 bg-gray-100 rounded-md w-4/6">
+                <h3 class="text-lg font-semibold mb-4 select-none">General Information</h3>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <FormTextInput Label="Serial Number" @bind-Value="Customer!.SerialNumber" For="@(() => Customer!.SerialNumber)" />
+                    <FormTextInput Label="Title" @bind-Value="Customer.Title" For="@(() => Customer.Title)" />
+                    <FormTextInput Label="Name" @bind-Value="Customer.Name" For="@(() => Customer.Name)" />
+                    <FormTextInput Label="Address" @bind-Value="Customer.Address" For="@(() => Customer.Address)" />
+                    <FormTextInput Label="Contact Information" @bind-Value="Customer.ContactInformation" For="@(() => Customer.ContactInformation)" />
+                    <FormTextInput Label="Region" @bind-Value="Customer.Region" For="@(() => Customer.Region)" />
+                    <FormTextInput Label="Geographical Location" @bind-Value="Customer.GeoLocation" For="@(() => Customer.GeoLocation)" ValidationFunction="OnInputValidation.GeoCoordinates" />
+                </div>
+            </div>
+
+            <!-- Workdays and Holidays Section -->
+            <div class="mt-6 bg-gray-100 rounded-md p-4 w-full">
                 <h3 class="text-lg font-semibold mb-4">Delivery days</h3>
 
                 <div class="grid grid-row gap-4">
@@ -97,10 +98,11 @@
                 </div>
             </div>
 
-            <div class="bg-gray-100 rounded-md p-4 mt-6">
-                <h3 class="text-lg font-semibold mb-4">Light diet</h3>
-
-                <div class="flex flex-row flex-wrap justify-between">
+            <!-- Box configuration Section -->
+            <div class="bg-gray-100 rounded-md p-4 mt-6 w-full">
+                <h3 class="text-lg font-semibold mb-4">Box configuration</h3>
+                <p class="font-semibold">Light diet:</p>
+                <div class="flex flex-row flex-wrap">
                     @foreach(var lightDiet in Customer.LightDietOverviews)
                     {
                         <div class="m-2">
@@ -108,11 +110,23 @@
                         </div>
                     }
                 </div>
+
+                <p class="font-semibold">Box content:</p>
+                <div class="flex flex-row flex-wrap w-fit max-w-full">
+                    @if (Customer.PortionSizes?.Count() != 0)
+                    {
+                        @for (int i = 0; i <  Customer.BoxContentSelectedList.Count(); i++)
+                        {
+                            int currentIndex = i;
+                            <FormDefaultSelect Class="justify-between m-2" Label="@Customer.BoxContentSelectedList[currentIndex].Name" @bind-Value="@Customer.BoxContentSelectedList[currentIndex].PortionSizeId" SelectInputs="Customer.PortionSizes" />
+                        }
+                    }
+                </div>
             </div>
 
             <div>
                 @if(Customer.Id == 0){
-                    <FormInputSelect Label="Select Route" @bind-Value="Customer.RouteId" RouteOverviews="Customer.RouteDetails"/>
+                    <FormDefaultSelect Label="Select Route" @bind-Value="Customer.RouteId" SelectInputs="Customer.RouteDetails" />
                 }
                 <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
             </div>

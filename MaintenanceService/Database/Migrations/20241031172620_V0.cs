@@ -13,6 +13,19 @@ namespace MaintenanceService.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "BoxContent",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BoxContent", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Holiday",
                 columns: table => new
                 {
@@ -29,6 +42,19 @@ namespace MaintenanceService.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LightDiet",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LightDiet", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Maintenance",
                 columns: table => new
                 {
@@ -39,6 +65,19 @@ namespace MaintenanceService.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Maintenance", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PortionSize",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PortionSize", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,6 +158,62 @@ namespace MaintenanceService.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomersLightDiet",
+                columns: table => new
+                {
+                    CustomerId = table.Column<int>(type: "integer", nullable: false),
+                    LightDietId = table.Column<int>(type: "integer", nullable: false),
+                    Selected = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomersLightDiet", x => new { x.CustomerId, x.LightDietId });
+                    table.ForeignKey(
+                        name: "FK_CustomersLightDiet_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomersLightDiet_LightDiet_LightDietId",
+                        column: x => x.LightDietId,
+                        principalTable: "LightDiet",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomersMenuPlan",
+                columns: table => new
+                {
+                    CustomerId = table.Column<int>(type: "integer", nullable: false),
+                    BoxContentId = table.Column<int>(type: "integer", nullable: false),
+                    PortionSizeId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomersMenuPlan", x => new { x.CustomerId, x.BoxContentId });
+                    table.ForeignKey(
+                        name: "FK_CustomersMenuPlan_BoxContent_BoxContentId",
+                        column: x => x.BoxContentId,
+                        principalTable: "BoxContent",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomersMenuPlan_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomersMenuPlan_PortionSize_PortionSizeId",
+                        column: x => x.PortionSizeId,
+                        principalTable: "PortionSize",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MonthlyOverview",
                 columns: table => new
                 {
@@ -159,11 +254,6 @@ namespace MaintenanceService.Database.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.InsertData(
-                table: "Route",
-                columns: new[] { "Id", "Name", "Position" },
-                values: new object[] { -2147483648, "Archive", 2147483647 });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Customer_HolidaysId",
                 table: "Customer",
@@ -182,6 +272,21 @@ namespace MaintenanceService.Database.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_CustomersLightDiet_LightDietId",
+                table: "CustomersLightDiet",
+                column: "LightDietId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomersMenuPlan_BoxContentId",
+                table: "CustomersMenuPlan",
+                column: "BoxContentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomersMenuPlan_PortionSizeId",
+                table: "CustomersMenuPlan",
+                column: "PortionSizeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DailyOverview_MonthlyOverviewId",
                 table: "DailyOverview",
                 column: "MonthlyOverviewId");
@@ -196,6 +301,12 @@ namespace MaintenanceService.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CustomersLightDiet");
+
+            migrationBuilder.DropTable(
+                name: "CustomersMenuPlan");
+
+            migrationBuilder.DropTable(
                 name: "DailyOverview");
 
             migrationBuilder.DropTable(
@@ -203,6 +314,15 @@ namespace MaintenanceService.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "Maintenance");
+
+            migrationBuilder.DropTable(
+                name: "LightDiet");
+
+            migrationBuilder.DropTable(
+                name: "BoxContent");
+
+            migrationBuilder.DropTable(
+                name: "PortionSize");
 
             migrationBuilder.DropTable(
                 name: "MonthlyOverview");

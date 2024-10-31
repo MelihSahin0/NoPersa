@@ -15,7 +15,7 @@ namespace SharedLibrary.Validations
             this.max = max;
         }
 
-    public override bool IsValid(object? value)
+        public override bool IsValid(object? value)
         {
             if (string.IsNullOrWhiteSpace(value?.ToString()))
             {

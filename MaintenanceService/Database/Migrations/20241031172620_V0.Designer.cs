@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaintenanceService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    [Migration("20241025110423_V3")]
-    partial class V3
+    [Migration("20241031172620_V0")]
+    partial class V0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,23 @@ namespace MaintenanceService.Database.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("SharedLibrary.Models.BoxContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BoxContent");
+                });
 
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
@@ -106,20 +123,40 @@ namespace MaintenanceService.Database.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.CustomersLightDiet", b =>
                 {
-                    b.Property<int>("CustomersId")
+                    b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("LightDietsId")
+                    b.Property<int>("LightDietId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("Selected")
                         .HasColumnType("boolean");
 
-                    b.HasKey("CustomersId", "LightDietsId");
+                    b.HasKey("CustomerId", "LightDietId");
 
-                    b.HasIndex("LightDietsId");
+                    b.HasIndex("LightDietId");
 
                     b.ToTable("CustomersLightDiet");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.CustomersMenuPlan", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BoxContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PortionSizeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CustomerId", "BoxContentId");
+
+                    b.HasIndex("BoxContentId");
+
+                    b.HasIndex("PortionSizeId");
+
+                    b.ToTable("CustomersMenuPlan");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.DailyOverview", b =>
@@ -232,6 +269,23 @@ namespace MaintenanceService.Database.Migrations
                     b.ToTable("MonthlyOverview");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.PortionSize", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PortionSize");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Route", b =>
                 {
                     b.Property<int>("Id")
@@ -317,19 +371,46 @@ namespace MaintenanceService.Database.Migrations
                 {
                     b.HasOne("SharedLibrary.Models.Customer", "Customer")
                         .WithMany("CustomersLightDiets")
-                        .HasForeignKey("CustomersId")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.LightDiet", "LightDiet")
                         .WithMany("CustomersLightDiets")
-                        .HasForeignKey("LightDietsId")
+                        .HasForeignKey("LightDietId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Customer");
 
                     b.Navigation("LightDiet");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.CustomersMenuPlan", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.BoxContent", "BoxContent")
+                        .WithMany("CustomerMenuPlans")
+                        .HasForeignKey("BoxContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.Customer", "Customer")
+                        .WithMany("CustomerMenuPlans")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.PortionSize", "PortionSize")
+                        .WithMany("CustomerMenuPlans")
+                        .HasForeignKey("PortionSizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BoxContent");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("PortionSize");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.DailyOverview", b =>
@@ -354,8 +435,15 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.BoxContent", b =>
+                {
+                    b.Navigation("CustomerMenuPlans");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
+                    b.Navigation("CustomerMenuPlans");
+
                     b.Navigation("CustomersLightDiets");
 
                     b.Navigation("MonthlyOverviews");
@@ -369,6 +457,11 @@ namespace MaintenanceService.Database.Migrations
             modelBuilder.Entity("SharedLibrary.Models.MonthlyOverview", b =>
                 {
                     b.Navigation("DailyOverviews");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.PortionSize", b =>
+                {
+                    b.Navigation("CustomerMenuPlans");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Route", b =>

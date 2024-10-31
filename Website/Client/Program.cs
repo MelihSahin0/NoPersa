@@ -18,7 +18,7 @@ builder.Services.AddSingleton<NavigationContainer>();
 
 builder.Services.AddSingleton(new JsonSerializerOptions
 {
-    PropertyNamingPolicy = null
+    PropertyNamingPolicy = null,
 });
 
 // Supply HttpClient instances that include access tokens when making requests to the server project

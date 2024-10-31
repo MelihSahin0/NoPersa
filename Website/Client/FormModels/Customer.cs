@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Website.Client.Components.Default;
 using Website.Client.Models;
 using Website.Client.Services;
 
@@ -99,11 +100,18 @@ namespace Website.Client.FormModels
         public required int RouteId { get; set; }
 
         [JsonIgnore]
-        public List<RouteOverview>? RouteDetails { get; set; }
+        public List<SelectInput>? RouteDetails { get; set; }
 
         [ValidateComplexType]
         [Required]
         public required List<SelectedLightDiet> LightDietOverviews { get; set; }
+
+        [ValidateComplexType]
+        [Required]
+        [MinChildren(1, ErrorMessage = "At least one box content with one portion size should be defined")]
+        public required List<BoxContentSelected> BoxContentSelectedList { get; set; }
+
+        public List<SelectInput>? PortionSizes { get; set; }
 
         [JsonIgnore]
         public int selectedMonthlyDeliveries = 0;

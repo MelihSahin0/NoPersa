@@ -1,6 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-using SharedLibrary.DTOs.GetDTOs;
+﻿using SharedLibrary.DTOs.GetDTOs;
 
 namespace SharedLibrary.DTOs
 {
@@ -43,5 +41,9 @@ namespace SharedLibrary.DTOs
         public int? RouteId { get; set; }
 
         public List<DTOLightDietOverview>? LightDietOverviews { get; set; }
+
+        public List<DTOBoxContentSelected>? BoxContentSelectedList { get; set; }
+
+        public List<DTOSelectInput>? PortionSizes { get; set; }
     }
 }

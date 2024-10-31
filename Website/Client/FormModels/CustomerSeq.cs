@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Website.Client.Components.Default;
 using Website.Client.Models;
 
 namespace Website.Client.FormModels
@@ -12,6 +13,6 @@ namespace Website.Client.FormModels
         public required int[] SelectedRouteDetailsId { get; set; }
 
         [Required]
-        public required List<RouteOverview> RouteOverview { get; set; }
+        public required List<SelectInput> RouteOverview { get; set; }
     }
 }

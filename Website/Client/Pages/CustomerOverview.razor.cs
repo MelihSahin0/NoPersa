@@ -1,13 +1,14 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using System.Formats.Asn1;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Website.Client.Components.Default;
 using Website.Client.Enums;
 using Website.Client.FormModels;
 using Website.Client.Models;
 using Website.Client.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Website.Client.Pages
 {
@@ -50,7 +51,7 @@ namespace Website.Client.Pages
                 });
             }
 
-            Customer ??= new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
+            Customer = new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
                 Id = 0,
                 SerialNumber = string.Empty,
@@ -85,7 +86,9 @@ namespace Website.Client.Pages
                 ContactInformation = string.Empty,
                 RouteId = int.MinValue,
                 RouteDetails = [],
-                LightDietOverviews = []
+                LightDietOverviews = [],
+                PortionSizes = [],
+                BoxContentSelectedList = []
             };
         }
 
@@ -118,13 +121,15 @@ namespace Website.Client.Pages
                         Customer.Article = customer.Article;
                         Customer.DefaultPrice = customer.DefaultPrice;
                         Customer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
-                        Customer.MonthlyDeliveries = customer.MonthlyDeliveries;
+                        Customer.MonthlyDeliveries =[.. customer.MonthlyDeliveries];
                         Customer.TemporaryDelivery = customer.TemporaryDelivery;
                         Customer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
                         Customer.Workdays = customer.Workdays;
                         Customer.Holidays = customer.Holidays;
                         Customer.RouteId = customer.RouteId;
-                        Customer.LightDietOverviews = customer.LightDietOverviews;
+                        Customer.LightDietOverviews = [.. customer.LightDietOverviews];
+                        Customer.PortionSizes = [.. customer.PortionSizes];
+                        Customer.BoxContentSelectedList = [.. customer.BoxContentSelectedList];
                     }
                     else if (response1.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {}
@@ -135,7 +140,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetLightDiets", "{}", JsonSerializerOptions)!;
+                    using var response1 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetLightDiets")!;
 
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
@@ -146,21 +151,34 @@ namespace Website.Client.Pages
                     {
                         NotificationService.SetError(await response1.Content.ReadAsStringAsync());
                     }
+
+                    using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetBoxContentOverview")!;
+
+                    if (response2.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        BoxContentOverview boxContentOverview = JsonSerializer.Deserialize<BoxContentOverview>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                        Customer.BoxContentSelectedList = [.. boxContentOverview.BoxContentSelectedList];
+                        Customer.PortionSizes = [.. boxContentOverview.SelectInputs];
+                    }
+                    else
+                    {
+                        NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                    }
                 }
 
-                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetRoutesOverview")!;
+                using var responseRoute = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetRoutesOverview")!;
 
-                if (response2.StatusCode == System.Net.HttpStatusCode.OK)
+                if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    Customer.RouteDetails = [.. JsonSerializer.Deserialize<Route>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteOverview.OrderBy(x => x.Name)];
+                    Customer.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
                 }
                 else
                 {
-                    NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                    NotificationService.SetError(await responseRoute.Content.ReadAsStringAsync());
                 }
             }
             catch
-            {
+            { 
                 NotificationService.SetError("Server is not reachable.");
             }
         }

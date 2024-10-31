@@ -6,6 +6,7 @@ using Website.Client.Services;
 using Website.Client.FormModels;
 using Website.Client.Models;
 using System.Net.Http.Json;
+using Website.Client.Components.Default;
 
 namespace Website.Client.Pages
 {
@@ -44,7 +45,7 @@ namespace Website.Client.Pages
                 {
                     CustomerSeq.SequenceDetails = [.. JsonSerializer.Deserialize<List<SequenceDetail>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(r => r.Name)];
                     CustomerSeq.SelectedRouteDetailsId = CustomerSeq.SequenceDetails.Take(2).Select(r => r.Id).ToArray();
-                    CustomerSeq.RouteOverview = [.. CustomerSeq.SequenceDetails.Select(r => new RouteOverview() { Id = r.Id, Name = r.Name, Position = 0, NumberOfCustomers = 0 }).OrderBy(r => r.Name)];
+                    CustomerSeq.RouteOverview = [.. CustomerSeq.SequenceDetails.Select(r => new SelectInput() { Id = r.Id, Value = r.Name}).OrderBy(r => r.Value)];
                 }
                 else
                 {

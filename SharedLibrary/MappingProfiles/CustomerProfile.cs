@@ -18,7 +18,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.DefaultNumberOfBoxes, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.DefaultNumberOfBoxes) ? (int?)null : int.Parse(src.DefaultNumberOfBoxes)))
                 .ForMember(dest => dest.MonthlyOverviews, opt => opt.MapFrom(src => src.MonthlyDeliveries))
                 .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId ?? (int?)null))
-                .ForMember(dest => dest.CustomersLightDiets, opt => opt.MapFrom(src => src.LightDietOverviews));
+                .ForMember(dest => dest.CustomersLightDiets, opt => opt.MapFrom(src => src.LightDietOverviews))
+                .ForMember(dest => dest.CustomerMenuPlans, opt => opt.MapFrom(src => src.BoxContentSelectedList));
 
             CreateMap<Customer, DTOCustomer>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
@@ -29,7 +30,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.DefaultNumberOfBoxes, opt => opt.MapFrom(src => src.DefaultNumberOfBoxes))
                 .ForMember(dest => dest.MonthlyDeliveries, opt => opt.MapFrom(src => src.MonthlyOverviews))
                 .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId ?? (int?)null))
-                .ForMember(dest => dest.LightDietOverviews, opt => opt.MapFrom(src => src.CustomersLightDiets));
+                .ForMember(dest => dest.LightDietOverviews, opt => opt.MapFrom(src => src.CustomersLightDiets))
+                .ForMember(dest => dest.BoxContentSelectedList, opt => opt.MapFrom(src => src.CustomerMenuPlans));
         }
     }
 }

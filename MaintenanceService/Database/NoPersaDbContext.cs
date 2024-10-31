@@ -19,6 +19,7 @@ namespace MaintenanceService.Database
         public DbSet<Holiday> Holiday { get; set; }
         public DbSet<CustomersLightDiet> CustomersLightDiet { get; set; }
         public DbSet<LightDiet> LightDiet { get; set; }
+        public DbSet<CustomersMenuPlan> CustomersMenuPlan { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,6 +66,27 @@ namespace MaintenanceService.Database
                         .WithMany(c => c.CustomersLightDiets)
                         .OnDelete(DeleteBehavior.Restrict)
                 );
+
+            modelBuilder.Entity<CustomersMenuPlan>()
+                   .HasKey(cmp => new { cmp.CustomerId, cmp.BoxContentId });
+
+            modelBuilder.Entity<CustomersMenuPlan>()
+                .HasOne(cmp => cmp.Customer)
+                .WithMany(c => c.CustomerMenuPlans)
+                .HasForeignKey(cmp => cmp.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<CustomersMenuPlan>()
+                .HasOne(cmp => cmp.BoxContent)
+                .WithMany(bc => bc.CustomerMenuPlans)
+                .HasForeignKey(cmp => cmp.BoxContentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CustomersMenuPlan>()
+                .HasOne(cmp => cmp.PortionSize)
+                .WithMany(ps => ps.CustomerMenuPlans)
+                .HasForeignKey(cmp => cmp.PortionSizeId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Maintenance>()
                 .Property(e => e.NextDailyDeliverySave)

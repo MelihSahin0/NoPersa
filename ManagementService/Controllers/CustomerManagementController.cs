@@ -7,7 +7,6 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Util;
-using System.Security.Cryptography.Xml;
 
 namespace ManagementService.Controllers
 {
@@ -35,11 +34,14 @@ namespace ManagementService.Controllers
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews.Where(n => n.Year == DateTime.Today.Year && n.Month == DateTime.Today.Month)).ThenInclude(d => d.DailyOverviews)
                                         .Include(cld => cld.CustomersLightDiets).ThenInclude(ld => ld.LightDiet)
+                                        .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(b => b.BoxContent)
+                                        .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(p => p.PortionSize)
                                         .First();
+
                 if (dbCustomer != null)
                 {
                     DTOCustomer dTOCustomer = mapper.Map<DTOCustomer>(dbCustomer);
-                    if (dTOCustomer.LightDietOverviews?.Count != context.LightDiets.AsNoTracking().Count())
+                    if (dTOCustomer.LightDietOverviews!.Count != context.LightDiets.AsNoTracking().Count())
                     {
                         foreach (LightDiet lightDiet in context.LightDiets.AsNoTracking().ToList())
                         {
@@ -54,6 +56,25 @@ namespace ManagementService.Controllers
                             }
                         }
                     }
+
+                    if (dTOCustomer.BoxContentSelectedList!.Count != context.BoxContents.AsNoTracking().Count())
+                    {
+                        PortionSize defaultPortionSize = context.PortionSizes.AsNoTracking().First();
+                        foreach (BoxContent boxContent in context.BoxContents.AsNoTracking().ToList())
+                        {
+                            if (!dTOCustomer.BoxContentSelectedList!.Any(bc => bc.Id == boxContent.Id))
+                            {
+                                dTOCustomer.BoxContentSelectedList!.Add(new()
+                                {
+                                    Id = boxContent.Id,
+                                    Name = boxContent.Name,
+                                    PortionSizeId = defaultPortionSize.Id,
+                                });
+                            }
+                        }
+                    }
+
+                    dTOCustomer.PortionSizes = mapper.Map<List<DTOSelectInput>>(context.PortionSizes.AsNoTracking().ToList());
 
                     return Ok(dTOCustomer);
                 }
@@ -102,6 +123,24 @@ namespace ManagementService.Controllers
                         customer.MonthlyOverviews.Remove(overviewToRemove);
                     }
 
+                    foreach (CustomersLightDiet customersLightDiet in customer.CustomersLightDiets)
+                    {
+                        customersLightDiet.Customer = customer;
+                        customersLightDiet.CustomerId = customer.Id;
+                        customersLightDiet.LightDietId = customersLightDiet.LightDietId;
+                        customersLightDiet.LightDiet = context.LightDiets.FirstOrDefault(d => d.Id == customersLightDiet.LightDietId)!;
+                    }
+
+                    foreach (CustomersMenuPlan customerMenuPlan in customer.CustomerMenuPlans)
+                    {
+                        customerMenuPlan.Customer = customer;
+                        customerMenuPlan.CustomerId = customer.Id;
+                        customerMenuPlan.BoxContentId = customerMenuPlan.BoxContentId;
+                        customerMenuPlan.BoxContent = context.BoxContents.FirstOrDefault(p => p.Id == customerMenuPlan.BoxContentId)!;
+                        customerMenuPlan.PortionSizeId = customerMenuPlan.PortionSizeId;
+                        customerMenuPlan.PortionSize = context.PortionSizes.FirstOrDefault(p => p.Id == customerMenuPlan.PortionSizeId)!;
+                    }
+
                     context.Customers.Add(customer);
                 }
                 else
@@ -110,6 +149,7 @@ namespace ManagementService.Controllers
                                            .Include(w => w.Workdays).Include(h => h.Holidays)
                                            .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                            .Include(cld => cld.CustomersLightDiets)
+                                           .Include(cmp => cmp.CustomerMenuPlans)
                                            .FirstOrDefault();
 
                     if (dbCustomer == null)
@@ -187,8 +227,28 @@ namespace ManagementService.Controllers
                         {
                             customersLightDiet.Customer = customer;
                             customersLightDiet.CustomerId = customer.Id;
+                            customersLightDiet.LightDietId = customersLightDiet.LightDietId;
                             customersLightDiet.LightDiet = context.LightDiets.FirstOrDefault(d => d.Id == customersLightDiet.LightDietId)!;
                             dbCustomer.CustomersLightDiets.Add(customersLightDiet);
+                        }
+                    }
+
+                    foreach (CustomersMenuPlan customerMenuPlan in customer.CustomerMenuPlans)
+                    {
+                        CustomersMenuPlan? dbCustomerMenuPlan = dbCustomer.CustomerMenuPlans.FirstOrDefault(cmp => cmp.BoxContentId == customerMenuPlan.BoxContentId);
+
+                        if (dbCustomerMenuPlan != null)
+                        {
+                            dbCustomerMenuPlan.PortionSize = context.PortionSizes.FirstOrDefault(p => p.Id == customerMenuPlan.PortionSizeId)!; ;
+                            dbCustomerMenuPlan.PortionSizeId = customerMenuPlan.PortionSizeId;
+                        }
+                        else
+                        {
+                            customerMenuPlan.Customer = customer;
+                            customerMenuPlan.CustomerId = customer.Id;
+                            customerMenuPlan.BoxContent = context.BoxContents.FirstOrDefault(p => p.Id == customerMenuPlan.BoxContentId)!;
+                            customerMenuPlan.PortionSize = context.PortionSizes.FirstOrDefault(p => p.Id == customerMenuPlan.PortionSizeId)!;
+                            dbCustomer.CustomerMenuPlans.Add(customerMenuPlan);
                         }
                     }
                 }
@@ -216,10 +276,7 @@ namespace ManagementService.Controllers
         {
             try
             {
-                DTORoutes dTORoutes = new()
-                {
-                    RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(context.Routes.AsNoTracking().Include(r => r.Customers))]
-                };
+                List<DTOSelectInput> dTORoutes = mapper.Map<List<DTOSelectInput>>(context.Routes.AsNoTracking().Include(r => r.Customers));
 
                 return Ok(dTORoutes);
             }
@@ -264,22 +321,18 @@ namespace ManagementService.Controllers
             }
         }
 
-        [HttpPost("GetLightDiets", Name = "GetLightDiets")]
+        //If customerId == 0 then the code below will be called and only then
+        [HttpGet("GetLightDiets", Name = "GetLightDiets")]
         public IActionResult GetLightDiets()
         {
             try
             {
-                List<DTOLightDietOverview> dTOLightDietOverview = [];
-
-                foreach (LightDiet lightDiet in context.LightDiets.AsNoTracking().ToList())
+                List<DTOLightDietOverview> dTOLightDietOverview = [.. context.LightDiets.AsNoTracking().Select(lightDiet => new DTOLightDietOverview
                 {
-                    dTOLightDietOverview.Add(new()
-                    {
-                        Id = lightDiet.Id,
-                        Name = lightDiet.Name,
-                        Selected = false
-                    });
-                }
+                    Id = lightDiet.Id,
+                    Name = lightDiet.Name,
+                    Selected = false
+                })];
 
                 return Ok(dTOLightDietOverview);
             }
@@ -291,6 +344,45 @@ namespace ManagementService.Controllers
             catch (Exception e)
             {
                 logger.LogError(e, "failed getting customer daily delivery");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpGet("GetBoxContentOverview", Name = "GetBoxContentOverview")]
+        public IActionResult GetBoxContentOverview()
+        {
+            try
+            {
+                if (!context.BoxContents.AsNoTracking().Any() || !context.PortionSizes.AsNoTracking().Any())
+                {
+                    return NotFound("At least one box content and one portion size is required");
+                }
+
+                List<DTOSelectInput> dTOSelectionList = mapper.Map<List<DTOSelectInput>>(context.PortionSizes.AsNoTracking().ToList());
+
+                List<DTOBoxContentSelected> dTOBoxContentSelectedList = [.. context.BoxContents.AsNoTracking().Select(boxContent => new DTOBoxContentSelected
+                {
+                    Id = boxContent.Id,
+                    Name = boxContent.Name,
+                    PortionSizeId = dTOSelectionList.First().Id
+                })];
+
+                DTOBoxContentOverview dTOBoxContentOverview = new() 
+                {
+                    BoxContentSelectedList = dTOBoxContentSelectedList, 
+                    SelectInputs = dTOSelectionList 
+                };
+
+                return Ok(dTOBoxContentOverview);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map customer box content overview");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "failed getting box content overview");
                 return BadRequest("An error occurred while processing your request.");
             }
         }

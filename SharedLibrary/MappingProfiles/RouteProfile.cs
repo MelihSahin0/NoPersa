@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
-using System.Xml.Serialization;
 
 namespace SharedLibrary.MappingProfiles
 {

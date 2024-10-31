@@ -22,6 +22,23 @@ namespace MaintenanceService.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("SharedLibrary.Models.BoxContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BoxContent");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -117,6 +134,26 @@ namespace MaintenanceService.Database.Migrations
                     b.HasIndex("LightDietId");
 
                     b.ToTable("CustomersLightDiet");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.CustomersMenuPlan", b =>
+                {
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("BoxContentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PortionSizeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CustomerId", "BoxContentId");
+
+                    b.HasIndex("BoxContentId");
+
+                    b.HasIndex("PortionSizeId");
+
+                    b.ToTable("CustomersMenuPlan");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.DailyOverview", b =>
@@ -229,6 +266,23 @@ namespace MaintenanceService.Database.Migrations
                     b.ToTable("MonthlyOverview");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.PortionSize", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PortionSize");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Route", b =>
                 {
                     b.Property<int>("Id")
@@ -329,6 +383,33 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("LightDiet");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.CustomersMenuPlan", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.BoxContent", "BoxContent")
+                        .WithMany("CustomerMenuPlans")
+                        .HasForeignKey("BoxContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.Customer", "Customer")
+                        .WithMany("CustomerMenuPlans")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SharedLibrary.Models.PortionSize", "PortionSize")
+                        .WithMany("CustomerMenuPlans")
+                        .HasForeignKey("PortionSizeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BoxContent");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("PortionSize");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.DailyOverview", b =>
                 {
                     b.HasOne("SharedLibrary.Models.MonthlyOverview", "MonthlyOverview")
@@ -351,8 +432,15 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.BoxContent", b =>
+                {
+                    b.Navigation("CustomerMenuPlans");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
+                    b.Navigation("CustomerMenuPlans");
+
                     b.Navigation("CustomersLightDiets");
 
                     b.Navigation("MonthlyOverviews");
@@ -366,6 +454,11 @@ namespace MaintenanceService.Database.Migrations
             modelBuilder.Entity("SharedLibrary.Models.MonthlyOverview", b =>
                 {
                     b.Navigation("DailyOverviews");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.PortionSize", b =>
+                {
+                    b.Navigation("CustomerMenuPlans");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Route", b =>

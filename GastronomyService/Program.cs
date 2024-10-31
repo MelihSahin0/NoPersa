@@ -33,7 +33,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-builder.Services.AddAutoMapper(typeof(CustomerProfile), typeof(DailyOverviewProfile), typeof(MonthlyOverviewProfile), typeof(WeekdaysProfile), typeof(RouteProfile));
+builder.Services.AddAutoMapper(typeof(CustomerProfile), typeof(DailyOverviewProfile), typeof(MonthlyOverviewProfile), typeof(WeekdaysProfile), typeof(RouteProfile), typeof(BoxConfigurationProfile));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

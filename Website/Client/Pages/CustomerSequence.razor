@@ -1,5 +1,6 @@
 ﻿@page "/customerSequence"
 @using Website.Client.Components
+@using Website.Client.Components.Default
 @using Website.Client.FormModels
 @using Website.Client.Models
 @using Website.Client.Styles
@@ -13,7 +14,7 @@
             @for (int i = 0; i < CustomerSeq.SelectedRouteDetailsId.Count(); i++)
             {
                 int j = i;
-                <FormInputSelect Class="w-1/2 justify-center" RouteOverviews="@([.. CustomerSeq.RouteOverview.Where(r => r.Id != CustomerSeq.SelectedRouteDetailsId[CustomerSeq.SelectedRouteDetailsId.Count() - 1 - j])])"
+                <FormDefaultSelect Class="w-1/2 justify-center" SelectInputs="@([.. CustomerSeq.RouteOverview.Where(r => r.Id != CustomerSeq.SelectedRouteDetailsId[CustomerSeq.SelectedRouteDetailsId.Count() - 1 - j])])"
                                  @bind-Value="CustomerSeq.SelectedRouteDetailsId[j]"/>
             }
         </div>

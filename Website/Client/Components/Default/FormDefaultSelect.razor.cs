@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Website.Client.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace Website.Client.Components
+namespace Website.Client.Components.Default
 {
-    public partial class FormInputSelect
+    public partial class FormDefaultSelect
     {
         [Parameter]
         public required string Class { get; init; }
@@ -15,27 +15,27 @@ namespace Website.Client.Components
         public int Value { get; set; }
 
         [Parameter]
-        public List<RouteOverview>? RouteOverviews { get; set; }
+        public List<SelectInput>? SelectInputs { get; set; }
 
         [Parameter]
         public EventCallback<int> ValueChanged { get; set; }
 
-        private List<RouteOverview>? previousList;
+        private List<SelectInput>? previousSelectInputs;
 
         protected override async Task OnParametersSetAsync()
         {
-            if (!ListComparer(previousList, RouteOverviews))
+            if (!ListComparer(previousSelectInputs, SelectInputs))
             {
-                previousList = RouteOverviews?.Select(x => new RouteOverview() { Id = x.Id, Name = x.Name, Position = x.Position, NumberOfCustomers = x.NumberOfCustomers }).ToList(); 
+                previousSelectInputs = SelectInputs?.Select(x => new SelectInput() { Id = x.Id, Value = x.Value }).ToList();
                 await ValueChanged.InvokeAsync(Value);
             }
         }
 
-        private static bool ListComparer(List<RouteOverview>? oldList, List<RouteOverview>? newList)
+        private static bool ListComparer(List<SelectInput>? oldList, List<SelectInput>? newList)
         {
             if (oldList == null || newList == null) return false;
             if (oldList.Count != newList.Count) return false;
-            return !oldList.Where((t, i) => t.Id != newList[i].Id || t.Name != newList[i].Name).Any();
+            return !oldList.Where((t, i) => t.Id != newList[i].Id || t.Value != newList[i].Value).Any();
         }
 
         private async Task OnValueChanged(ChangeEventArgs e)
@@ -46,5 +46,15 @@ namespace Website.Client.Components
                 await ValueChanged.InvokeAsync(Value);
             }
         }
+    }
+
+    public class SelectInput
+    {
+        [Required]
+        public required int Id { get; set; }
+
+        [Required(ErrorMessage = "Name is required.")]
+        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
+        public required string Value { get; set; }
     }
 }

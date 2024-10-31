@@ -17,6 +17,9 @@ namespace ManagementService.Database
         public DbSet<DailyOverview> DailyOverviews { get; set; }
         public DbSet<LightDiet> LightDiets { get; set; }
         public DbSet<CustomersLightDiet> CustomersLightDiets { get; set; }
+        public DbSet<BoxContent> BoxContents { get; set; }
+        public DbSet<PortionSize> PortionSizes { get; set; }
+        public DbSet<CustomersMenuPlan> CustomerMenuPlans { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +50,18 @@ namespace ManagementService.Database
             modelBuilder.Entity<CustomersLightDiet>()
                         .ToTable("CustomersLightDiet")
                         .HasKey(cld => new { cld.CustomerId, cld.LightDietId });
+
+            modelBuilder.Entity<BoxContent>()
+                        .ToTable("BoxContent")
+                        .HasKey(d => d.Id);
+
+            modelBuilder.Entity<PortionSize>()
+                        .ToTable("PortionSize")
+                        .HasKey(d => d.Id);
+
+            modelBuilder.Entity<CustomersMenuPlan>()
+                .ToTable("CustomersMenuPlan")
+                .HasKey(cmp => new { cmp.CustomerId, cmp.BoxContentId });
         }
     }
 }
