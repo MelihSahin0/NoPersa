@@ -28,11 +28,13 @@ namespace SharedLibrary.MappingProfiles
 
             CreateMap<DTOPortionSize, PortionSize>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Value));
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Value))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
 
             CreateMap<PortionSize, DTOPortionSize>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Name));
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
 
             CreateMap<DTOLightDietOverview, CustomersLightDiet>()
                 .ForMember(dest => dest.LightDietId, opt => opt.MapFrom(src => src.Id))

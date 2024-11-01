@@ -3,6 +3,7 @@ using EFCore.BulkExtensions;
 using GastronomyService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
@@ -59,6 +60,8 @@ namespace GastronomyService.Controllers
 
             try
             {
+                bool updateCustomersLightDiets = dTOLightDiets.Any(l => l.Id == 0);
+
                 List<LightDiet> newLightDiets = [];
                 List<LightDiet> oldLightDiets = [];
                 foreach (var dTOLightDiet in dTOLightDiets)
@@ -75,7 +78,8 @@ namespace GastronomyService.Controllers
                     }
                 }
 
-                var dbExistingLightDiets = context.LightDiets.Where(r => oldLightDiets.Select(or => or.Id).Contains(r.Id)).ToList();
+                var oldDietIds = oldLightDiets.Select(d => d.Id).ToHashSet();
+                var dbExistingLightDiets = context.LightDiets.Where(d => oldDietIds.Contains(d.Id)).ToList();
                 foreach (var dbExistingLightDiet in dbExistingLightDiets)
                 {
                     var dbUpdatedLightDiet = oldLightDiets.FirstOrDefault(or => or.Id == dbExistingLightDiet.Id);
@@ -85,7 +89,7 @@ namespace GastronomyService.Controllers
                     }
                 }
 
-                var dbNotFoundLightDiets = context.LightDiets.Where(er => !oldLightDiets.Select(or => or.Id).Contains(er.Id)).ToList();
+                var dbNotFoundLightDiets = context.LightDiets.Where(er => !oldDietIds.Contains(er.Id)).ToList();
                 
                 const int batchSize = 1000;
                 for (int j = 0; j < dbNotFoundLightDiets.Count; j += batchSize)
@@ -95,8 +99,36 @@ namespace GastronomyService.Controllers
                 }
 
                 context.LightDiets.AddRange(newLightDiets);
-
                 context.SaveChanges();
+
+                if (updateCustomersLightDiets)
+                {
+                    List<LightDiet> lightDiets = [.. context.LightDiets]; 
+
+                    foreach (Customer customer in context.Customers.Include(cld => cld.CustomersLightDiets))
+                    {
+                        foreach (LightDiet lightDiet in lightDiets)
+                        {
+                            CustomersLightDiet? dbCustomersLightDiet = customer.CustomersLightDiets.FirstOrDefault(cld => cld.LightDietId == lightDiet.Id);
+
+                            if (dbCustomersLightDiet == null)
+                            {
+                                dbCustomersLightDiet = new()
+                                {
+                                    Customer = customer,
+                                    CustomerId = customer.Id,
+                                    LightDietId = lightDiet.Id,
+                                    LightDiet = lightDiet,
+                                    Selected = false
+                                };
+                                customer.CustomersLightDiets.Add(dbCustomersLightDiet);
+                            }
+                        }
+                    }
+
+                    context.BulkSaveChanges();
+                }
+
                 transaction.Commit();
 
                 return Ok(dTOLightDiets);
@@ -150,6 +182,8 @@ namespace GastronomyService.Controllers
 
             try
             {
+                bool updateCustomersMenu = dTOBoxContents.Any(l => l.Id == 0) && context.PortionSizes.AsNoTracking().Any();
+
                 List<BoxContent> newBoxContents = [];
                 List<BoxContent> oldBoxContents = [];
                 foreach (var dTOBoxContent in dTOBoxContents)
@@ -166,7 +200,8 @@ namespace GastronomyService.Controllers
                     }
                 }
 
-                var dbExistingLightDiets = context.BoxContents.Where(r => oldBoxContents.Select(or => or.Id).Contains(r.Id)).ToList();
+                var oldBoxId = oldBoxContents.Select(d => d.Id).ToHashSet();
+                var dbExistingLightDiets = context.BoxContents.Where(d => oldBoxId.Contains(d.Id)).ToList();
                 foreach (var dbExistingLightDiet in dbExistingLightDiets)
                 {
                     var dbUpdatedLightDiet = oldBoxContents.FirstOrDefault(or => or.Id == dbExistingLightDiet.Id);
@@ -176,7 +211,7 @@ namespace GastronomyService.Controllers
                     }
                 }
 
-                var dbNotFoundLightDiets = context.BoxContents.Where(er => !oldBoxContents.Select(or => or.Id).Contains(er.Id)).ToList();
+                var dbNotFoundLightDiets = context.BoxContents.Where(er => !oldBoxId.Contains(er.Id)).ToList();
 
                 const int batchSize = 1000;
                 for (int j = 0; j < dbNotFoundLightDiets.Count; j += batchSize)
@@ -186,8 +221,38 @@ namespace GastronomyService.Controllers
                 }
 
                 context.BoxContents.AddRange(newBoxContents);
-
                 context.SaveChanges();
+
+                if (updateCustomersMenu)
+                {
+                    List<BoxContent> boxContents = [.. context.BoxContents];
+                    PortionSize portionSize = context.PortionSizes.First(p => p.Position == 0);
+
+                    foreach (Customer customer in context.Customers.Include(cmp => cmp.CustomerMenuPlans))
+                    {
+                        foreach (BoxContent boxContent in boxContents)
+                        {
+                            CustomersMenuPlan? dBCustomersMenuPlan = customer.CustomerMenuPlans.FirstOrDefault(cmp => cmp.BoxContentId == boxContent.Id);
+
+                            if (dBCustomersMenuPlan == null)
+                            {
+                                dBCustomersMenuPlan = new()
+                                {
+                                    Customer = customer,
+                                    CustomerId = customer.Id,
+                                    BoxContentId = boxContent.Id,
+                                    BoxContent = boxContent,
+                                    PortionSize = portionSize,
+                                    PortionSizeId = portionSize.Id
+                                };
+                                customer.CustomerMenuPlans.Add(dBCustomersMenuPlan);
+                            }
+                        }
+                    }
+
+                    context.BulkSaveChanges();
+                }
+
                 transaction.Commit();
 
                 return Ok(dTOBoxContents);
@@ -213,13 +278,6 @@ namespace GastronomyService.Controllers
             {
                 List<DTOPortionSize> dTOPortionSizes = mapper.Map<List<DTOPortionSize>>(context.PortionSizes.AsNoTracking());
 
-                int i = 0;
-                foreach (DTOPortionSize dTOPortionSize in dTOPortionSizes.OrderBy(d => d.Value))
-                {
-                    dTOPortionSize.Position = i;
-                    i++;
-                }
-
                 return Ok(dTOPortionSizes);
             }
             catch (ValidationException e)
@@ -241,6 +299,8 @@ namespace GastronomyService.Controllers
 
             try
             {
+                bool updateCustomersMenu = dTOPortionSizes.Count != 0 && !context.PortionSizes.AsNoTracking().Any();
+
                 List<PortionSize> newPortionSizes = [];
                 List<PortionSize> oldPortionSizes = [];
                 foreach (var dTOPortionSize in dTOPortionSizes)
@@ -257,17 +317,19 @@ namespace GastronomyService.Controllers
                     }
                 }
 
-                var dbExistingPortionSizes = context.PortionSizes.Where(r => oldPortionSizes.Select(or => or.Id).Contains(r.Id)).ToList();
+                var oldPortionId = oldPortionSizes.Select(p => p.Id).ToHashSet();
+                var dbExistingPortionSizes = context.PortionSizes.Where(p => oldPortionId.Contains(p.Id)).ToList();
                 foreach (var dbExistingPortionSize in dbExistingPortionSizes)
                 {
                     var dbUpdatedPortionSize = oldPortionSizes.FirstOrDefault(or => or.Id == dbExistingPortionSize.Id);
                     if (dbUpdatedPortionSize != null)
                     {
                         dbExistingPortionSize.Name = dbUpdatedPortionSize.Name;
+                        dbExistingPortionSize.Position = dbUpdatedPortionSize.Position;
                     }
                 }
 
-                var dbNotFoundPortionSizes = context.PortionSizes.Where(er => !oldPortionSizes.Select(or => or.Id).Contains(er.Id)).ToList();
+                var dbNotFoundPortionSizes = context.PortionSizes.Where(er => !oldPortionId.Contains(er.Id)).ToList();
 
                 const int batchSize = 1000;
                 for (int j = 0; j < dbNotFoundPortionSizes.Count; j += batchSize)
@@ -277,8 +339,38 @@ namespace GastronomyService.Controllers
                 }
 
                 context.PortionSizes.AddRange(newPortionSizes);
-
                 context.SaveChanges();
+
+                if (updateCustomersMenu)
+                {
+                    List<BoxContent> boxContents = [.. context.BoxContents];
+                    PortionSize portionSize = context.PortionSizes.First(p => p.Position == 0);
+
+                    foreach (Customer customer in context.Customers.Include(cmp => cmp.CustomerMenuPlans))
+                    {
+                        foreach (BoxContent boxContent in boxContents)
+                        {
+                            CustomersMenuPlan? dBCustomersMenuPlan = customer.CustomerMenuPlans.FirstOrDefault(cmp => cmp.BoxContentId == boxContent.Id);
+
+                            if (dBCustomersMenuPlan == null)
+                            {
+                                dBCustomersMenuPlan = new()
+                                {
+                                    Customer = customer,
+                                    CustomerId = customer.Id,
+                                    BoxContentId = boxContent.Id,
+                                    BoxContent = boxContent,
+                                    PortionSize = portionSize,
+                                    PortionSizeId = portionSize.Id
+                                };
+                                customer.CustomerMenuPlans.Add(dBCustomersMenuPlan);
+                            }
+                        }
+                    }
+
+                    context.BulkSaveChanges();
+                }
+
                 transaction.Commit();
 
                 return Ok(dTOPortionSizes);

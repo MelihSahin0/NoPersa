@@ -87,14 +87,29 @@ namespace Website.Client.Pages
                 using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateBoxContents", BoxConfigurations.BoxContents, JsonSerializerOptions);
                 using var response3 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdatePortionSizes", BoxConfigurations.PortionSizes, JsonSerializerOptions);
 
-                if (response1.StatusCode == System.Net.HttpStatusCode.OK && response2.StatusCode == System.Net.HttpStatusCode.OK && response3.StatusCode == System.Net.HttpStatusCode.OK)
+                bool isSuccess1 = response1.StatusCode == System.Net.HttpStatusCode.OK;
+                bool isSuccess2 = response2.StatusCode == System.Net.HttpStatusCode.OK;
+                bool isSuccess3 = response3.StatusCode == System.Net.HttpStatusCode.OK;
+
+                if (isSuccess1 && isSuccess2 && isSuccess3)
                 {
                     NotificationService.SetSuccess("Successfully updated box configuration");
                     NavigationManager.NavigateTo("/");
                 }
                 else
                 {
-                    NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                    if (!isSuccess1)
+                    {
+                        NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                    }
+                    if (!isSuccess2)
+                    {
+                        NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                    }
+                    if (!isSuccess3)
+                    {
+                        NotificationService.SetError(await response3.Content.ReadAsStringAsync());
+                    }
                 }
             }
             catch

@@ -188,7 +188,10 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", Customer, JsonSerializerOptions);
+                using var response = Customer.Id == 0 ?
+                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/InsertCustomer", Customer, JsonSerializerOptions)
+                   :
+                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", Customer, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

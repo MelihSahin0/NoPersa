@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SharedLibrary.Validations;
+using System.ComponentModel.DataAnnotations;
 
 namespace SharedLibrary.Models
 {
@@ -9,6 +10,10 @@ namespace SharedLibrary.Models
 
         [Required]
         public required string Name { get; set; }
+
+        [Required]
+        [IntType(min: 0)]
+        public required int Position { get; set; }
 
         public List<CustomersMenuPlan> CustomerMenuPlans { get; set; } = [];
     }
