@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MaintenanceService", "Maint
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoPersa.Tests", "NoPersa.Tests\NoPersa.Tests.csproj", "{E320AFBB-0BC3-4FD8-BDF2-7C4BD1E4E52F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GastronomyService", "GastronomyService\GastronomyService.csproj", "{EE09175A-94A2-40F3-A276-D4D6AC86F462}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GastronomyService", "GastronomyService\GastronomyService.csproj", "{EE09175A-94A2-40F3-A276-D4D6AC86F462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

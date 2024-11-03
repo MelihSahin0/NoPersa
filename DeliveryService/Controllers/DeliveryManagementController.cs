@@ -143,6 +143,7 @@ namespace DeliveryService.Controllers
                                           .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month))
                                                                     .ThenInclude(d=>d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDay.Day))
                                           .ToListAsync();
+                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
 
                 foreach (Route dbRoute in dbRoutes)
                 {
@@ -152,8 +153,7 @@ namespace DeliveryService.Controllers
                         DTOCustomerRoute dTOCustomerRoutes = mapper.Map<DTOCustomerRoute>(dbCustomer);
 
                         MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
-                        Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
-
+                     
                         if (dbFoundOverview != null)
                         {
                             int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
@@ -222,7 +222,8 @@ namespace DeliveryService.Controllers
 
                         if (dbCustomer != null)
                         {
-                            if (route.Id == int.MinValue && dbCustomer.RouteId != route.Id)
+                            //Check if customer was taken out from Archive
+                            if (route.Id != int.MinValue && dbCustomer.RouteId == int.MinValue)
                             {
                                 CheckMonthlyOverview.CheckAndAdd(dbCustomer);
                             }

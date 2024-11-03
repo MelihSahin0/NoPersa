@@ -336,12 +336,13 @@ namespace ManagementService.Controllers
                 }
 
                 List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
+                int id = portionSizes.FirstOrDefault(ps => ps.Position == 0)!.Id;
 
                 List<DTOBoxContentSelected> dTOBoxContentSelectedList = [.. context.BoxContents.AsNoTracking().Select(boxContent => new DTOBoxContentSelected
                 {
                     Id = boxContent.Id,
                     Name = boxContent.Name,
-                    PortionSizeId = portionSizes.First(sl => sl.Position == 0).Id
+                    PortionSizeId = id
                 })];
 
                 DTOBoxContentOverview dTOBoxContentOverview = new() 

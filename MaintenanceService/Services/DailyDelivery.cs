@@ -27,7 +27,7 @@ namespace MaintenanceService.Services
         public Task StartAsync(CancellationToken cancellationToken)
         {
             var now =  DateTime.Now;
-            var targetTime = DateTime.Today.AddHours(18);
+            var targetTime = DateTime.Today.AddHours(18); //When to update the DailyOverviews
 
             var initialDelay = targetTime - now;
             if (initialDelay < TimeSpan.Zero)
@@ -69,17 +69,19 @@ namespace MaintenanceService.Services
             {
                 DateTime lowestDate = maintenance.NextDailyDeliverySave;
 
-                List<Customer> dbCustomers = await context.Customer.Where(m => m.MonthlyOverviews.Any(x => x.Year > maintenance.NextDailyDeliverySave.Year || (x.Year == maintenance.NextDailyDeliverySave.Year && x.Month >= maintenance.NextDailyDeliverySave.Month)))
+                List<Customer> dbCustomers = await context.Customer.Where(r => r.RouteId != int.MinValue || (r.RouteId == int.MinValue && r.MonthlyOverviews.Any(x => x.Year == maintenance.NextDailyDeliverySave.Year && x.Month == maintenance.NextDailyDeliverySave.Month)))
                                                                    .Include(w => w.Workdays)
                                                                    .Include(h => h.Holidays)
                                                                    .Include(m => m.MonthlyOverviews.Where(x => x.Year > maintenance.NextDailyDeliverySave.Year || (x.Year == maintenance.NextDailyDeliverySave.Year && x.Month >= maintenance.NextDailyDeliverySave.Month)))
                                                                        .ThenInclude(d => d.DailyOverviews)
                                                                    .ToListAsync();
 
-                foreach (Customer dbCustomer in dbCustomers)
+                DateTime time = new(maintenance.NextDailyDeliverySave.Year, maintenance.NextDailyDeliverySave.Month, maintenance.NextDailyDeliverySave.Day);
+                while (DateTime.Today.Date >= time.Date)
                 {
-                    DateTime time = new(maintenance.NextDailyDeliverySave.Year, maintenance.NextDailyDeliverySave.Month, maintenance.NextDailyDeliverySave.Day);
-                    while (DateTime.Today.Date >= time.Date)
+                    Holiday? holiday = await context.Holiday.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == time.Year && h.Month == time.Month && h.Day == time.Day);
+
+                    foreach (Customer dbCustomer in dbCustomers)
                     {
                         MonthlyOverview? dbMonthlyOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == time.Year && x.Month == time.Month);
 
@@ -97,8 +99,7 @@ namespace MaintenanceService.Services
                             DailyOverview dbDailyOverview = dbMonthlyOverview!.DailyOverviews.First(x => x.DayOfMonth == time.Day);
                             if (dbDailyOverview.NumberOfBoxes == null)
                             {
-                                Holiday? holiday = await context.Holiday.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == time.Year && h.Month == time.Month && h.Day == time.Day);
-                                if (CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, time.Year, time.Month, time.Day) 
+                                if (CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, time.Year, time.Month, time.Day)
                                     && dbCustomer.RouteId != int.MinValue)
                                 {
                                     dbDailyOverview.NumberOfBoxes = dbCustomer.DefaultNumberOfBoxes;
@@ -115,9 +116,9 @@ namespace MaintenanceService.Services
                                 dbDailyOverview.Price = dbCustomer.DefaultPrice;
                             }
                         }
-                        time = time.AddDays(1);
                     }
-                }      
+                    time = time.AddDays(1);
+                }
 
                 const int batchSize = 1000;
                 for (int i = 0; i < dbCustomers.Count; i += batchSize)

@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
+using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
+using Holiday = SharedLibrary.Models.Holiday;
+using Route = SharedLibrary.Models.Route;
 
 namespace GastronomyService.Controllers
 {
@@ -17,6 +21,7 @@ namespace GastronomyService.Controllers
         private readonly NoPersaDbContext context;
         private readonly ILogger<GastronomyManagementController> logger;
         private readonly IMapper mapper;
+        private readonly string currentCountry = "at"; //TODO: Will be removed in the future
 
         public GastronomyManagementController(ILogger<GastronomyManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
         {
@@ -389,6 +394,100 @@ namespace GastronomyService.Controllers
             {
                 transaction.Rollback();
                 logger.LogError(e, "Updating portion sizes failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpPost("GetFoodOverview", Name = "GetFoodOverview")]
+        public async Task<IActionResult> GetFoodOverview([FromBody] DTOSelectedDay dTOSelectedDay)
+        {
+            try
+            {
+                List<Route> dbRoutes = await context.Routes.AsNoTracking().Where(r => r.Id != int.MinValue).Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                                       .Include(r => r.Customers).ThenInclude(c => c.Holidays)
+                                       .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month))
+                                                                 .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDay.Day))
+                                       .Include(r => r.Customers).ThenInclude(cmp => cmp.CustomerMenuPlans)
+                                       .Include(r => r.Customers).ThenInclude(cld => cld.CustomersLightDiets)
+                                       .ToListAsync();
+                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
+
+                List<DTOFoodBoxOverview> dTOFoodBoxOverviews = [];
+                List<DTOLightDietsNumberOf> dTOLightDietsNumberOfs = mapper.Map<List<DTOLightDietsNumberOf>>(context.LightDiets.AsNoTracking());
+                List<DTOPortionSizeNumberOf> dTOPortionSizeNumberOfs = mapper.Map<List<DTOPortionSizeNumberOf>>(context.PortionSizes.AsNoTracking());
+                List<DTOBoxContentNumberOf> dTOBoxContentNumberOfs = mapper.Map<List<DTOBoxContentNumberOf>>(context.BoxContents.AsNoTracking());
+
+                foreach (var item in dTOBoxContentNumberOfs)
+                {
+                    item.PortionSizes = dTOPortionSizeNumberOfs.Select(x => x.Clone()).ToList();
+                }
+
+                DTOFoodBoxOverview summaryFoodBoxOverview = new()
+                {
+                    RouteName = "Summary",
+                    LightDiets = dTOLightDietsNumberOfs.Select(x => x.Clone()).ToList(),
+                    BoxContents = dTOBoxContentNumberOfs.Select(x => x.Clone()).ToList()
+                };
+
+                foreach (Route dbRoute in dbRoutes.OrderBy(r => r.Position))
+                {
+                    DTOFoodBoxOverview dTOFoodBoxOverview = new()
+                    {
+                        RouteName = dbRoute.Name,
+                        LightDiets = dTOLightDietsNumberOfs.Select(x => x.Clone()).ToList(),
+                        BoxContents = dTOBoxContentNumberOfs.Select(x => x.Clone()).ToList()
+                    };
+
+                    foreach (Customer dbCustomer in dbRoute.Customers ?? [])
+                    {
+                        bool toDeliver = false;
+
+                        MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
+                      
+                        if (dbFoundOverview != null)
+                        {
+                            int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
+                            toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day));
+                        }
+                        else //Safety Measure
+                        {
+                            toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
+                        }
+
+                        if (toDeliver)
+                        {
+                            foreach (CustomersLightDiet lightDiet in dbCustomer.CustomersLightDiets)
+                            {
+                                if (lightDiet.Selected)
+                                {
+                                    dTOFoodBoxOverview.LightDiets.First(l => l.Id == lightDiet.LightDietId).Value += 1;
+                                    summaryFoodBoxOverview.LightDiets.First(l => l.Id == lightDiet.LightDietId).Value += 1;
+
+                                }
+                            }
+
+                            foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
+                            {
+                                dTOFoodBoxOverview.BoxContents.First(b => b.Id == menuPlan.BoxContentId).PortionSizes!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
+                                summaryFoodBoxOverview.BoxContents.First(b => b.Id == menuPlan.BoxContentId).PortionSizes!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
+                            }
+                        }
+                    }
+                    dTOFoodBoxOverviews.Add(dTOFoodBoxOverview);
+                }
+
+                dTOFoodBoxOverviews.Insert(0, summaryFoodBoxOverview);
+
+                return Ok(dTOFoodBoxOverviews);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map food overview");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Getting map food overview failed");
                 return BadRequest("An error occurred while processing your request.");
             }
         }

@@ -21,11 +21,10 @@ namespace SharedLibrary.Util
             List<DailyOverview> dailyOverviews = Enumerable.Range(1, 31).Select(i => new DailyOverview
             {
                 DayOfMonth = i,
-                Price = customer.DefaultPrice,
+                Price = i < dateTime.Day ? customer.DefaultPrice : null,
                 NumberOfBoxes = i < dateTime.Day ? 0 : null,
                 MonthlyOverview = monthlyOverview
             }).ToList();
-
 
             monthlyOverview.DailyOverviews = dailyOverviews;
             customer.MonthlyOverviews.Add(monthlyOverview);

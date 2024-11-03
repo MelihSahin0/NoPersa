@@ -13,10 +13,14 @@ namespace Website.Client.Components
         [Parameter]
         public EventCallback<int> ValueChanged { get; set; }
 
+        [Parameter]
+        public EventCallback SelectionChanged { get; set; }
+
         private async Task OnButtonClick(int index)
         {
             Value = index;
             await ValueChanged.InvokeAsync(Value);
+            await SelectionChanged.InvokeAsync();
         }
     }
 }

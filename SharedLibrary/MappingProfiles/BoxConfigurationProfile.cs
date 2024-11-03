@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using SharedLibrary.DTOs;
 using SharedLibrary.Models;
-using System.ComponentModel.Design;
-using System.Xml.Serialization;
 
 namespace SharedLibrary.MappingProfiles
 {
@@ -78,6 +76,20 @@ namespace SharedLibrary.MappingProfiles
                     }).ToList(),
                     SelectInputs = new List<DTOSelectInput>()
                 });
+
+            CreateMap<LightDiet, DTOLightDietsNumberOf>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 0));
+
+            CreateMap<BoxContent, DTOBoxContentNumberOf>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+
+            CreateMap<PortionSize, DTOPortionSizeNumberOf>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 0));
         }
     }
 }
