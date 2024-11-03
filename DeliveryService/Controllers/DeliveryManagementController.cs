@@ -34,12 +34,7 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                DTORoutes dTORoutes = new()
-                {
-                    RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(context.Routes.AsNoTracking().Include(r => r.Customers))]
-                };
-
-                return Ok(dTORoutes);
+                return Ok(mapper.Map<List<DTORouteOverview>>(context.Routes.AsNoTracking().Include(r => r.Customers)));
             }
             catch (ValidationException e)
             {
@@ -55,7 +50,7 @@ namespace DeliveryService.Controllers
 
 
         [HttpPost("UpdateRoutes", Name = "UpdateRoutes")]
-        public IActionResult UpdateRoutes([FromBody] DTORoutes routes)
+        public IActionResult UpdateRoutes([FromBody] List<DTORouteOverview> routes)
         {
             using var transaction = context.Database.BeginTransaction();
 
@@ -63,7 +58,7 @@ namespace DeliveryService.Controllers
             {
                 List<Route> newRoutes = [];
                 List<Route> oldRoutes = [];
-                foreach (var routeDto in routes.RouteOverview ?? [])
+                foreach (var routeDto in routes ?? [])
                 {
                     Route route = mapper.Map<Route>(routeDto);
                     route.Customers = [];
@@ -78,7 +73,8 @@ namespace DeliveryService.Controllers
                     }
                 }
 
-                var dbExistingRoutes = context.Routes.Where(r => oldRoutes.Select(or => or.Id).Contains(r.Id)).ToList();
+                var oldRouteIds = oldRoutes.Select(d => d.Id).ToHashSet();
+                var dbExistingRoutes = context.Routes.Where(r => oldRouteIds.Contains(r.Id)).ToList();
                 foreach (var dbExistingRoute in dbExistingRoutes)
                 {
                     var dbUpdatedRoute = oldRoutes.FirstOrDefault(or => or.Id == dbExistingRoute.Id);
@@ -90,7 +86,7 @@ namespace DeliveryService.Controllers
                 }
 
                 //without Archive
-                var dbNotFoundRoutes = context.Routes.Where(er => !oldRoutes.Select(or => or.Id).Contains(er.Id) && er.Id != int.MinValue).Include(r => r.Customers).ToList();
+                var dbNotFoundRoutes = context.Routes.Where(er => !oldRouteIds.Contains(er.Id) && er.Id != int.MinValue).Include(r => r.Customers).ToList();
                 int i = (context.Customers.Where(c => c.RouteId == int.MinValue)
                                           .Select(c => (int?)c.Position)
                                           .Max() ?? -1) + 1;
@@ -139,7 +135,6 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                DTODeliveryStatus dTODeliveryStatus = new();
                 List<DTORouteDetails> routes = [];
 
                 //Without Archive
@@ -176,9 +171,7 @@ namespace DeliveryService.Controllers
                     routes.Add(dTORouteDetails);
                 }
 
-                dTODeliveryStatus.RouteDetails = [.. routes];
-
-                return Ok(dTODeliveryStatus);
+                return Ok(routes);
             }
             catch (ValidationException e)
             {

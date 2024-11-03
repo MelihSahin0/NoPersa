@@ -60,12 +60,7 @@ namespace NoPersa.Tests.DeliveryTests
             List<Route> routes = [.. context.Routes.AsNoTracking()];
             routes.FirstOrDefault(r => r.Id == 1)!.Name = "Route 0";
 
-            DTORoutes dTORoutes = new()
-            { 
-                RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(routes)] 
-            };
-
-            controller.UpdateRoutes(dTORoutes);
+            controller.UpdateRoutes(mapper.Map<List<DTORouteOverview>>(routes));
 
             Assert.AreEqual("Route 0", context.Routes.FirstOrDefault(r => r.Id == 1)!.Name);
         }
@@ -79,12 +74,7 @@ namespace NoPersa.Tests.DeliveryTests
             routes.FirstOrDefault(r => r.Id == 2)!.Position = 3;
             routes.FirstOrDefault(r => r.Id == 3)!.Position = 1;
 
-            DTORoutes dTORoutes = new()
-            {
-                RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(routes)]
-            };
-
-            controller.UpdateRoutes(dTORoutes);
+            controller.UpdateRoutes(mapper.Map<List<DTORouteOverview>>(routes));
 
             CollectionAssert.AreEqual(new List<int> {int.MinValue, 3,1,2}, context.Routes.OrderBy(r => r.Position)!.Select(r => r.Id).ToList());
         }
@@ -96,12 +86,7 @@ namespace NoPersa.Tests.DeliveryTests
             List<Route> routes = [.. context.Routes.AsNoTracking()];
             routes.Add(new() { Id = 0, Name = "Route 4", Position = 4 });
 
-            DTORoutes dTORoutes = new()
-            {
-                RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(routes)]
-            };
-
-            controller.UpdateRoutes(dTORoutes);
+            controller.UpdateRoutes(mapper.Map<List<DTORouteOverview>>(routes));
 
             Assert.AreEqual(routes.Count, context.Routes.Count());
         }
@@ -113,14 +98,7 @@ namespace NoPersa.Tests.DeliveryTests
             List<Route> routes = [.. context.Routes.AsNoTracking()];
             routes.RemoveAll(r => r.Id == 3);
 
-            DTORoutes dTORoutes = new()
-            {
-                RouteOverview = [.. mapper.Map<List<DTORouteOverview>>(routes)]
-            };
-
-            controller.UpdateRoutes(dTORoutes);
-
-            var ex = context.Routes.ToList();
+            controller.UpdateRoutes(mapper.Map<List<DTORouteOverview>>(routes));
 
             Assert.AreEqual(routes.Count, context.Routes.Count());
         }

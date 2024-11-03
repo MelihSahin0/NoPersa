@@ -5,6 +5,7 @@ using Blazored.LocalStorage;
 using System.Net.Http.Json;
 using Website.Client.FormModels;
 using Website.Client.Services;
+using Website.Client.Models;
 
 namespace Website.Client.Pages
 {
@@ -42,7 +43,7 @@ namespace Website.Client.Pages
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    Routes = JsonSerializer.Deserialize<Route>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    Routes.RouteOverview = JsonSerializer.Deserialize<List<RouteOverview>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                     Routes.RouteOverview.RemoveAll(r => r.Id == int.MinValue);
                 }
                 else
@@ -61,7 +62,7 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateRoutes", Routes, JsonSerializerOptions);
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateRoutes", Routes.RouteOverview, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

@@ -299,7 +299,7 @@ namespace GastronomyService.Controllers
 
             try
             {
-                bool updateCustomersMenu = dTOPortionSizes.Count != 0 && !context.PortionSizes.AsNoTracking().Any();
+                bool updateCustomersMenu = dTOPortionSizes.Count != 0 && dTOPortionSizes.FirstOrDefault(p => p.Position == 0)?.Id == 0;
 
                 List<PortionSize> newPortionSizes = [];
                 List<PortionSize> oldPortionSizes = [];
@@ -330,6 +330,10 @@ namespace GastronomyService.Controllers
                 }
 
                 var dbNotFoundPortionSizes = context.PortionSizes.Where(er => !oldPortionId.Contains(er.Id)).ToList();
+                if (dbNotFoundPortionSizes.Count > 0)
+                {
+                    updateCustomersMenu = true;
+                }
 
                 const int batchSize = 1000;
                 for (int j = 0; j < dbNotFoundPortionSizes.Count; j += batchSize)

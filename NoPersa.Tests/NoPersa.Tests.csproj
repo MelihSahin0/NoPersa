@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DeliveryService\DeliveryService.csproj" />
+    <ProjectReference Include="..\GastronomyService\GastronomyService.csproj" />
     <ProjectReference Include="..\MaintenanceService\MaintenanceService.csproj" />
     <ProjectReference Include="..\ManagementService\ManagementService.csproj" />
     <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />

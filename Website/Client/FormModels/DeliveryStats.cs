@@ -55,7 +55,7 @@ namespace Website.Client.FormModels
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    RouteDetails = [.. JsonSerializer.Deserialize<DeliveryStats>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.RouteDetails.OrderBy(x => x.Position)];
+                    RouteDetails = [.. JsonSerializer.Deserialize<List<RouteDetails>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Position)];
                 }
                 else
                 {
