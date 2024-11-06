@@ -9,58 +9,123 @@
         <FormDayPicker Label="Date picker" OnDayMonthYearSelected="@(() => FillBoxes.OnDayMonthYearSelected())" @bind-Year="@FillBoxes.Year" @bind-Month="@FillBoxes.Month" @bind-Day="@FillBoxes.Day" />
     </div>
     <div class="flex flex-col max-w-full">
-        @if (FillBoxes.DisplayTypeIndex == 0 && FillBoxes.FoodOverview.Any())
+        @if (FillBoxes.DisplayTypeIndex == 0)
         {
-            <div class="flex flex-row max-w-full justify-between mb-2 border-black border-b-2">
-                <Tab @bind-Value="FillBoxes.FoodOverviewIndex" Items="@FillBoxes.FoodOverview.Select(f => f.RouteName).ToList()"/>
-            </div>
-            <div class="flex flex-row max-w-full justify-center ">
-                <table class="min-w-full border border-black text-center bg-white">
-                    <thead class="bg-gray-200 border-b border-black">
-                        <tr>
-                            <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Menus</th>
-                            @foreach (string portionSize in FillBoxes.FoodOverview[0].BoxContents[0].PortionSizes.Select(p => p.Name))
-                            {
-                                <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@portionSize</th>
-                            }
-                            <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (BoxContent boxContent in FillBoxes.FoodOverview[FillBoxes.FoodOverviewIndex].BoxContents)
-                        {
-                            int total = 0;
+            @if (FillBoxes.FoodOverview.Any())
+            {
+                <div class="flex flex-row max-w-full justify-between mb-2 border-black border-b-2">
+                    <Tab @bind-Value="FillBoxes.FoodOverviewIndex" Items="@FillBoxes.FoodOverview.Select(f => f.RouteName).ToList()"/>
+                </div>
+                <div class="flex flex-row max-w-full justify-center ">
+                    <table class="border border-black text-center bg-white">
+                        <thead class="bg-gray-200 border-b border-black">
                             <tr>
-                                <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@boxContent.Name</td>
-                                @foreach (PortionSize portionSize in boxContent.PortionSizes)
+                                <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Menus</th>
+                                @foreach (string portionSize in FillBoxes.FoodOverview[0].BoxContents[0].PortionSizes.Select(p => p.Name))
                                 {
-                                    <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@portionSize.Value</td>
-                                    total += portionSize.Value;
+                                    <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@portionSize</th>
                                 }
-                                <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@total</td>
+                                <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Total</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-                <table class="min-w-full border border-black text-center bg-white ml-5">
-                    <thead class="bg-gray-200 border-b border-black">
-                        <tr>
-                            <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Light diets</th>
-                            <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">of which included</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (LightDiet lightDiet in FillBoxes.FoodOverview[FillBoxes.FoodOverviewIndex].LightDiets)
-                        {
+                        </thead>
+                        <tbody>
+                            @foreach (BoxContent boxContent in FillBoxes.FoodOverview[FillBoxes.FoodOverviewIndex].BoxContents)
+                            {
+                                int total = 0;
+                                <tr>
+                                    <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@boxContent.Name</td>
+                                    @foreach (PortionSize portionSize in boxContent.PortionSizes)
+                                    {
+                                        <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@portionSize.Value</td>
+                                        total += portionSize.Value;
+                                    }
+                                    <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@total</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <table class="border border-black text-center bg-white ml-5">
+                        <thead class="bg-gray-200 border-b border-black">
                             <tr>
-                                <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@lightDiet.Name</td>
-                                <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@lightDiet.Value</td>
+                                <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Light diets</th>
+                                <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">of which included</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach (LightDiet lightDiet in FillBoxes.FoodOverview[FillBoxes.FoodOverviewIndex].LightDiets)
+                            {
+                                <tr>
+                                    <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@lightDiet.Name</td>
+                                    <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@lightDiet.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
         }
-        @* Second tab *@
+        else
+        {
+            @if (FillBoxes.RoutesFoodOverview.Any())
+            {
+                <div class="flex flex-row">
+                    <div class="w-4/6 m-2">
+                        @foreach (var route in FillBoxes.RoutesFoodOverview)
+                        {
+                            <div>
+                                <div class="flex items-center mb-2 border-b-2" @onclick="@(() => FillBoxes.ToggleRoute(route))">
+                                    <span class="text-gray-600 mr-2">
+                                        @if (FillBoxes.ExpandedRoutes.Contains(route))
+                                        {
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        }
+                                        else
+                                        {
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        }
+                                    </span>
+                                    <h3 class="text-lg font-semibold select-none">@route.Name</h3>
+                                </div>
+
+                                @if (FillBoxes.ExpandedRoutes.Contains(route))
+                                {
+                                    <div class="flex flex-row flex-wrap w-full">
+                                        @foreach (CustomersFood customer in route.CustomersFoods)
+                                        {
+                                            string backgroundColor = FillBoxes.DisplayCustomer != null && FillBoxes.DisplayCustomer == customer ? "bg-yellow" : FillBoxes.ClickedCustomer.Contains(customer) ? "bg-lightGreen" : "bg-lightRed";
+                                            <CustomerStatusDisplay Text="@($"{customer.Position + 1}. {@customer.Name}")" BackgroundColor="@backgroundColor" OnClick="@(() => FillBoxes.SetDisplayCustomer(customer))"/>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="w-2/6 m-2">
+                            @if (FillBoxes.DisplayCustomer != null)
+                            {
+                                <div>
+                                    <h3 class="text-xl font-semibold text-gray-700">@(FillBoxes.DisplayCustomer.Position + 1). @FillBoxes.DisplayCustomer.Name</h3>
+
+                                    <h5 class="text-lg font-semibold mt-4">Light diets:</h5>
+                                    @foreach (string lightDiet in FillBoxes.DisplayCustomer.LightDiets)
+                                    {
+                                        <a class="text-lg font-semibold m-4 select-none">@lightDiet</a>
+                                    }
+
+                                    <h5 class="text-lg font-semibold mt-4">Box Contents:</h5>
+                                    @foreach (CustomersBoxContent boxContent in FillBoxes.DisplayCustomer.BoxContents)
+                                    {
+                                        <h3 class="text-lg font-semibold ml-4 mt-2 select-none">@boxContent.BoxName: @boxContent.PortionSize</h3>
+                                    }
+                                </div>
+                            }
+                    </div>
+                </div>
+            }
+        }
     </div>
 </div>

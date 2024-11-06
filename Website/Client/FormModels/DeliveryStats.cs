@@ -35,6 +35,8 @@ namespace Website.Client.FormModels
         [Required]
         public required List<RouteDetails> RouteDetails { get; set; }
 
+        public bool HideNonDeliverableCustomer { get; set; } = false;
+
         [Required]
         public required int Year { get; set; }
 

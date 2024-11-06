@@ -36,9 +36,9 @@ namespace Website.Client.Pages
             FillBoxes = new FillBoxes(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
                 FoodOverview = [],
+                RoutesFoodOverview = [],
                 DisplayTypeIndex = 0,
                 FoodOverviewIndex = 0,
-                RouteOverviewIndex = 0,
                 Year = dateTime.Year,
                 Month = (Enums.Months)(dateTime.Month),
                 Day = dateTime.Day,

@@ -5,17 +5,22 @@
 
 <div class="max-w-full">
     <div class="flex flex-row max-w-full justify-between mb-2 border-black border-b-2">
-        <Tab @bind-Value="TabIndex" Items="@DeliveryStats.RouteDetails.Select(route => route.Name).ToList()" />
-        <FormDayPicker Label="Date picker" OnDayMonthYearSelected="@(() => DeliveryStats.OnDayMonthYearSelected())" @bind-Year="@DeliveryStats.Year" @bind-Month="@DeliveryStats.Month" @bind-Day="@DeliveryStats.Day" />
+        <Tab @bind-Value="TabIndex" Items="@DeliveryStats.RouteDetails.Select(route => route.Name).ToList()"/>
+
+        <div class="flex flex-row">
+            <FormInputCheckbox IsColumn="false" Label="Hide non-deliverable customers:" @bind-Value="DeliveryStats.HideNonDeliverableCustomer" />
+            <FormDayPicker Label="Date picker" OnDayMonthYearSelected="@(() => DeliveryStats.OnDayMonthYearSelected())" @bind-Year="@DeliveryStats.Year" @bind-Month="@DeliveryStats.Month" @bind-Day="@DeliveryStats.Day" />
+        </div>
     </div>
     <div class="flex flex-row max-w-full">
         @if (DeliveryStats.RouteDetails.Any()) 
         {        
             @foreach (CustomersRoute customerRoutes in DeliveryStats.RouteDetails[TabIndex].CustomersRoute.OrderBy(AbandonedMutexException => AbandonedMutexException.Position).ToList())
             {
-                <div class="bg-gray-700 m-2 ring-1 ring-black rounded-md">
-                    <button class="@($"{Scaling.GetTextScaling()} {(customerRoutes.ToDeliver ? "bg-lightGreen" : "bg-lightRed")} text-white p-1 rounded-md select-none hover:bg-skyHover")" @onclick="() => OpenCustomerOverview(customerRoutes.Id)">@customerRoutes.Name</button>
-                </div>
+                @if (!DeliveryStats.HideNonDeliverableCustomer || (DeliveryStats.HideNonDeliverableCustomer && customerRoutes.ToDeliver))
+                {
+                    <CustomerStatusDisplay Text="@customerRoutes.Name" BackgroundColor="@(customerRoutes.ToDeliver ? "bg-lightGreen" : "bg-lightRed")" OnClick="@(() => OpenCustomerOverview(customerRoutes.Id))" />
+                }
             }
         }
     </div>

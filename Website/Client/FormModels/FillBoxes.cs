@@ -35,16 +35,15 @@ namespace Website.Client.FormModels
         [Required]
         public required List<FoodOverview> FoodOverview { get; set; }
 
-        //missing Routes
+        [ValidateComplexType]
+        [Required]
+        public required List<RoutesFoodOverview> RoutesFoodOverview { get; set; }
 
         [Required]
         public required int DisplayTypeIndex { get; set; }
 
         [Required]
         public required int FoodOverviewIndex { get; set; }
-
-        [Required]
-        public required int RouteOverviewIndex { get; set; }
 
         [Required]
         public required int Year { get; set; }
@@ -54,6 +53,23 @@ namespace Website.Client.FormModels
 
         [Required]
         public required int Day { get; set; }
+
+        public HashSet<RoutesFoodOverview> ExpandedRoutes { get; set; } = [];
+        public void ToggleRoute(RoutesFoodOverview route)
+        {
+            if (!ExpandedRoutes.Remove(route))
+            {
+                ExpandedRoutes.Add(route);
+            }
+        }
+
+        public HashSet<CustomersFood> ClickedCustomer { get; set; } = [];
+        public CustomersFood? DisplayCustomer { get; set; }
+        public void SetDisplayCustomer(CustomersFood customer)
+        {
+            DisplayCustomer = customer;
+            ClickedCustomer.Add(customer);
+        }
 
         public async Task OnDayMonthYearSelected()
         {
@@ -80,7 +96,28 @@ namespace Website.Client.FormModels
                 }
                 else
                 {
-                    //TODO
+                    using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetRoutesFoodOverview",
+                                           new
+                                           {
+                                               Year = Year,
+                                               Month = Month,
+                                               Day = Day,
+                                           }, JsonSerializerOptions)!;
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        RoutesFoodOverview = [.. JsonSerializer.Deserialize<List<RoutesFoodOverview>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!];
+
+                        RoutesFoodOverview? routesFoodOverview = RoutesFoodOverview.FirstOrDefault(r => r.Position == 0);
+                        if (routesFoodOverview != null)
+                        {
+                            ToggleRoute(routesFoodOverview);
+                        }
+                    }
+                    else
+                    {
+                        NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    }
                 }
             }
             catch

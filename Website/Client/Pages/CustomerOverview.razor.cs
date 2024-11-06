@@ -101,7 +101,6 @@ namespace Website.Client.Pages
                     {
                         Id = NavigationContainer.CustomerId
                     };
-                    NavigationContainer.CustomerId = null;
 
                     using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomer", data, JsonSerializerOptions)!;
 
@@ -194,6 +193,7 @@ namespace Website.Client.Pages
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
+                    NavigationContainer.CustomerId = null;
                     NotificationService.SetSuccess("Successfully added/updated customer");
                     NavigationManager.NavigateTo("/");
                 }

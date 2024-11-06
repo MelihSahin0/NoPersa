@@ -17,6 +17,7 @@ const customColors = {
     orange: color.orange["500"],
     blue: "#3273F6",
     blueHover: "#265BC1",
+    yellow: color.yellow["500"],
     white: "#ffffff",
     black: "#000000"
 };
@@ -74,7 +75,11 @@ const generateRingClassse = (integers) => [
 
 const generateDistanceClasses = (integers) => [
     `w-${integers}`,
+    `min-w-${integers}`,
+    `max-w-${integers}`,
     `h-${integers}`,
+    `min-h-${integers}`,
+    `max-h-${integers}`,
 ]
 
 module.exports = {

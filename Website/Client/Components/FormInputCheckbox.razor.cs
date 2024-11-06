@@ -7,6 +7,9 @@ namespace Website.Client.Components
         private readonly string Id = Guid.NewGuid().ToString();
 
         [Parameter]
+        public required bool IsColumn { get; set; } = true;
+
+        [Parameter]
         public required string Label { get; init; }
 
         [Parameter]
