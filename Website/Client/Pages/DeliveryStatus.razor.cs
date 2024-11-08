@@ -26,13 +26,13 @@ namespace Website.Client.Pages
         [Inject]
         public required NavigationContainer NavigationContainer { get; set; }
 
-        public required DeliveryStats DeliveryStats { get; set; }
+        public required DeliveryStatusModel DeliveryStatusModel { get; set; }
 
         public required int TabIndex { get; set; }
         protected override void OnInitialized()
         {
             DateTime dateTime = DateTime.Today;
-            DeliveryStats = new DeliveryStats(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
+            DeliveryStatusModel = new DeliveryStatusModel(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
                 RouteDetails = [],
                 Year = dateTime.Year,
@@ -44,7 +44,7 @@ namespace Website.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await DeliveryStats.OnDayMonthYearSelected();
+            await DeliveryStatusModel.OnDayMonthYearSelected();
         }
 
         private void OpenCustomerOverview(int customerId)

@@ -8,7 +8,7 @@
         <label for="@Id" class="@($"{Scaling.GetTextScaling()} {(LabelTextOrientation.Equals("center") ? "text-center" : "")} select-none")">@Label</label>
     }
     <TextInput id="@Id"
-               class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation}")"
+               class="@($"{Scaling.GetTextScaling()} {ValidStateCss()} {InputStyles.GetInputDefaultStyle()} {TextOrientation}")"
                Placeholder="@Placeholder"
                IsDisabled="@IsDisabled"
                Value="@Value"

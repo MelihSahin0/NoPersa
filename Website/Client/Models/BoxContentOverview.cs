@@ -5,6 +5,7 @@ namespace Website.Client.Models
     public class BoxContentOverview
     {
         public List<BoxContentSelected> BoxContentSelectedList { get; set; } = [];
+
         public List<SelectInput> SelectInputs { get; set; } = [];
     }
 }

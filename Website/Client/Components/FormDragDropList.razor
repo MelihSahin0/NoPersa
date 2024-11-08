@@ -11,7 +11,7 @@
     <div class="w-full">
         @if (DisplayFilter)
         {
-            <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black mb-5")"
+            <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {TextOrientation} border-black mb-5")"
                        Placeholder="Filter"
                        @bind-Value="@StartFilter"/>
         }
@@ -28,7 +28,7 @@
                         @ondragstart="() => draggedItem = route"
                         @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
                         <div class="flex flex-row">
-                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => route.Name)} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation}")"
+                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => route.Name)} {InputStyles.GetInputDefaultStyle()} {TextOrientation}")"
                                        Placeholder="@Placeholder"
                                        @bind-Value="@route.Name"
                                        ValidationFunction="@ValidationFunction"/>

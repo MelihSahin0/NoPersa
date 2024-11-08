@@ -3,7 +3,7 @@ using DeliveryService.Database;
 using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.Delivery;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
@@ -34,7 +34,7 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                return Ok(mapper.Map<List<DTORouteOverview>>(context.Routes.AsNoTracking().Include(r => r.Customers)));
+                return Ok(mapper.Map<List<DTORouteSummary>>(context.Routes.AsNoTracking().Include(r => r.Customers)));
             }
             catch (ValidationException e)
             {
@@ -50,7 +50,7 @@ namespace DeliveryService.Controllers
 
 
         [HttpPost("UpdateRoutes", Name = "UpdateRoutes")]
-        public IActionResult UpdateRoutes([FromBody] List<DTORouteOverview> routes)
+        public IActionResult UpdateRoutes([FromBody] List<DTORouteSummary> dTORouteSummary)
         {
             using var transaction = context.Database.BeginTransaction();
 
@@ -58,9 +58,9 @@ namespace DeliveryService.Controllers
             {
                 List<Route> newRoutes = [];
                 List<Route> oldRoutes = [];
-                foreach (var routeDto in routes ?? [])
+                foreach (var routeSummary in dTORouteSummary ?? [])
                 {
-                    Route route = mapper.Map<Route>(routeDto);
+                    Route route = mapper.Map<Route>(routeSummary);
                     route.Customers = [];
 
                     if (route.Id == 0)
@@ -114,7 +114,7 @@ namespace DeliveryService.Controllers
                 context.SaveChanges();
                 transaction.Commit();
 
-                return Ok(routes);
+                return Ok(dTORouteSummary);
             }
             catch (ValidationException e)
             {
@@ -135,7 +135,7 @@ namespace DeliveryService.Controllers
         {
             try
             {
-                List<DTORouteDetails> routes = [];
+                List<DTORouteOverview> routes = [];
 
                 //Without Archive
                 List<Route> dbRoutes = await context.Routes.AsNoTracking().Where(r => r.Id != int.MinValue).Include(r => r.Customers).ThenInclude(c => c.Workdays)
@@ -147,28 +147,28 @@ namespace DeliveryService.Controllers
 
                 foreach (Route dbRoute in dbRoutes)
                 {
-                    List<DTOCustomerRoute> customerRoutes = [];
+                    List<DTOCustomerDeliveryStatus> dTOCustomerDeliveryStatusList = [];
                     foreach (Customer dbCustomer in dbRoute.Customers ?? [])
                     {
-                        DTOCustomerRoute dTOCustomerRoutes = mapper.Map<DTOCustomerRoute>(dbCustomer);
+                        DTOCustomerDeliveryStatus dTOCustomerDeliveryStatus = mapper.Map<DTOCustomerDeliveryStatus>(dbCustomer);
 
                         MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
                      
                         if (dbFoundOverview != null)
                         {
                             int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
-                            dTOCustomerRoutes.ToDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day));
+                            dTOCustomerDeliveryStatus.ToDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day));
                         }
                         else //Safety Measure
                         {
-                            dTOCustomerRoutes.ToDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
+                            dTOCustomerDeliveryStatus.ToDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day);
                         }
 
-                        customerRoutes.Add(dTOCustomerRoutes);
+                        dTOCustomerDeliveryStatusList.Add(dTOCustomerDeliveryStatus);
                     }
-                    DTORouteDetails dTORouteDetails = mapper.Map<DTORouteDetails>(dbRoute);
-                    dTORouteDetails.CustomersRoute = [..customerRoutes];
-                    routes.Add(dTORouteDetails);
+                    DTORouteOverview dTORouteOverview = mapper.Map<DTORouteOverview>(dbRoute);
+                    dTORouteOverview.CustomerDeliveryStatus = [..dTOCustomerDeliveryStatusList];
+                    routes.Add(dTORouteOverview);
                 }
 
                 return Ok(routes);
@@ -192,7 +192,7 @@ namespace DeliveryService.Controllers
             {
                 List<Route> dbRoutes = [.. context.Routes.AsNoTracking().Include(r => r.Customers)];
 
-                return Ok(mapper.Map<List<DTOSequenceDetails>>(dbRoutes));
+                return Ok(mapper.Map<List<DTOCustomersInRoute>>(dbRoutes));
             }
             catch (ValidationException e)
             {
@@ -207,29 +207,29 @@ namespace DeliveryService.Controllers
         }
 
         [HttpPost("UpdateCustomerSequence", Name = "UpdateCustomerSequence")]
-        public IActionResult UpdateCustomerSequence([FromBody] List<DTOSequenceDetails> dTOSequenceDetails)
+        public IActionResult UpdateCustomerSequence([FromBody] List<DTOCustomersInRoute> dTOCustomersInRoutes)
         {
             using var transaction = context.Database.BeginTransaction();
 
             try
             {
                 List<Customer> customersToUpdate = [];
-                foreach (DTOSequenceDetails route in dTOSequenceDetails)
+                foreach (DTOCustomersInRoute dTOCustomerInRoute in dTOCustomersInRoutes)
                 {
-                    foreach (DTOCustomerSequence customer in route.CustomersRoute ?? [])
+                    foreach (DTOCustomerSequence dTOCustomerSequence in dTOCustomerInRoute.CustomerSequence ?? [])
                     {
-                        Customer? dbCustomer = context.Customers.FirstOrDefault(c => c.Id == customer.Id);
+                        Customer? dbCustomer = context.Customers.FirstOrDefault(c => c.Id == dTOCustomerSequence.Id);
 
                         if (dbCustomer != null)
                         {
                             //Check if customer was taken out from Archive
-                            if (route.Id != int.MinValue && dbCustomer.RouteId == int.MinValue)
+                            if (dTOCustomerInRoute.Id != int.MinValue && dbCustomer.RouteId == int.MinValue)
                             {
                                 CheckMonthlyOverview.CheckAndAdd(dbCustomer);
                             }
 
-                            dbCustomer.RouteId = route.Id;
-                            dbCustomer.Position = customer.Position;
+                            dbCustomer.RouteId = dTOCustomerInRoute.Id;
+                            dbCustomer.Position = dTOCustomerSequence.Position;
                             customersToUpdate.Add(dbCustomer);
                         }
                     }

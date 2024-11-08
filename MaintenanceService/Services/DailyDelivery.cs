@@ -2,10 +2,10 @@
 using SharedLibrary.Models;
 using System.Text.Json;
 using EFCore.BulkExtensions;
-using SharedLibrary.DTOs;
 using Holiday = SharedLibrary.Models.Holiday;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Util;
+using SharedLibrary.DTOs.Maintenance;
 
 namespace MaintenanceService.Services
 {

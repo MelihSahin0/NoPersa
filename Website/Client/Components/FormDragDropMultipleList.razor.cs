@@ -39,16 +39,16 @@ namespace Website.Client.Components
         [Parameter]
         public required int[]? SelectedRouteId { get; set; }
 
-        private CustomersSequence? draggedItem;
-        private void HandleDrop(CustomersSequence landingModel, int targetId)
+        private CustomerSequence? draggedItem;
+        private void HandleDrop(CustomerSequence landingModel, int targetId)
         {
             if (draggedItem is null)
             {
                 return;
             }
 
-            var sourceRoute = SequenceDetails.Find(r => r.CustomersRoute.Contains(draggedItem));
-            var targetRoute = SequenceDetails.Find(r => r.CustomersRoute.Contains(landingModel));
+            var sourceRoute = SequenceDetails.Find(r => r.CustomerSequence.Contains(draggedItem));
+            var targetRoute = SequenceDetails.Find(r => r.CustomerSequence.Contains(landingModel));
 
             int originalLanding = 0;
             if (sourceRoute == null)
@@ -59,7 +59,7 @@ namespace Website.Client.Components
             {
                 foreach (var routeId in SelectedRouteId ?? [])
                 {
-                    if (SequenceDetails.FirstOrDefault(r => r.Id == routeId)!.CustomersRoute.Count == 0)
+                    if (SequenceDetails.FirstOrDefault(r => r.Id == routeId)!.CustomerSequence.Count == 0)
                     {
                         targetRoute = SequenceDetails.FirstOrDefault(r => r.Id == routeId);
                         break;
@@ -71,7 +71,7 @@ namespace Website.Client.Components
                     return;
                 }
 
-                if (targetId == sourceRoute.Id && targetRoute.CustomersRoute.Count == 0)
+                if (targetId == sourceRoute.Id && targetRoute.CustomerSequence.Count == 0)
                 {
                     return;
                 }
@@ -83,21 +83,21 @@ namespace Website.Client.Components
 
             if (sourceRoute.Id == targetRoute.Id)
             {
-                sourceRoute.CustomersRoute.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
+                sourceRoute.CustomerSequence.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
 
                 draggedItem.Position = originalLanding;
             }
             else
             {
-                sourceRoute.CustomersRoute.Remove(draggedItem);
+                sourceRoute.CustomerSequence.Remove(draggedItem);
 
-                targetRoute.CustomersRoute.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
+                targetRoute.CustomerSequence.Where(x => x.Position >= landingModel.Position).ToList().ForEach(x => x.Position++);
 
                 draggedItem.Position = originalLanding;
-                targetRoute.CustomersRoute.Add(draggedItem);
+                targetRoute.CustomerSequence.Add(draggedItem);
 
                 int i = 0;
-                foreach (var customer in sourceRoute.CustomersRoute.OrderBy(c => c.Position).ToList())
+                foreach (var customer in sourceRoute.CustomerSequence.OrderBy(c => c.Position).ToList())
                 {
                     customer.Position = i++;
                     customer.IsDragOver = false;
@@ -105,7 +105,7 @@ namespace Website.Client.Components
             }
 
             int j = 0;
-            foreach (var customer in targetRoute.CustomersRoute.OrderBy(c => c.Position).ToList())
+            foreach (var customer in targetRoute.CustomerSequence.OrderBy(c => c.Position).ToList())
             {
                 customer.Position = j++;
                 customer.IsDragOver = false;

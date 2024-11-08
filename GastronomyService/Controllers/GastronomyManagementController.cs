@@ -4,7 +4,7 @@ using GastronomyService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
-using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.Gastro;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
@@ -412,30 +412,30 @@ namespace GastronomyService.Controllers
                                        .ToListAsync();
                 Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
 
-                List<DTOFoodBoxOverview> dTOFoodBoxOverviews = [];
-                List<DTOLightDietsNumberOf> dTOLightDietsNumberOfs = mapper.Map<List<DTOLightDietsNumberOf>>(context.LightDiets.AsNoTracking());
-                List<DTOPortionSizeNumberOf> dTOPortionSizeNumberOfs = mapper.Map<List<DTOPortionSizeNumberOf>>(context.PortionSizes.AsNoTracking());
-                List<DTOBoxContentNumberOf> dTOBoxContentNumberOfs = mapper.Map<List<DTOBoxContentNumberOf>>(context.BoxContents.AsNoTracking());
+                List<DTORoutesFoodSummary> dTORoutesFoodSummaryList = [];
+                List<DTOLightDietSummary> dTOLightDietSummaryList = mapper.Map<List<DTOLightDietSummary>>(context.LightDiets.AsNoTracking());
+                List<DTOPortionSizeSummary> dTOPortionSizeSummaryList = mapper.Map<List<DTOPortionSizeSummary>>(context.PortionSizes.AsNoTracking());
+                List<DTOBoxContentSummary> dTOBoxContentSummaryList = mapper.Map<List<DTOBoxContentSummary>>(context.BoxContents.AsNoTracking());
 
-                foreach (var item in dTOBoxContentNumberOfs)
+                foreach (DTOBoxContentSummary dTOBoxContentSummary in dTOBoxContentSummaryList)
                 {
-                    item.PortionSizes = dTOPortionSizeNumberOfs.Select(x => x.Clone()).ToList();
+                    dTOBoxContentSummary.PortionSizeSummary = dTOPortionSizeSummaryList.Select(x => x.Clone()).ToList();
                 }
 
-                DTOFoodBoxOverview summaryFoodBoxOverview = new()
+                DTORoutesFoodSummary dTOSummaryRoutesFoodSummary = new()
                 {
                     RouteName = "Summary",
-                    LightDiets = dTOLightDietsNumberOfs.Select(x => x.Clone()).ToList(),
-                    BoxContents = dTOBoxContentNumberOfs.Select(x => x.Clone()).ToList()
+                    LightDietSummary = dTOLightDietSummaryList.Select(x => x.Clone()).ToList(),
+                    BoxContentSummary = dTOBoxContentSummaryList.Select(x => x.Clone()).ToList()
                 };
 
                 foreach (Route dbRoute in dbRoutes.OrderBy(r => r.Position))
                 {
-                    DTOFoodBoxOverview dTOFoodBoxOverview = new()
+                    DTORoutesFoodSummary dTORoutesFoodSummary = new()
                     {
                         RouteName = dbRoute.Name,
-                        LightDiets = dTOLightDietsNumberOfs.Select(x => x.Clone()).ToList(),
-                        BoxContents = dTOBoxContentNumberOfs.Select(x => x.Clone()).ToList()
+                        LightDietSummary = dTOLightDietSummaryList.Select(x => x.Clone()).ToList(),
+                        BoxContentSummary = dTOBoxContentSummaryList.Select(x => x.Clone()).ToList()
                     };
 
                     foreach (Customer dbCustomer in dbRoute.Customers ?? [])
@@ -460,25 +460,25 @@ namespace GastronomyService.Controllers
                             {
                                 if (lightDiet.Selected)
                                 {
-                                    dTOFoodBoxOverview.LightDiets.First(l => l.Id == lightDiet.LightDietId).Value += 1;
-                                    summaryFoodBoxOverview.LightDiets.First(l => l.Id == lightDiet.LightDietId).Value += 1;
+                                    dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += 1;
+                                    dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += 1;
 
                                 }
                             }
 
                             foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
                             {
-                                dTOFoodBoxOverview.BoxContents.First(b => b.Id == menuPlan.BoxContentId).PortionSizes!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
-                                summaryFoodBoxOverview.BoxContents.First(b => b.Id == menuPlan.BoxContentId).PortionSizes!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
+                                dTORoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
+                                dTOSummaryRoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
                             }
                         }
                     }
-                    dTOFoodBoxOverviews.Add(dTOFoodBoxOverview);
+                    dTORoutesFoodSummaryList.Add(dTORoutesFoodSummary);
                 }
 
-                dTOFoodBoxOverviews.Insert(0, summaryFoodBoxOverview);
+                dTORoutesFoodSummaryList.Insert(0, dTOSummaryRoutesFoodSummary);
 
-                return Ok(dTOFoodBoxOverviews);
+                return Ok(dTORoutesFoodSummaryList);
             }
             catch (ValidationException e)
             {

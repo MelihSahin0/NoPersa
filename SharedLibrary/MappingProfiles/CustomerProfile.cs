@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 
 namespace SharedLibrary.MappingProfiles
@@ -8,7 +8,7 @@ namespace SharedLibrary.MappingProfiles
     {
         public CustomerProfile() 
         {
-            CreateMap<DTOCustomer, Customer>()
+            CreateMap<DTOCustomerOverview, Customer>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id == -1 ? 0 : src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Name) ? null : src.Name))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Address) ? null : src.Address))
@@ -21,7 +21,7 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.CustomersLightDiets, opt => opt.MapFrom(src => src.LightDietOverviews))
                 .ForMember(dest => dest.CustomerMenuPlans, opt => opt.MapFrom(src => src.BoxContentSelectedList));
 
-            CreateMap<Customer, DTOCustomer>()
+            CreateMap<Customer, DTOCustomerOverview>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.Region, opt => opt.MapFrom(src => src.Region))

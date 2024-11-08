@@ -26,14 +26,14 @@ namespace Website.Client.Pages
         [Inject]
         public required NavigationContainer NavigationContainer { get; set; }
 
-        public required FillBoxes FillBoxes { get; set; }
+        public required FillBoxesOverviewModel FillBoxesOverviewModel { get; set; }
 
         public required List<string> TypeList { get; set; }
 
         protected override void OnInitialized()
         {
             DateTime dateTime = DateTime.Today;
-            FillBoxes = new FillBoxes(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
+            FillBoxesOverviewModel = new FillBoxesOverviewModel(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
                 FoodOverview = [],
                 RoutesFoodOverview = [],
@@ -48,7 +48,7 @@ namespace Website.Client.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            await FillBoxes.OnDayMonthYearSelected();
+            await FillBoxesOverviewModel.OnDayMonthYearSelected();
         }
     }
 }

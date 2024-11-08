@@ -28,11 +28,11 @@ namespace Website.Client.Pages
 
         public bool IsSubmitting { get; set; } = false;
 
-        public required BoxConfigurations BoxConfigurations { get; set; }
+        public required BoxConfigurationModel BoxConfigurationModel { get; set; }
 
         protected override void OnInitialized()
         {
-            BoxConfigurations = new BoxConfigurations() { LightDiets = [], BoxContents = [], PortionSizes = [] };
+            BoxConfigurationModel = new BoxConfigurationModel() { LightDiets = [], BoxContents = [], PortionSizes = [] };
         }
 
         protected override async Task OnInitializedAsync()
@@ -43,7 +43,7 @@ namespace Website.Client.Pages
 
                 if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    BoxConfigurations.LightDiets = JsonSerializer.Deserialize<List<DragDropInput>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    BoxConfigurationModel.LightDiets = JsonSerializer.Deserialize<List<DragDropInput>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                 }
                 else
                 {
@@ -54,7 +54,7 @@ namespace Website.Client.Pages
 
                 if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    BoxConfigurations.BoxContents = JsonSerializer.Deserialize<List<DragDropInput>>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    BoxConfigurationModel.BoxContents = JsonSerializer.Deserialize<List<DragDropInput>>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace Website.Client.Pages
 
                 if (response3.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    BoxConfigurations.PortionSizes = JsonSerializer.Deserialize<List<DragDropInput>>(await response3.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    BoxConfigurationModel.PortionSizes = JsonSerializer.Deserialize<List<DragDropInput>>(await response3.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                 }
                 else
                 {
@@ -83,9 +83,9 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response1 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateLightDiets", BoxConfigurations.LightDiets, JsonSerializerOptions);
-                using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateBoxContents", BoxConfigurations.BoxContents, JsonSerializerOptions);
-                using var response3 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdatePortionSizes", BoxConfigurations.PortionSizes, JsonSerializerOptions);
+                using var response1 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateLightDiets", BoxConfigurationModel.LightDiets, JsonSerializerOptions);
+                using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateBoxContents", BoxConfigurationModel.BoxContents, JsonSerializerOptions);
+                using var response3 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdatePortionSizes", BoxConfigurationModel.PortionSizes, JsonSerializerOptions);
 
                 bool isSuccess1 = response1.StatusCode == System.Net.HttpStatusCode.OK;
                 bool isSuccess2 = response2.StatusCode == System.Net.HttpStatusCode.OK;

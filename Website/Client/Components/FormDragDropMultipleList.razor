@@ -10,14 +10,14 @@
         <div class="w-1/2 justify-center m-1">
             @if (DisplayFilter)
             {
-                <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black")"
+                <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {TextOrientation} border-black")"
                            Placeholder="Filter" @bind-Value="@StartFilter![j]" />
             }
             <ul class="@($"{MaxHeight} {MinHeight} w-full p-2 space-y-2 flex flex-col overflow-y-auto")"
                 ondragover="event.preventDefault();"
                 ondragstart="event.dataTransfer.setData('', event.target.id);"
                 @ondrop="() => HandleDrop(null, currentId)">
-                @foreach (var customer in SequenceDetails.Find(r => r.Id == currentId)?.CustomersRoute.OrderBy(c => c.Position).ToList() ?? [])
+                @foreach (var customer in SequenceDetails.Find(r => r.Id == currentId)?.CustomerSequence.OrderBy(c => c.Position).ToList() ?? [])
                 {
                     @if (DisplayFilter == false || string.IsNullOrWhiteSpace(StartFilter![j]) || customer.Name.ToLower().StartsWith(StartFilter[j]!.ToLower()))
                     {
@@ -27,7 +27,7 @@
                             @ondragstart="() => draggedItem = customer"
                             @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
                             <div class="flex flex-row">
-                                <label class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInpuptDefaultStyle()} {TextOrientation} border-black select-none")">
+                                <label class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {TextOrientation} border-black select-none")">
                                     @customer.Name
                                 </label>
                             </div>

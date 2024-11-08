@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
-using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.Management;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;
 
@@ -82,7 +82,7 @@ namespace NoPersa.Tests.ManagementTests
             Customer customer = customers.FirstOrDefault(c => c.Id == 1)!;
             customer.Name = "Customer 0";
                 
-            controller.UpdateCustomer(mapper.Map<DTOCustomer>(customer));
+            controller.UpdateCustomer(mapper.Map<DTOCustomerOverview>(customer));
             Customer dbCustomer = context.Customers.FirstOrDefault(c => c.Id == 1)!;
 
             Assert.AreEqual(customer.Name, dbCustomer.Name);
@@ -105,7 +105,7 @@ namespace NoPersa.Tests.ManagementTests
             List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking()];
             List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
 
-            controller.InsertCustomer(mapper.Map<DTOCustomer>(customer));
+            controller.InsertCustomer(mapper.Map<DTOCustomerOverview>(customer));
             Customer dbCustomer = context.Customers.FirstOrDefault(c => c.Name == "Customer new")!;
 
             Assert.AreEqual(customer.Name, dbCustomer.Name);

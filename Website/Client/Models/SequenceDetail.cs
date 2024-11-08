@@ -13,10 +13,10 @@ namespace Website.Client.Models
         public required string Name { get; set; }
 
         [Required]
-        public required List<CustomersSequence> CustomersRoute { get; set; }
+        public required List<CustomerSequence> CustomerSequence { get; set; }
     }
 
-    public class CustomersSequence
+    public class CustomerSequence
     {
         [Required]
         public required int Id { get; set; }

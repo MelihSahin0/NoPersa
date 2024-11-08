@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.Gastro;
+using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 
 namespace SharedLibrary.MappingProfiles
@@ -77,16 +78,16 @@ namespace SharedLibrary.MappingProfiles
                     SelectInputs = new List<DTOSelectInput>()
                 });
 
-            CreateMap<LightDiet, DTOLightDietsNumberOf>()
+            CreateMap<LightDiet, DTOLightDietSummary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 0));
 
-            CreateMap<BoxContent, DTOBoxContentNumberOf>()
+            CreateMap<BoxContent, DTOBoxContentSummary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
-            CreateMap<PortionSize, DTOPortionSizeNumberOf>()
+            CreateMap<PortionSize, DTOPortionSizeSummary>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 0));

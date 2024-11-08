@@ -1,12 +1,12 @@
 ﻿using ManagementService.Database;
 using Microsoft.AspNetCore.Mvc;
 using SharedLibrary.Models;
-using SharedLibrary.DTOs;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Util;
+using SharedLibrary.DTOs.Management;
 
 namespace ManagementService.Controllers
 {
@@ -26,11 +26,11 @@ namespace ManagementService.Controllers
         }
 
         [HttpPost("GetCustomer", Name = "GetCustomer")]
-        public IActionResult GetCustomer([FromBody] DTOSelectedCustomer dTOSelectedCustomer)
+        public IActionResult GetCustomer([FromBody] DTOId dTOId)
         {
             try
             {
-                Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == dTOSelectedCustomer.Id)
+                Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == dTOId.Id)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews.Where(n => n.Year == DateTime.Today.Year && n.Month == DateTime.Today.Month)).ThenInclude(d => d.DailyOverviews)
                                         .Include(cld => cld.CustomersLightDiets).ThenInclude(ld => ld.LightDiet)
@@ -40,10 +40,10 @@ namespace ManagementService.Controllers
 
                 if (dbCustomer != null)
                 {
-                    DTOCustomer dTOCustomer = mapper.Map<DTOCustomer>(dbCustomer);
-                    dTOCustomer.PortionSizes = mapper.Map<List<DTOSelectInput>>(context.PortionSizes.AsNoTracking().ToList());
+                    DTOCustomerOverview dTOCustomerOverview = mapper.Map<DTOCustomerOverview>(dbCustomer);
+                    dTOCustomerOverview.PortionSizes = mapper.Map<List<DTOSelectInput>>(context.PortionSizes.AsNoTracking().ToList());
 
-                    return Ok(dTOCustomer);
+                    return Ok(dTOCustomerOverview);
                 }
 
                 return NotFound();
@@ -61,16 +61,16 @@ namespace ManagementService.Controllers
         }
 
         [HttpPost("InsertCustomer", Name = "InsertCustomer")]
-        public IActionResult InsertCustomer([FromBody] DTOCustomer dTOCustomer)
+        public IActionResult InsertCustomer([FromBody] DTOCustomerOverview dTOCustomerOverview)
         {
             using var transaction = context.Database.BeginTransaction();
 
             try
             {
                 DateTime today = DateTime.Today;
-                Customer customer = mapper.Map<Customer>(dTOCustomer);
+                Customer customer = mapper.Map<Customer>(dTOCustomerOverview);
 
-                customer.Position = (context.Customers.Where(c => c.RouteId == dTOCustomer.RouteId)
+                customer.Position = (context.Customers.Where(c => c.RouteId == dTOCustomerOverview.RouteId)
                                                           .Select(c => (int?)c.Position)
                                                           .Max() ?? -1) + 1;
 
@@ -111,7 +111,7 @@ namespace ManagementService.Controllers
                 context.SaveChanges();
                 transaction.Commit();
 
-                return Ok(dTOCustomer);
+                return Ok(dTOCustomerOverview);
             }
             catch (ValidationException e)
             {
@@ -128,14 +128,14 @@ namespace ManagementService.Controllers
         }
 
         [HttpPost("UpdateCustomer", Name = "UpdateCustomer")]
-        public IActionResult UpdateCustomer([FromBody] DTOCustomer dTOCustomer)
+        public IActionResult UpdateCustomer([FromBody] DTOCustomerOverview dTOCustomerOverview)
         {
             using var transaction = context.Database.BeginTransaction();
 
             try
             {
                 DateTime today = DateTime.Today;
-                Customer customer = mapper.Map<Customer>(dTOCustomer);
+                Customer customer = mapper.Map<Customer>(dTOCustomerOverview);
 
 
                 Customer? dbCustomer = context.Customers.Where(c => c.Id == customer.Id)
@@ -232,7 +232,7 @@ namespace ManagementService.Controllers
                 context.SaveChanges();
                 transaction.Commit();
 
-                return Ok(dTOCustomer);
+                return Ok(dTOCustomerOverview);
             }
             catch (ValidationException e)
             {
@@ -270,13 +270,13 @@ namespace ManagementService.Controllers
         }
 
         [HttpPost("GetCustomerDailyDelivery", Name = "GetCustomerDailyDelivery")]
-        public IActionResult GetCustomerDailyDelivery([FromBody] DTOMonthOfTheYear monthOfTheYear)
+        public IActionResult GetCustomerDailyDelivery([FromBody] DTOMonthOfTheYear dTOMonthOfTheYear)
         {
             try
             {
-                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.AsNoTracking().FirstOrDefault(m => m.CustomerId == monthOfTheYear.ReferenceId &&
-                                                                                                          m.Year == monthOfTheYear.Year &&
-                                                                                                          m.Month == monthOfTheYear.Month);
+                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.AsNoTracking().FirstOrDefault(m => m.CustomerId == dTOMonthOfTheYear.ReferenceId &&
+                                                                                                          m.Year == dTOMonthOfTheYear.Year &&
+                                                                                                          m.Month == dTOMonthOfTheYear.Month);
                 if (monthlyOverview == null)
                 {
                     return NotFound();

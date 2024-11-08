@@ -33,7 +33,7 @@ namespace Website.Client.Pages
 
         public bool IsSubmitting { get; set; } = false;
 
-        public required Customer Customer { get; set; }
+        public required CustomerOverviewModel CustomerOverviewModel { get; set; }
 
         protected override void OnInitialized()
         {
@@ -50,7 +50,7 @@ namespace Website.Client.Pages
                 });
             }
 
-            Customer = new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
+            CustomerOverviewModel = new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
                 Id = 0,
                 SerialNumber = string.Empty,
@@ -106,28 +106,28 @@ namespace Website.Client.Pages
 
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        Customer customer = JsonSerializer.Deserialize<Customer>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                        FormModels.CustomerOverviewModel customer = JsonSerializer.Deserialize<FormModels.CustomerOverviewModel>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
 
-                        Customer.Id = customer.Id;
-                        Customer.SerialNumber = customer.SerialNumber;
-                        Customer.Title = customer.Title;
-                        Customer.Name = customer.Name;
-                        Customer.Address = customer.Address;
-                        Customer.Region = customer.Region;
-                        Customer.GeoLocation = customer.GeoLocation;
-                        Customer.ContactInformation = customer.ContactInformation;
-                        Customer.Article = customer.Article;
-                        Customer.DefaultPrice = customer.DefaultPrice;
-                        Customer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
-                        Customer.MonthlyDeliveries =[.. customer.MonthlyDeliveries];
-                        Customer.TemporaryDelivery = customer.TemporaryDelivery;
-                        Customer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
-                        Customer.Workdays = customer.Workdays;
-                        Customer.Holidays = customer.Holidays;
-                        Customer.RouteId = customer.RouteId;
-                        Customer.LightDietOverviews = [.. customer.LightDietOverviews];
-                        Customer.PortionSizes = [.. customer.PortionSizes];
-                        Customer.BoxContentSelectedList = [.. customer.BoxContentSelectedList];
+                        CustomerOverviewModel.Id = customer.Id;
+                        CustomerOverviewModel.SerialNumber = customer.SerialNumber;
+                        CustomerOverviewModel.Title = customer.Title;
+                        CustomerOverviewModel.Name = customer.Name;
+                        CustomerOverviewModel.Address = customer.Address;
+                        CustomerOverviewModel.Region = customer.Region;
+                        CustomerOverviewModel.GeoLocation = customer.GeoLocation;
+                        CustomerOverviewModel.ContactInformation = customer.ContactInformation;
+                        CustomerOverviewModel.Article = customer.Article;
+                        CustomerOverviewModel.DefaultPrice = customer.DefaultPrice;
+                        CustomerOverviewModel.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
+                        CustomerOverviewModel.MonthlyDeliveries =[.. customer.MonthlyDeliveries];
+                        CustomerOverviewModel.TemporaryDelivery = customer.TemporaryDelivery;
+                        CustomerOverviewModel.TemporaryNoDelivery = customer.TemporaryNoDelivery;
+                        CustomerOverviewModel.Workdays = customer.Workdays;
+                        CustomerOverviewModel.Holidays = customer.Holidays;
+                        CustomerOverviewModel.RouteId = customer.RouteId;
+                        CustomerOverviewModel.LightDietOverviews = [.. customer.LightDietOverviews];
+                        CustomerOverviewModel.PortionSizes = [.. customer.PortionSizes];
+                        CustomerOverviewModel.BoxContentSelectedList = [.. customer.BoxContentSelectedList];
                     }
                     else if (response1.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {}
@@ -143,7 +143,7 @@ namespace Website.Client.Pages
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         List<SelectedLightDiet> lightDietOverviews = JsonSerializer.Deserialize<List<SelectedLightDiet>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-                        Customer.LightDietOverviews = [.. lightDietOverviews];
+                        CustomerOverviewModel.LightDietOverviews = [.. lightDietOverviews];
                     }
                     else
                     {
@@ -155,8 +155,8 @@ namespace Website.Client.Pages
                     if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         BoxContentOverview boxContentOverview = JsonSerializer.Deserialize<BoxContentOverview>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-                        Customer.BoxContentSelectedList = [.. boxContentOverview.BoxContentSelectedList];
-                        Customer.PortionSizes = [.. boxContentOverview.SelectInputs];
+                        CustomerOverviewModel.BoxContentSelectedList = [.. boxContentOverview.BoxContentSelectedList];
+                        CustomerOverviewModel.PortionSizes = [.. boxContentOverview.SelectInputs];
                     }
                     else
                     {
@@ -168,7 +168,7 @@ namespace Website.Client.Pages
 
                 if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    Customer.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
+                    CustomerOverviewModel.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
                 }
                 else
                 {
@@ -186,10 +186,10 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = Customer.Id == 0 ?
-                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/InsertCustomer", Customer, JsonSerializerOptions)
+                using var response = CustomerOverviewModel.Id == 0 ?
+                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/InsertCustomer", CustomerOverviewModel, JsonSerializerOptions)
                    :
-                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", Customer, JsonSerializerOptions);
+                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", CustomerOverviewModel, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

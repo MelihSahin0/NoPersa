@@ -5,23 +5,23 @@
 
 <div class="max-w-full">
     <div class="flex flex-row max-w-full justify-between mb-2 border-black border-b-2">
-        <Tab @bind-Value="FillBoxes.DisplayTypeIndex" Items="@TypeList" SelectionChanged="@(() => FillBoxes.OnDayMonthYearSelected())" />
-        <FormDayPicker Label="Date picker" OnDayMonthYearSelected="@(() => FillBoxes.OnDayMonthYearSelected())" @bind-Year="@FillBoxes.Year" @bind-Month="@FillBoxes.Month" @bind-Day="@FillBoxes.Day" />
+        <Tab @bind-Value="FillBoxesOverviewModel.DisplayTypeIndex" Items="@TypeList" SelectionChanged="@(() => FillBoxesOverviewModel.OnDayMonthYearSelected())" />
+        <FormDayPicker Label="Date picker" OnDayMonthYearSelected="@(() => FillBoxesOverviewModel.OnDayMonthYearSelected())" @bind-Year="@FillBoxesOverviewModel.Year" @bind-Month="@FillBoxesOverviewModel.Month" @bind-Day="@FillBoxesOverviewModel.Day" />
     </div>
     <div class="flex flex-col max-w-full">
-        @if (FillBoxes.DisplayTypeIndex == 0)
+        @if (FillBoxesOverviewModel.DisplayTypeIndex == 0)
         {
-            @if (FillBoxes.FoodOverview.Any())
+            @if (FillBoxesOverviewModel.FoodOverview.Any())
             {
                 <div class="flex flex-row max-w-full justify-between mb-2 border-black border-b-2">
-                    <Tab @bind-Value="FillBoxes.FoodOverviewIndex" Items="@FillBoxes.FoodOverview.Select(f => f.RouteName).ToList()"/>
+                    <Tab @bind-Value="FillBoxesOverviewModel.FoodOverviewIndex" Items="@FillBoxesOverviewModel.FoodOverview.Select(f => f.RouteName).ToList()"/>
                 </div>
                 <div class="flex flex-row max-w-full justify-center ">
                     <table class="border border-black text-center bg-white">
                         <thead class="bg-gray-200 border-b border-black">
                             <tr>
                                 <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">Menus</th>
-                                @foreach (string portionSize in FillBoxes.FoodOverview[0].BoxContents[0].PortionSizes.Select(p => p.Name))
+                                @foreach (string portionSize in FillBoxesOverviewModel.FoodOverview[0].BoxContentSummary[0].PortionSizeSummary.Select(p => p.Name))
                                 {
                                     <th class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@portionSize</th>
                                 }
@@ -29,12 +29,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (BoxContent boxContent in FillBoxes.FoodOverview[FillBoxes.FoodOverviewIndex].BoxContents)
+                            @foreach (BoxContentSummary boxContent in FillBoxesOverviewModel.FoodOverview[FillBoxesOverviewModel.FoodOverviewIndex].BoxContentSummary)
                             {
                                 int total = 0;
                                 <tr>
                                     <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@boxContent.Name</td>
-                                    @foreach (PortionSize portionSize in boxContent.PortionSizes)
+                                    @foreach (PortionSizeSummary portionSize in boxContent.PortionSizeSummary)
                                     {
                                         <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@portionSize.Value</td>
                                         total += portionSize.Value;
@@ -52,7 +52,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (LightDiet lightDiet in FillBoxes.FoodOverview[FillBoxes.FoodOverviewIndex].LightDiets)
+                            @foreach (LightDietSummary lightDiet in FillBoxesOverviewModel.FoodOverview[FillBoxesOverviewModel.FoodOverviewIndex].LightDietSummary)
                             {
                                 <tr>
                                     <td class="@($"{Scaling.GetTextScaling()} border border-black px-4 py-2")">@lightDiet.Name</td>
@@ -66,16 +66,16 @@
         }
         else
         {
-            @if (FillBoxes.RoutesFoodOverview.Any())
+            @if (FillBoxesOverviewModel.RoutesFoodOverview.Any())
             {
                 <div class="flex flex-row">
                     <div class="w-4/6 m-2">
-                        @foreach (var route in FillBoxes.RoutesFoodOverview)
+                        @foreach (var route in FillBoxesOverviewModel.RoutesFoodOverview)
                         {
                             <div>
-                                <div class="flex items-center mb-2 border-b-2" @onclick="@(() => FillBoxes.ToggleRoute(route))">
+                                <div class="flex items-center mb-2 border-b-2" @onclick="@(() => FillBoxesOverviewModel.ToggleRoute(route))">
                                     <span class="text-gray-600 mr-2">
-                                        @if (FillBoxes.ExpandedRoutes.Contains(route))
+                                        @if (FillBoxesOverviewModel.ExpandedRoutes.Contains(route))
                                         {
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -91,13 +91,13 @@
                                     <h3 class="text-lg font-semibold select-none">@route.Name</h3>
                                 </div>
 
-                                @if (FillBoxes.ExpandedRoutes.Contains(route))
+                                @if (FillBoxesOverviewModel.ExpandedRoutes.Contains(route))
                                 {
                                     <div class="flex flex-row flex-wrap w-full">
                                         @foreach (CustomersFood customer in route.CustomersFoods)
                                         {
-                                            string backgroundColor = FillBoxes.DisplayCustomer != null && FillBoxes.DisplayCustomer == customer ? "bg-yellow" : FillBoxes.ClickedCustomer.Contains(customer) ? "bg-lightGreen" : "bg-lightRed";
-                                            <CustomerStatusDisplay Text="@($"{customer.Position + 1}. {@customer.Name}")" BackgroundColor="@backgroundColor" OnClick="@(() => FillBoxes.SetDisplayCustomer(customer))"/>
+                                            string backgroundColor = FillBoxesOverviewModel.DisplayCustomer != null && FillBoxesOverviewModel.DisplayCustomer == customer ? "bg-yellow" : FillBoxesOverviewModel.ClickedCustomer.Contains(customer) ? "bg-lightGreen" : "bg-lightRed";
+                                            <CustomerStatusDisplay Text="@($"{customer.Position + 1}. {@customer.Name}")" BackgroundColor="@backgroundColor" OnClick="@(() => FillBoxesOverviewModel.SetDisplayCustomer(customer))"/>
                                         }
                                     </div>
                                 }
@@ -105,19 +105,19 @@
                         }
                     </div>
                     <div class="w-2/6 m-2">
-                            @if (FillBoxes.DisplayCustomer != null)
+                            @if (FillBoxesOverviewModel.DisplayCustomer != null)
                             {
                                 <div>
-                                    <h3 class="text-xl font-semibold text-gray-700">@(FillBoxes.DisplayCustomer.Position + 1). @FillBoxes.DisplayCustomer.Name</h3>
+                                    <h3 class="text-xl font-semibold text-gray-700">@(FillBoxesOverviewModel.DisplayCustomer.Position + 1). @FillBoxesOverviewModel.DisplayCustomer.Name</h3>
 
                                     <h5 class="text-lg font-semibold mt-4">Light diets:</h5>
-                                    @foreach (string lightDiet in FillBoxes.DisplayCustomer.LightDiets)
+                                    @foreach (string lightDiet in FillBoxesOverviewModel.DisplayCustomer.LightDiets)
                                     {
                                         <a class="text-lg font-semibold m-4 select-none">@lightDiet</a>
                                     }
 
                                     <h5 class="text-lg font-semibold mt-4">Box Contents:</h5>
-                                    @foreach (CustomersBoxContent boxContent in FillBoxes.DisplayCustomer.BoxContents)
+                                    @foreach (CustomersBoxContent boxContent in FillBoxesOverviewModel.DisplayCustomer.BoxContents)
                                     {
                                         <h3 class="text-lg font-semibold ml-4 mt-2 select-none">@boxContent.BoxName: @boxContent.PortionSize</h3>
                                     }

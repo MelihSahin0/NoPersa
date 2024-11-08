@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SharedLibrary.DTOs;
+using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 
 namespace SharedLibrary.MappingProfiles
