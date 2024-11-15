@@ -73,7 +73,8 @@ namespace MaintenanceService.Database.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Position = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,9 +123,6 @@ namespace MaintenanceService.Database.Migrations
                     SerialNumber = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Address = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Region = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    GeoLocation = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     ContactInformation = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Article = table.Column<int>(type: "integer", nullable: false),
                     DefaultPrice = table.Column<double>(type: "double precision", nullable: false),
@@ -149,12 +147,14 @@ namespace MaintenanceService.Database.Migrations
                         name: "FK_Customer_Weekday_HolidaysId",
                         column: x => x.HolidaysId,
                         principalTable: "Weekday",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Customer_Weekday_WorkdaysId",
                         column: x => x.WorkdaysId,
                         principalTable: "Weekday",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,6 +209,30 @@ namespace MaintenanceService.Database.Migrations
                         name: "FK_CustomersMenuPlan_PortionSize_PortionSizeId",
                         column: x => x.PortionSizeId,
                         principalTable: "PortionSize",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeliveryLocation",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Address = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Region = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Latitude = table.Column<int>(type: "integer", nullable: false),
+                    Longitude = table.Column<int>(type: "integer", nullable: false),
+                    DeliveryWhishes = table.Column<string>(type: "text", nullable: true),
+                    CustomerId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeliveryLocation", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DeliveryLocation_Customer_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customer",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -292,6 +316,12 @@ namespace MaintenanceService.Database.Migrations
                 column: "MonthlyOverviewId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DeliveryLocation_CustomerId",
+                table: "DeliveryLocation",
+                column: "CustomerId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MonthlyOverview_CustomerId",
                 table: "MonthlyOverview",
                 column: "CustomerId");
@@ -308,6 +338,9 @@ namespace MaintenanceService.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "DailyOverview");
+
+            migrationBuilder.DropTable(
+                name: "DeliveryLocation");
 
             migrationBuilder.DropTable(
                 name: "Holiday");

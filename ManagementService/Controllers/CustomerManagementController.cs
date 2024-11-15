@@ -31,6 +31,7 @@ namespace ManagementService.Controllers
             try
             {
                 Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == dTOId.Id)
+                                        .Include(dl => dl.DeliveryLocation)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews.Where(n => n.Year == DateTime.Today.Year && n.Month == DateTime.Today.Month)).ThenInclude(d => d.DailyOverviews)
                                         .Include(cld => cld.CustomersLightDiets).ThenInclude(ld => ld.LightDiet)
@@ -139,6 +140,7 @@ namespace ManagementService.Controllers
 
 
                 Customer? dbCustomer = context.Customers.Where(c => c.Id == customer.Id)
+                                       .Include(dl => dl.DeliveryLocation)
                                        .Include(w => w.Workdays).Include(h => h.Holidays)
                                        .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                        .Include(cld => cld.CustomersLightDiets)
@@ -153,15 +155,18 @@ namespace ManagementService.Controllers
                 dbCustomer.SerialNumber = customer.SerialNumber;
                 dbCustomer.Title = customer.Title;
                 dbCustomer.Name = customer.Name;
-                dbCustomer.Address = customer.Address;
-                dbCustomer.Region = customer.Region;
-                dbCustomer.GeoLocation = customer.GeoLocation;
                 dbCustomer.ContactInformation = customer.ContactInformation;
                 dbCustomer.Article = customer.Article;
                 dbCustomer.DefaultPrice = customer.DefaultPrice;
                 dbCustomer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
                 dbCustomer.TemporaryDelivery = customer.TemporaryDelivery;
                 dbCustomer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
+
+                dbCustomer.DeliveryLocation.Address = customer.DeliveryLocation.Address;
+                dbCustomer.DeliveryLocation.Region = customer.DeliveryLocation.Region;
+                dbCustomer.DeliveryLocation.Latitude = customer.DeliveryLocation.Latitude;
+                dbCustomer.DeliveryLocation.Longitude = customer.DeliveryLocation.Longitude;
+                dbCustomer.DeliveryLocation.DeliveryWhishes = customer.DeliveryLocation.DeliveryWhishes;
 
                 dbCustomer.Workdays.Monday = customer.Workdays.Monday;
                 dbCustomer.Workdays.Tuesday = customer.Workdays.Tuesday;

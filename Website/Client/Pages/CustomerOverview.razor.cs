@@ -1,6 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Routing;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Components.Default;
@@ -37,6 +39,8 @@ namespace Website.Client.Pages
 
         protected override void OnInitialized()
         {
+            NavigationManager.LocationChanged += OnLocationChanged;
+
             DateTime dateTime = DateTime.Today;
 
             List<DailyDelivery> dailyOverviews = [];
@@ -56,9 +60,13 @@ namespace Website.Client.Pages
                 SerialNumber = string.Empty,
                 Name = string.Empty,
                 Title = string.Empty,
-                Address = string.Empty,
-                Region = string.Empty,
-                GeoLocation = string.Empty,
+                DeliveryLocation = new DeliveryLocation() 
+                { 
+                    Address = string.Empty,
+                    Region = string.Empty,
+                    GeoLocation = string.Empty,
+                    DeliveryWhishes = string.Empty
+                },
                 DisplayMonth = new MonthOfTheYear()
                 {
                     Month = (Months)(dateTime.Month),
@@ -106,15 +114,16 @@ namespace Website.Client.Pages
 
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
-                        FormModels.CustomerOverviewModel customer = JsonSerializer.Deserialize<FormModels.CustomerOverviewModel>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                        CustomerOverviewModel customer = JsonSerializer.Deserialize<CustomerOverviewModel>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
 
                         CustomerOverviewModel.Id = customer.Id;
                         CustomerOverviewModel.SerialNumber = customer.SerialNumber;
                         CustomerOverviewModel.Title = customer.Title;
                         CustomerOverviewModel.Name = customer.Name;
-                        CustomerOverviewModel.Address = customer.Address;
-                        CustomerOverviewModel.Region = customer.Region;
-                        CustomerOverviewModel.GeoLocation = customer.GeoLocation;
+                        CustomerOverviewModel.DeliveryLocation.Address = customer.DeliveryLocation.Address;
+                        CustomerOverviewModel.DeliveryLocation.Region = customer.DeliveryLocation.Region;
+                        CustomerOverviewModel.DeliveryLocation.GeoLocation = customer.DeliveryLocation.GeoLocation;
+                        CustomerOverviewModel.DeliveryLocation.DeliveryWhishes = customer.DeliveryLocation.DeliveryWhishes;
                         CustomerOverviewModel.ContactInformation = customer.ContactInformation;
                         CustomerOverviewModel.Article = customer.Article;
                         CustomerOverviewModel.DefaultPrice = customer.DefaultPrice;
@@ -207,6 +216,16 @@ namespace Website.Client.Pages
                 NotificationService.SetError("Server is not reachable.");
             }
             IsSubmitting = false;
+        }
+
+        private void OnLocationChanged(object sender, LocationChangedEventArgs args)
+        {
+            NavigationContainer.CustomerId = null;
+        }
+
+        public void Dispose()
+        {
+            NavigationManager.LocationChanged -= OnLocationChanged;
         }
     }
 }

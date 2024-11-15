@@ -54,7 +54,6 @@ namespace Website.Client.Components.Default
         public required int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
-        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public required string Value { get; set; }
     }
 }

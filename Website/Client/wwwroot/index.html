@@ -5,11 +5,12 @@
     <meta charset="utf-8" />
     <title>Website</title>
     <base href="/" />
-    <link rel="stylesheet" href="/css/output.css" >
+    <link rel="stylesheet" href="/css/output.css">
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#ffffff" />
     <link rel="apple-touch-icon" href="icon-192.png" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 </head>
 
 <body>
@@ -25,6 +26,13 @@
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
     <script src="_framework/aspnetcore-browser-refresh.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/pouchdb@^5.2.0/dist/pouchdb.js"></script>
+    <script src="https://unpkg.com/leaflet.tilelayer.pouchdbcached@latest/L.TileLayer.PouchDBCached.js"></script>
+
+    <script src="js/leafletMap.js"></script>
+    <script src="js/geolocation.js"></script>
 
     <environment names="Development">
         <script src="_framework/aspnetcore-browser-refresh.js"></script>

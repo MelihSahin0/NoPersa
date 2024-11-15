@@ -7,6 +7,6 @@ namespace Website.Client.FormModels
     {
         [ValidateComplexType]
         [Required]
-        public required List<RouteOverview> RouteOverview { get; set; }
+        public required List<RouteSummary> RouteSummary { get; set; }
     }
 }

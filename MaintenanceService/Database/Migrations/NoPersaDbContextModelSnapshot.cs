@@ -47,11 +47,6 @@ namespace MaintenanceService.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
                     b.Property<int>("Article")
                         .HasColumnType("integer");
 
@@ -65,10 +60,6 @@ namespace MaintenanceService.Database.Migrations
                     b.Property<double>("DefaultPrice")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("GeoLocation")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
                     b.Property<int>("HolidaysId")
                         .HasColumnType("integer");
 
@@ -79,11 +70,6 @@ namespace MaintenanceService.Database.Migrations
 
                     b.Property<int>("Position")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
 
                     b.Property<int?>("RouteId")
                         .HasColumnType("integer");
@@ -181,6 +167,44 @@ namespace MaintenanceService.Database.Migrations
                     b.HasIndex("MonthlyOverviewId");
 
                     b.ToTable("DailyOverview");
+                });
+
+            modelBuilder.Entity("SharedLibrary.Models.DeliveryLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DeliveryWhishes")
+                        .HasColumnType("text");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Region")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .IsUnique();
+
+                    b.ToTable("DeliveryLocation");
                 });
 
             modelBuilder.Entity("SharedLibrary.Models.Holiday", b =>
@@ -346,7 +370,7 @@ namespace MaintenanceService.Database.Migrations
                     b.HasOne("SharedLibrary.Models.Weekday", "Holidays")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.Customer", "HolidaysId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.Route", "Route")
@@ -357,7 +381,7 @@ namespace MaintenanceService.Database.Migrations
                     b.HasOne("SharedLibrary.Models.Weekday", "Workdays")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.Customer", "WorkdaysId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Holidays");
@@ -424,6 +448,17 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("MonthlyOverview");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.DeliveryLocation", b =>
+                {
+                    b.HasOne("SharedLibrary.Models.Customer", "Customer")
+                        .WithOne("DeliveryLocation")
+                        .HasForeignKey("SharedLibrary.Models.DeliveryLocation", "CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.MonthlyOverview", b =>
                 {
                     b.HasOne("SharedLibrary.Models.Customer", "Customer")
@@ -445,6 +480,9 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("CustomerMenuPlans");
 
                     b.Navigation("CustomersLightDiets");
+
+                    b.Navigation("DeliveryLocation")
+                        .IsRequired();
 
                     b.Navigation("MonthlyOverviews");
                 });

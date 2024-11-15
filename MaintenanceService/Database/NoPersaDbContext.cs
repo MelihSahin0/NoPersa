@@ -24,16 +24,22 @@ namespace MaintenanceService.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>()
+                .HasOne(dl => dl.DeliveryLocation)
+                .WithOne(c => c.Customer)
+                .HasForeignKey<DeliveryLocation>(dl => dl.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Customer>()
                 .HasOne(c => c.Workdays)
                 .WithOne()
                 .HasForeignKey<Customer>(c => c.WorkdaysId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Customer>()
                 .HasOne(c => c.Holidays)
                 .WithOne()
                 .HasForeignKey<Customer>(c => c.HolidaysId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Customer>()
                 .HasMany(c => c.MonthlyOverviews)

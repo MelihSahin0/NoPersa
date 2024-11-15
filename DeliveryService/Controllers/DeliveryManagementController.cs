@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Azure.Core.GeoJson;
 using DeliveryService.Database;
+using DeliveryService.Model;
 using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +10,8 @@ using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
+using System.Text;
 using Holiday = SharedLibrary.Models.Holiday;
 using Route = SharedLibrary.Models.Route;
 
@@ -20,21 +24,23 @@ namespace DeliveryService.Controllers
         private readonly NoPersaDbContext context;
         private readonly ILogger<DeliveryManagementController> logger;
         private readonly IMapper mapper;
+        private readonly HttpClient httpClient;
         private readonly string currentCountry = "at"; //TODO: Will be removed in the future
 
-        public DeliveryManagementController(ILogger<DeliveryManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
+        public DeliveryManagementController(ILogger<DeliveryManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper, HttpClient httpClient)
         {
             this.context = noPersaDbContext;
             this.logger = logger;
             this.mapper = mapper;
+            this.httpClient = httpClient;
         }
 
-        [HttpGet("GetRoutesOverview", Name = "GetRoutesOverview")]
-        public IActionResult GetRoutesOverview()
+        [HttpGet("GetRoutesSummary", Name = "GetRoutesSummary")]
+        public IActionResult GetRoutesSummary()
         {
             try
             {
-                return Ok(mapper.Map<List<DTORouteSummary>>(context.Routes.AsNoTracking().Include(r => r.Customers)));
+                return Ok(mapper.Map<List<DTORouteSummary>>(context.Routes.AsNoTracking().Where(r => r.Id != int.MinValue).Include(r => r.Customers)));
             }
             catch (ValidationException e)
             {
@@ -47,7 +53,6 @@ namespace DeliveryService.Controllers
                 return BadRequest("An error occurred while processing your request.");
             }
         }
-
 
         [HttpPost("UpdateRoutes", Name = "UpdateRoutes")]
         public IActionResult UpdateRoutes([FromBody] List<DTORouteSummary> dTORouteSummary)
@@ -258,6 +263,179 @@ namespace DeliveryService.Controllers
                 logger.LogError(e, "Failed getting customer sequence");
                 return BadRequest("An error occurred while processing your request.");
             }
-        }  
+        }
+
+        [HttpGet("{z}/{x}/{y}", Name = "GetTile")]
+        public async Task<IActionResult> GetTile(int z, int x, int y)
+        {
+            string url = $"https://api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key={Environment.GetEnvironmentVariable("ROUTING_API")}";
+
+            try
+            {
+                var response = await httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var imageData = await response.Content.ReadAsByteArrayAsync();
+                    return File(imageData, "image/png");
+                }
+                else
+                {
+                    return StatusCode((int)response.StatusCode, "Error fetching tile.");
+                }
+            }
+            catch
+            {
+                return StatusCode(500, "Error fetching tile.");
+            }
+        }
+
+        [HttpPost("GetRouting", Name = "GetRouting")]
+        public async Task<IActionResult> GetRouting([FromBody] DTOSelectedDayWithReference dTOSelectedDayWithReference)
+        {
+            try
+            {
+                Route? dbRoute = await context.Routes.AsNoTracking().Where(r => r.Id != int.MinValue && r.Id == dTOSelectedDayWithReference.ReferenceId)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.DeliveryLocation)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.Holidays)
+                                                      .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month))
+                                                                                .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDayWithReference.Day))
+                                                      .FirstOrDefaultAsync();
+                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDayWithReference.Year && h.Month == dTOSelectedDayWithReference.Month && h.Day == dTOSelectedDayWithReference.Day);
+
+                if (dbRoute == null)
+                {
+                    return NotFound();
+                }
+
+                List<string> coordinatesList = [];
+
+                if (!string.IsNullOrWhiteSpace(dTOSelectedDayWithReference.GeoLocation))
+                {
+                    coordinatesList.Add(dTOSelectedDayWithReference.GeoLocation);
+                }
+
+                foreach (Customer dbCustomer in dbRoute.Customers.OrderBy(p => p.Position).ToList() ?? [])
+                {
+                    MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month);
+                    bool toDeliver = false;
+
+                    if (dbFoundOverview != null)
+                    {
+                        int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDayWithReference.Day)).NumberOfBoxes;
+                        toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day));
+                    }
+                    else //Safety Measure
+                    {
+                        toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day);
+                    }
+
+                    if (toDeliver)
+                    {
+                        coordinatesList.Add($"{dbCustomer.DeliveryLocation.Latitude},{dbCustomer.DeliveryLocation.Longitude}");
+                    }
+                }
+
+                if ((string.IsNullOrWhiteSpace(dTOSelectedDayWithReference.GeoLocation) && coordinatesList.Count == 0) || (!string.IsNullOrWhiteSpace(dTOSelectedDayWithReference.GeoLocation) && coordinatesList.Count == 1))
+                {
+                    return NoContent();
+                }
+
+                var response = await httpClient.GetFromJsonAsync<RouteResponse>($"https://api.tomtom.com/routing/1/calculateRoute/{string.Join(":", coordinatesList)}/json?key={Environment.GetEnvironmentVariable("ROUTING_API")}");
+
+                if (response != null)
+                {
+                    List<DTOPoints> points = response.Routes
+                                                .SelectMany(route => route.Legs)
+                                                .SelectMany(leg => leg.Points)
+                                                .Select(point => new DTOPoints
+                                                {
+                                                    Latitude = point.Latitude,
+                                                    Longitude = point.Longitude
+                                                })
+                                                .ToList();
+
+                    return Ok(points);
+                }
+                else
+                {
+                    return NoContent();
+                }
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map routes");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Getting routes overview failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpPost("GetCustomerToDeliver", Name = "GetCustomerToDeliver")]
+        public async Task<IActionResult> GetCustomerToDeliver([FromBody] DTOSelectedDayWithReference dTOSelectedDayWithReference)
+        {
+            try
+            {
+                Route? dbRoute = await context.Routes.AsNoTracking().Where(r => r.Id != int.MinValue && r.Id == dTOSelectedDayWithReference.ReferenceId)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.DeliveryLocation)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.Workdays)
+                                                      .Include(r => r.Customers).ThenInclude(c => c.Holidays)
+                                                      .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month))
+                                                                                .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDayWithReference.Day))
+                                                      .FirstOrDefaultAsync();
+                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDayWithReference.Year && h.Month == dTOSelectedDayWithReference.Month && h.Day == dTOSelectedDayWithReference.Day);
+
+                if (dbRoute == null)
+                {
+                    return NotFound();
+                }
+
+                List<DTOCustomersLocation> dTOCustomersLocations = [];
+                foreach (Customer dbCustomer in dbRoute.Customers.OrderBy(p => p.Position).ToList() ?? [])
+                {
+                    MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month);
+                    bool toDeliver = false;
+
+                    if (dbFoundOverview != null)
+                    {
+                        int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDayWithReference.Day)).NumberOfBoxes;
+                        toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day));
+                    }
+                    else //Safety Measure
+                    {
+                        toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day);
+                    }
+
+                    if (toDeliver)
+                    {
+                        dTOCustomersLocations.Add(new()
+                        {
+                            Id = dbCustomer.Id,
+                            Name = dbCustomer.Name,
+                            Address = dbCustomer.DeliveryLocation.Address,
+                            Latitude = dbCustomer.DeliveryLocation.Latitude,
+                            Longitude = dbCustomer.DeliveryLocation.Longitude,
+                            DeliveryWishes = dbCustomer.DeliveryLocation.DeliveryWhishes
+                        });
+                    }
+                }
+              
+                return Ok(dTOCustomersLocations);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map routes");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Getting routes overview failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
     }
 }

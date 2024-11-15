@@ -67,6 +67,7 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - ROUTING_API=${ROUTING_API}
 
   gastronomyservice:
     image: ${DOCKER_REGISTRY-}gastronomyservice

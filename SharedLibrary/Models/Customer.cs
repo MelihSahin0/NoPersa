@@ -19,16 +19,7 @@ namespace SharedLibrary.Models
         [MaxLength(64)]
         public required string Name {  get; set; }
 
-        [Required]
-        [MaxLength(64)]
-        public required string Address { get; set; }
-
-        [Required]
-        [MaxLength(64)]
-        public required string Region { get; set; }
-
-        [MaxLength(64)]
-        public string? GeoLocation { get; set; }
+        public required DeliveryLocation DeliveryLocation { get; set; }
 
         [MaxLength(64)]
         public string? ContactInformation { get; set; }

@@ -1,0 +1,66 @@
+﻿@page "/deliver"
+@using Website.Client.Components;
+@using Website.Client.Components.Base;
+@using Website.Client.Components.Default;
+@using Website.Client.Models
+@using Website.Client.Styles
+@using Website.Client.Validations;
+
+<LoadingPopup IsVisible="@DeliverModel.IsSubmitting"/>
+@if (!DeliverModel.CustomerDelivery.Any())
+{
+    <EditForm Model="DeliverModel" OnValidSubmit="@DeliverModel.GetRouteCustomers">
+        <div class="max-w-full">
+            <div class="flex flex-row max-w-full justify-between mb-2 pb-2 border-black border-b-2">
+                <FormDefaultSelect Label="Select Route" @bind-Value="DeliverModel.RouteId" SelectInputs="DeliverModel.RouteSummary" />
+                <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2")">Start route</button>
+                <FormDayPicker Label="Date picker" @bind-Year="DeliverModel.Year" @bind-Month="DeliverModel.Month" @bind-Day="DeliverModel.Day"/>
+            </div>
+        </div>
+    </EditForm>
+}
+else
+{
+    <EditForm Model="DeliverModel" OnValidSubmit="@DeliverModel.Submit">
+        <div class="max-w-full flex flex-col">
+            <div class="w-full flex flex-row">
+                <div class="flex flex-row w-1/2 justify-between mb-2 pb-2 border-black border-b-2">
+                    <div class="w-2/6 text-center">
+                        @if (DeliverModel.ButtonPrevious)
+                        {
+                            <button type="button" @onclick="@DeliverModel.Previous" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2 select-none")">Previous</button>
+                        }
+                    </div>
+                    <div class="w-2/6 text-center">
+                        @if (DeliverModel.ButtonNext)
+                        {
+                            <button type="button" @onclick="@DeliverModel.Next" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2 select-none")">Next</button>
+                        }
+                    </div>
+                    <div class="w-2/6 text-center">
+                        @if (DeliverModel.ButtonSubmit)
+                        {
+                            <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonSubmit ? "" : "invisible ")} bg-lightGreen mx-2 select-none")">Submit</button>
+                        }
+                    </div>
+                </div>
+                <div class="flex flex-row w-1/2 justify-between mb-2 pb-2 border-black border-b-2">
+                    <button type="button" @onclick="@DeliverModel.ShowMap">Use map</button>
+                </div>
+            </div>
+            <div class="flex flex-row">
+                <div class="self-center text-center w-1/2">
+                    @if (DeliverModel.displayCustomer != null)
+                    {
+                        <h1 class="text-2xl select-none m-2">@DeliverModel.displayCustomer.Name</h1>
+                        <h1 class="text-2xl select-none m-2">@DeliverModel.displayCustomer.Address</h1>
+                        <p class="text-2xl select-none m-2">@DeliverModel.displayCustomer.DeliveryWishes</p>
+                    }
+                </div>
+                <div class="w-1/2">
+                    <div id="map" class="w-full"></div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}

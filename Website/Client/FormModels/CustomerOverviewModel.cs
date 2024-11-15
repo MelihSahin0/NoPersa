@@ -46,17 +46,9 @@ namespace Website.Client.FormModels
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public required string Name { get; set; }
 
-        [Required(ErrorMessage = "Address is required.")]
-        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
-        public required string Address { get; set; }
-
-        [Required(ErrorMessage = "Region is required.")]
-        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
-        public required string Region { get; set; }
-
-        [GeoCoordinatesType]
-        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
-        public string? GeoLocation { get; set; }
+        [ValidateComplexType]
+        [Required]
+        public required DeliveryLocation DeliveryLocation { get; set; }
 
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? ContactInformation { get; set; }

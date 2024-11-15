@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Website.Client.Models
 {
-    public class RouteOverview
+    public class RouteSummary
     {
         [Required]
         public required int Id { get; set; }

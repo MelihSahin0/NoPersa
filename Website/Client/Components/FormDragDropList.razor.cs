@@ -36,13 +36,13 @@ namespace Website.Client.Components
         public string StartFilter { get; set; } = string.Empty;
 
         [Parameter]
-        public required List<RouteOverview> RouteOverviews { get; set; }
+        public required List<RouteSummary> RouteOverviews { get; set; }
 
         [Parameter]
-        public EventCallback<List<RouteOverview>> RouteOverviewsChanged { get; set; }
+        public EventCallback<List<RouteSummary>> RouteOverviewsChanged { get; set; }
 
-        private RouteOverview? draggedItem;
-        private void HandleDrop(RouteOverview landingModel)
+        private RouteSummary? draggedItem;
+        private void HandleDrop(RouteSummary landingModel)
         {
             if (draggedItem is null)
             {
@@ -82,7 +82,7 @@ namespace Website.Client.Components
 
         private void AddRoute()
         {
-            RouteOverviews.Add(new RouteOverview() { Id = 0, Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0 });
+            RouteOverviews.Add(new RouteSummary() { Id = 0, Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0 });
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)

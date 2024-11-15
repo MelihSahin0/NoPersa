@@ -15,6 +15,8 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAutoMapper(typeof(CustomerProfile), typeof(WeekdaysProfile), typeof(MonthlyOverviewProfile), typeof(DailyOverviewProfile));
 builder.Services.AddSingleton<NotificationService>();
 builder.Services.AddSingleton<NavigationContainer>();
+builder.Services.AddSingleton<GeoLocationService>();
+builder.Services.AddSingleton<LeafletService>();
 
 builder.Services.AddSingleton(new JsonSerializerOptions
 {
