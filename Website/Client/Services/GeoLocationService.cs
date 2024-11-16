@@ -34,19 +34,19 @@ namespace Website.Client.Services
         }
 
         [JSInvokable]
-        public void UpdateLocation(Location location)
+        public void UpdateLocation(Location? location)
         {
-            OnLocationUpdated?.Invoke(location);
+            if (location != null)
+            {
+                OnLocationUpdated?.Invoke(location);
+            }
         }
 
         public async Task StartWatchingLocationAsync()
         {
-            if (await jSRuntime.InvokeAsync<bool>("canUseGeolocation"))
-            {
-                dotNetObjectReference = DotNetObjectReference.Create(this);
+            dotNetObjectReference = DotNetObjectReference.Create(this);
 
-                watchId = await jSRuntime.InvokeAsync<int>("startWatchingPosition", dotNetObjectReference);
-            }
+            watchId = await jSRuntime.InvokeAsync<int>("startWatchingPosition", dotNetObjectReference);
         }
 
         public async Task StopWatchingLocationAsync()

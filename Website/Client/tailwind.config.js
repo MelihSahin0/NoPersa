@@ -18,6 +18,7 @@ const customColors = {
     blue: "#3273F6",
     blueHover: "#265BC1",
     yellow: color.yellow["500"],
+    lightGray: color.gray["300"],
     white: "#ffffff",
     black: "#000000"
 };

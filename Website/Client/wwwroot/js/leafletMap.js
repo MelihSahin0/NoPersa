@@ -70,12 +70,29 @@ function isInitialized() {
     return !!leafletMap;
 }
 
+function clearMap() {
+
+    clearMarkers();
+    clearMyMarker();
+
+    if (routeLayer) {
+        leafletMap.removeLayer(routeLayer);
+        routeLayer = null;
+    }
+
+    leafletMap.eachLayer(layer => {
+        leafletMap.removeLayer(layer);
+    });
+
+    leafletMap = null;
+}
+
 function initialize(elementId, lat, lng, zoom, baseUrl, pointsJson) {
     const points = JSON.parse(pointsJson);
 
     updateMapHeight();
 
-    leafletMap = L.map("map").setView([lat, lng], zoom);
+    leafletMap = L.map(elementId).setView([lat, lng], zoom);
 
     const bounds = calculateMaxBounds(points);
     leafletMap.setMaxBounds(bounds);

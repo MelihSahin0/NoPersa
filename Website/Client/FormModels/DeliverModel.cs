@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
@@ -12,7 +13,7 @@ using Website.Client.Services;
 
 namespace Website.Client.FormModels
 {
-    public class DeliverModel
+    public class DeliverModel : IDisposable
     {
         [JsonIgnore]
         public ILocalStorageService LocalStorage { get; init; }
@@ -27,17 +28,21 @@ namespace Website.Client.FormModels
         public NotificationService NotificationService { get; init; }
 
         [JsonIgnore]
+        public NavigationManager NavigationManager { get; set; }
+
+        [JsonIgnore]
         public GeoLocationService GeoLocationService { get; set; }
 
         [JsonIgnore]
         public LeafletService LeafletService { get; set; }
 
-        public DeliverModel(ILocalStorageService localStorage, JsonSerializerOptions jsonSerializerOptions, HttpClient httpClient, NotificationService notificationService, GeoLocationService geoLocationService, LeafletService leafletService) 
+        public DeliverModel(ILocalStorageService localStorage, JsonSerializerOptions jsonSerializerOptions, HttpClient httpClient, NotificationService notificationService, NavigationManager navigationManager, GeoLocationService geoLocationService, LeafletService leafletService) 
         {
             LocalStorage = localStorage;
             JsonSerializerOptions = jsonSerializerOptions;
             HttpClient = httpClient;
             NotificationService = notificationService;
+            NavigationManager = navigationManager;
             GeoLocationService = geoLocationService;
             LeafletService = leafletService;
         }
@@ -66,6 +71,9 @@ namespace Website.Client.FormModels
         [JsonIgnore]
         public bool IsSubmitting { get; set; } = false;
 
+        [JsonIgnore]
+        public bool DisplayMap { get; set; } = false;
+
         public async Task GetRouteCustomers(EditContext editContext)
         {
             IsSubmitting = true;
@@ -74,9 +82,9 @@ namespace Website.Client.FormModels
                 using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetCustomerToDeliver", new
                 {
                     ReferenceId = RouteId,
-                    Year = Year,
-                    Month = Month,
-                    Day = Day,
+                    Year,
+                    Month,
+                    Day,
                 }, JsonSerializerOptions)!;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
@@ -86,6 +94,23 @@ namespace Website.Client.FormModels
                     if (CustomerDelivery.Count != 0)
                     {
                         displayCustomer = CustomerDelivery[0];
+
+                        if (CustomerDelivery.Count == 1)
+                        {
+                            ButtonPrevious = false;
+                            ButtonNext = false;
+                            ButtonSubmit = true;
+                        }
+                        else
+                        {
+                            ButtonPrevious = false;
+                            ButtonNext = true;
+                            ButtonSubmit = false;
+                        }
+                    }
+                    else
+                    {
+                        NotificationService.SetError("No customers today");
                     }
                 }
                 else
@@ -102,58 +127,80 @@ namespace Website.Client.FormModels
 
         public async Task ShowMap()
         {
-            try
+            if (DisplayMap)
             {
-                Location? location = await GeoLocationService.GetCurrentLocation();
-
-                if (!LeafletService.CoordinatesSet())
+                try
                 {
-                    using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRouting", new
+                    Location? location = await GeoLocationService.GetCurrentLocation();
+
+                    if (!LeafletService.CoordinatesSet())
                     {
-                        ReferenceId = RouteId,
-                        Year = Year,
-                        Month = Month,
-                        Day = Day,
-                        GeoLocation = location != null ? $"{location.Latitude.ToString().Replace(",", ".")},{location.Longitude.ToString().Replace(",", ".")}" : ""
-                    }, JsonSerializerOptions)!;
-
-                    if (response2.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        var route = JsonSerializer.Deserialize<List<Location>>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-
-                        if (route == null || route.Count == 0)
+                        using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRouting", new
                         {
-                            NotificationService.SetError("No route to calculate");
-                        }
-                        else
-                        {
-                            LeafletService.SetCoordinates(route.Select(r => new[] { r.Latitude, r.Longitude }).ToArray());
+                            ReferenceId = RouteId,
+                            Year,
+                            Month,
+                            Day,
+                            GeoLocation = location != null ? $"{location.Latitude.ToString().Replace(",", ".")},{location.Longitude.ToString().Replace(",", ".")}" : ""
+                        }, JsonSerializerOptions)!;
 
-                            if (location != null)
+                        if (response2.StatusCode == System.Net.HttpStatusCode.OK)
+                        {
+                            var route = JsonSerializer.Deserialize<List<Location>>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+
+                            if (route == null || route.Count == 0)
                             {
-                                await LeafletService.Init(location.Latitude, location.Longitude, 14, await LocalStorage.GetItemAsync<string>("DeliveryService"));
-                                await HandleLocationUpdated(location);
+                                DisplayMap = false;
+                                NotificationService.SetError("No route to calculate");
                             }
                             else
                             {
-                                await LeafletService.Init(route[0].Latitude, route[0].Longitude, 14, await LocalStorage.GetItemAsync<string>("DeliveryService"));
+                                LeafletService.SetCoordinates(route.Select(r => new[] { r.Latitude, r.Longitude }).ToArray());
+
+                                await LeafletService.Init(14, await LocalStorage.GetItemAsync<string>("DeliveryService"));
+
+                                if (location != null)
+                                {
+                                    await HandleLocationUpdated(location);
+                                }
+
+                                await LeafletService.DrawAllRoute();
+                                await HandleMarker();
+
+                                GeoLocationService.OnLocationUpdated += HandleLocationUpdated;
                             }
-
-                            await LeafletService.DrawAllRoute();
-                            await HandleMarker();
-
-                            GeoLocationService.OnLocationUpdated += HandleLocationUpdated;
+                        }
+                        else
+                        {
+                            DisplayMap = false;
+                            NotificationService.SetError(await response2.Content.ReadAsStringAsync());
                         }
                     }
                     else
                     {
-                        NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                        await LeafletService.Init(14, await LocalStorage.GetItemAsync<string>("DeliveryService"));
+
+                        if (location != null)
+                        {   
+                            await HandleLocationUpdated(location);
+                        }
+
+                        await LeafletService.DrawAllRoute();
+                        await HandleMarker();
+
+                        GeoLocationService.OnLocationUpdated += HandleLocationUpdated;
                     }
                 }
-            } 
-            catch
+                catch
+                {
+                    DisplayMap = false;
+                    NotificationService.SetError("Server is not reachable.");
+                }
+            }
+            else
             {
-                NotificationService.SetError("Server is not reachable.");
+                await LeafletService.ClearMap();
+                GeoLocationService.OnLocationUpdated -= HandleLocationUpdated;
             }
         }
 
@@ -188,7 +235,6 @@ namespace Website.Client.FormModels
 
         private async Task HandleLocationUpdated(Location location)
         {
-            Console.WriteLine($"{location.Latitude}, {location.Longitude}");
             await LeafletService.ClearMyMarker();
             await LeafletService.AddMyMarker(new LeafletService.Marker() { Latitude = location.Latitude, Longitude = location.Longitude, PopupText = "Me" });
         }
@@ -198,7 +244,10 @@ namespace Website.Client.FormModels
             IsSubmitting = true;
             try
             {
-
+                await LeafletService.ClearMap();
+                GeoLocationService.OnLocationUpdated -= HandleLocationUpdated;
+                LeafletService.SetCoordinates([]);
+                NavigationManager.NavigateTo("/");
             }
             catch
             {
@@ -209,7 +258,7 @@ namespace Website.Client.FormModels
 
         public bool ButtonPrevious { get; set; } = false;
 
-        public bool ButtonNext { get; set; } = true;
+        public bool ButtonNext { get; set; } = false;
 
         public bool ButtonSubmit { get; set; } = false;
 
@@ -220,9 +269,9 @@ namespace Website.Client.FormModels
             if (CustomerIndex < CustomerDelivery.Count)
             {
                 displayCustomer = CustomerDelivery[CustomerIndex];
-                CheckButtons();
-                await HandleMarker();
             }
+            CheckButtons();
+            await HandleMarker();
         }
 
         public async Task Previous()
@@ -231,9 +280,9 @@ namespace Website.Client.FormModels
             if (CustomerIndex >= 0)
             {
                 displayCustomer = CustomerDelivery[CustomerIndex];
-                CheckButtons();
-                await HandleMarker();
             }
+            CheckButtons();
+            await HandleMarker();
         }
 
         private void CheckButtons()
@@ -250,12 +299,17 @@ namespace Website.Client.FormModels
                 ButtonNext = false;
                 ButtonSubmit = true;
             }
-            else 
+            else
             {
                 ButtonPrevious = true;
                 ButtonNext = true;
                 ButtonSubmit = false;
             }
+        }
+
+        public void Dispose()
+        {
+            GeoLocationService.OnLocationUpdated -= HandleLocationUpdated;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace Website.Client.Pages
         protected override void OnInitialized()
         {
             DateTime dateTime = DateTime.Today;
-            DeliverModel = new DeliverModel(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService, GeoLocationService, LeafletService)
+            DeliverModel = new DeliverModel(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService, NavigationManager, GeoLocationService, LeafletService)
             {
                 RouteId = -1,
                 RouteSummary = [],

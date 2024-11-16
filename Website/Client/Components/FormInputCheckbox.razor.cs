@@ -18,11 +18,16 @@ namespace Website.Client.Components
         [Parameter]
         public EventCallback<bool> ValueChanged { get; set; }
 
+        [Parameter]
+        public EventCallback<bool> OnValueChangedCallback { get; set; }
+
+
         private async Task OnValueChanged(ChangeEventArgs e)
         {
             var newValue = (bool?)Convert.ChangeType(e.Value, typeof(bool));
             Value = newValue ?? false;
             await ValueChanged.InvokeAsync(Value);
+            await OnValueChangedCallback.InvokeAsync(Value);
         }
     }
 }

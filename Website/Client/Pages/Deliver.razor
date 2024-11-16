@@ -24,32 +24,17 @@ else
     <EditForm Model="DeliverModel" OnValidSubmit="@DeliverModel.Submit">
         <div class="max-w-full flex flex-col">
             <div class="w-full flex flex-row">
-                <div class="flex flex-row w-1/2 justify-between mb-2 pb-2 border-black border-b-2">
-                    <div class="w-2/6 text-center">
-                        @if (DeliverModel.ButtonPrevious)
-                        {
-                            <button type="button" @onclick="@DeliverModel.Previous" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2 select-none")">Previous</button>
-                        }
-                    </div>
-                    <div class="w-2/6 text-center">
-                        @if (DeliverModel.ButtonNext)
-                        {
-                            <button type="button" @onclick="@DeliverModel.Next" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2 select-none")">Next</button>
-                        }
-                    </div>
-                    <div class="w-2/6 text-center">
-                        @if (DeliverModel.ButtonSubmit)
-                        {
-                            <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonSubmit ? "" : "invisible ")} bg-lightGreen mx-2 select-none")">Submit</button>
-                        }
-                    </div>
+                <div class="flex flex-row w-1/2 justify-between mb-2 pb-2 border-black border-b-2">   
+                    <button type="button" disabled="@(!DeliverModel.ButtonPrevious)" @onclick="@DeliverModel.Previous" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonPrevious ? "bg-lightGreen" : "bg-lightGray")} mx-2 select-none")">Previous</button>
+                    <button type="button" disabled="@(!DeliverModel.ButtonNext)" @onclick="@DeliverModel.Next" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonNext ? "bg-lightGreen" : "bg-lightGray")} mx-2 select-none")">Next</button>
+                    <button type="submit" disabled="@(!DeliverModel.ButtonSubmit)" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonSubmit ? "bg-lightGreen" : "bg-lightGray")} mx-2 select-none")">Submit</button>
                 </div>
-                <div class="flex flex-row w-1/2 justify-between mb-2 pb-2 border-black border-b-2">
-                    <button type="button" @onclick="@DeliverModel.ShowMap">Use map</button>
+                <div class="flex flex-row w-1/2 justify-center mb-2 pb-2 border-black border-b-2">
+                    <FormInputCheckbox Label="Use map" IsColumn="false" @bind-Value="@DeliverModel.DisplayMap" OnValueChangedCallback="@(() => DeliverModel.ShowMap())" />
                 </div>
             </div>
             <div class="flex flex-row">
-                <div class="self-center text-center w-1/2">
+                <div class="@($"{(DeliverModel.DisplayMap ? "w-1/2" : "w-full")} self-center text-center")">
                     @if (DeliverModel.displayCustomer != null)
                     {
                         <h1 class="text-2xl select-none m-2">@DeliverModel.displayCustomer.Name</h1>
@@ -57,9 +42,12 @@ else
                         <p class="text-2xl select-none m-2">@DeliverModel.displayCustomer.DeliveryWishes</p>
                     }
                 </div>
-                <div class="w-1/2">
-                    <div id="map" class="w-full"></div>
-                </div>
+                @if (DeliverModel.DisplayMap)
+                {
+                    <div class="w-1/2">
+                        <div id="map" class="w-full"></div>
+                    </div>
+                }
             </div>
         </div>
     </EditForm>

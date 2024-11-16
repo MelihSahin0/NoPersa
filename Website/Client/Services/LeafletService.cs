@@ -1,4 +1,5 @@
 ﻿using Microsoft.JSInterop;
+using System;
 using System.Text.Json;
 
 namespace Website.Client.Services
@@ -15,7 +16,7 @@ namespace Website.Client.Services
 
         public bool CoordinatesSet()
         {
-            return coordinates != null && coordinates.Length == 0;
+            return coordinates != null && coordinates.Length != 0;
         }
 
         public void SetCoordinates(double[][] coordinates)
@@ -23,7 +24,7 @@ namespace Website.Client.Services
             this.coordinates = coordinates;
         }
 
-        public async Task Init(double latitude, double longitude, double startZoom, string? url)
+        public async Task Init(double startZoom, string? url)
         {
             if (coordinates.Length == 0)
             {
@@ -33,37 +34,60 @@ namespace Website.Client.Services
             if (!await jSRuntime.InvokeAsync<bool>("isInitialized"))
             {
                 var jsonCoordinates = JsonSerializer.Serialize(coordinates);
-                await jSRuntime.InvokeVoidAsync("initialize", "map", latitude, longitude, startZoom, url, jsonCoordinates);
+                await jSRuntime.InvokeVoidAsync("initialize", "map", coordinates[0][0], coordinates[0][1], startZoom, url, jsonCoordinates);
+            }
+        }
+
+        public async Task ClearMap()
+        {
+            if (await jSRuntime.InvokeAsync<bool>("isInitialized"))
+            {
+                await jSRuntime.InvokeVoidAsync("clearMap");
             }
         }
 
         public async Task AddMarker(List<Marker> markers)
         {
-            foreach (var marker in markers)
+            if (await jSRuntime.InvokeAsync<bool>("isInitialized"))
             {
-                await jSRuntime.InvokeVoidAsync("addMarker", marker.Latitude, marker.Longitude, marker.PopupText, marker.ImageId);
+                foreach (var marker in markers)
+                {
+                    await jSRuntime.InvokeVoidAsync("addMarker", marker.Latitude, marker.Longitude, marker.PopupText, marker.ImageId);
+                }
             }
         }
 
         public async Task ClearMarkers()
         {
-            await jSRuntime.InvokeVoidAsync("clearMarkers");
+            if (await jSRuntime.InvokeAsync<bool>("isInitialized"))
+            {
+                await jSRuntime.InvokeVoidAsync("clearMarkers");
+            }
         }
 
         public async Task AddMyMarker(Marker marker)
         {
-            await jSRuntime.InvokeVoidAsync("addMyMarker", marker.Latitude, marker.Longitude, marker.PopupText);
+            if (await jSRuntime.InvokeAsync<bool>("isInitialized"))
+            {
+                await jSRuntime.InvokeVoidAsync("addMyMarker", marker.Latitude, marker.Longitude, marker.PopupText);
+            }
         }
 
         public async Task ClearMyMarker()
         {
-            await jSRuntime.InvokeVoidAsync("clearMyMarker");
+            if (await jSRuntime.InvokeAsync<bool>("isInitialized"))
+            {
+                await jSRuntime.InvokeVoidAsync("clearMyMarker");
+            }
         }
 
         public async Task DrawAllRoute()
         {
-            var jsonCoordinates = JsonSerializer.Serialize(coordinates);
-            await jSRuntime.InvokeVoidAsync("drawRoute", jsonCoordinates);
+            if (await jSRuntime.InvokeAsync<bool>("isInitialized"))
+            {
+                var jsonCoordinates = JsonSerializer.Serialize(coordinates);
+                await jSRuntime.InvokeVoidAsync("drawRoute", jsonCoordinates);
+            }
         }
 
         public class Marker
