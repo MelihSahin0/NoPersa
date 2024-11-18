@@ -1,0 +1,26 @@
+﻿@page "/searchCustomer"
+@using Website.Client.Components.Base
+@using Website.Client.Styles
+
+<div class="w-full flex flex-col">
+    <div class="w-2/6 flex flex-col self-center">
+        <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} text-left border-black mb-5")"
+                   Placeholder="Filter"
+                   @bind-Value="@StartFilter"/>
+
+        <ul class="@($"max-h-96 w-full space-y-2 flex flex-col overflow-y-auto")">
+            @foreach (var customer in DisplayCustomers)
+            {
+                @if (string.IsNullOrWhiteSpace(StartFilter) || customer.Name.ToLower().StartsWith(StartFilter.ToLower()))
+                {
+                    <li>
+                        <a class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} text-left select-none border-black px-1 inline-block border-2 text-black rounded-lg")"
+                           onclick="@(() => OpenCustomerOverview(customer.Id))">
+                            @customer.Name
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</div>

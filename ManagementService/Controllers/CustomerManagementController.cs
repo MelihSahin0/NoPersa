@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Util;
 using SharedLibrary.DTOs.Management;
+using SharedLibrary.DTOs.AnswerDTO;
 
 namespace ManagementService.Controllers
 {
@@ -23,6 +24,35 @@ namespace ManagementService.Controllers
             this.context = noPersaDbContext;
             this.logger = logger;
             this.mapper = mapper;
+        }
+
+        [HttpGet("GetAllCustomersName", Name = "GetAllCustomersName")]
+        public IActionResult GetAllCustomersName()
+        {
+            try 
+            {
+                List<DTOIDString> dTOIDStrings = [];
+                foreach (var customer in context.Customers.AsNoTracking().Select(c => new { c.Id, c.Name }).OrderBy(c => c.Name))
+                {
+                    dTOIDStrings.Add(new()
+                    {
+                        Id = customer.Id,
+                        Name = customer.Name,
+                    });
+                }
+
+                return Ok(dTOIDStrings);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map customer");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Failed getting customer");
+                return BadRequest("An error occurred while processing your request.");
+            }
         }
 
         [HttpPost("GetCustomer", Name = "GetCustomer")]

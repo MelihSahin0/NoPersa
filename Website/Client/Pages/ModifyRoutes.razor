@@ -7,7 +7,7 @@
 <EditForm Model="ModifyRoutesModel" OnValidSubmit="@Submit" class="w-full flex flex-col">
     <ObjectGraphDataAnnotationsValidator />
 
-    <FormDragDropList Class="w-2/6 flex self-center justify-center items-center" MaxHeight="max-h-96" 
+    <FormDragDropList Class="w-2/6 flex self-center" MaxHeight="max-h-96" 
                       @bind-RouteOverviews="ModifyRoutesModel.RouteSummary" Placeholder="Route name"/>
    
    <div class="flex flex-row self-center mt-5">

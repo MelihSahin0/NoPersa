@@ -23,10 +23,10 @@
                 @if (string.IsNullOrWhiteSpace(StartFilter) || route.Name.ToLower().StartsWith(StartFilter.ToLower()))
                 {
                     <li @ondrop="()=>HandleDrop(route)" @key="route"
-                        @ondragleave="@(()=> {route.IsDragOver = false;})"
-                        @ondragenter="@(()=>{route.IsDragOver = true;})"
+                        @ondragleave="@(() => {route.IsDragOver = false;})"
+                        @ondragenter="@(() => {route.IsDragOver = true;})"
                         @ondragstart="() => draggedItem = route"
-                        @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
+                        @ondragend="() => draggedItem = null" draggable="@(Draggable.ToString())">
                         <div class="flex flex-row">
                             <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => route.Name)} {InputStyles.GetInputDefaultStyle()} {TextOrientation}")"
                                        Placeholder="@Placeholder"
