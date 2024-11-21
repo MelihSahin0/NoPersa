@@ -21,7 +21,7 @@ namespace SharedLibrary.Util
             List<DailyOverview> dailyOverviews = Enumerable.Range(1, 31).Select(i => new DailyOverview
             {
                 DayOfMonth = i,
-                Price = i < dateTime.Day ? customer.DefaultPrice : null,
+                Price = i < dateTime.Day ? customer.Article.Price : null,
                 NumberOfBoxes = i < dateTime.Day ? 0 : null,
                 MonthlyOverview = monthlyOverview
             }).ToList();

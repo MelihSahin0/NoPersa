@@ -26,9 +26,7 @@ namespace SharedLibrary.DTOs.Management
 
         public DTOMonthOfTheYear? DisplayMonth { get; set; }
 
-        public string? Article { get; set; }
-
-        public string? DefaultPrice { get; set; }
+        public int ArticleId { get; set; }
 
         public string? DefaultNumberOfBoxes { get; set; }
 

@@ -19,6 +19,7 @@ namespace NoPersa.Tests.DeliveryTests
         private DeliveryManagementController controller;
         private IMapper mapper;
         private ILogger<DeliveryManagementController> logger;
+        private HttpClient httpClient;
 
         [TestInitialize]
         public void Setup()
@@ -33,16 +34,15 @@ namespace NoPersa.Tests.DeliveryTests
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile<CustomerProfile>();
-                cfg.AddProfile<DailyOverviewProfile>();
-                cfg.AddProfile<MonthlyOverviewProfile>();
-                cfg.AddProfile<WeekdaysProfile>();
-                cfg.AddProfile<RouteProfile>();
+                cfg.AddProfile<ManagementProfile>();
+                cfg.AddProfile<DeliveryProfile>();
+                cfg.AddProfile<GastronomyProfile>();
             });
 
             mapper = config.CreateMapper();
             logger = new Mock<ILogger<DeliveryManagementController>>().Object;
-            controller = new DeliveryManagementController(logger, context, mapper);
+            httpClient = new HttpClient();
+            controller = new DeliveryManagementController(logger, context, mapper, httpClient);
             
             SeedTestData();
         }

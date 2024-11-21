@@ -136,7 +136,7 @@ namespace GastronomyService.Controllers
 
                 transaction.Commit();
 
-                return Ok(dTOLightDiets);
+                return Ok();
             }
             catch (ValidationException e)
             {
@@ -260,7 +260,7 @@ namespace GastronomyService.Controllers
 
                 transaction.Commit();
 
-                return Ok(dTOBoxContents);
+                return Ok();
             }
             catch (ValidationException e)
             {
@@ -382,7 +382,7 @@ namespace GastronomyService.Controllers
 
                 transaction.Commit();
 
-                return Ok(dTOPortionSizes);
+                return Ok();
             }
             catch (ValidationException e)
             {

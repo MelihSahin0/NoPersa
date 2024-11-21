@@ -4,9 +4,9 @@ using SharedLibrary.Models;
 
 namespace SharedLibrary.MappingProfiles
 {
-    public class RouteProfile : Profile
+    public class DeliveryProfile : Profile
     {
-        public RouteProfile() 
+        public DeliveryProfile() 
         {
             CreateMap<DTORouteSummary, Route>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id == -1 ? 0 : src.Id))

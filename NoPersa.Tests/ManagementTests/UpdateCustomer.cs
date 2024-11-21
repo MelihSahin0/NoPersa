@@ -34,13 +34,10 @@ namespace NoPersa.Tests.ManagementTests
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile<CustomerProfile>();
-                cfg.AddProfile<DailyOverviewProfile>();
-                cfg.AddProfile<MonthlyOverviewProfile>();
-                cfg.AddProfile<WeekdaysProfile>();
-                cfg.AddProfile<RouteProfile>();
+                cfg.AddProfile<ManagementProfile>();
+                cfg.AddProfile<DeliveryProfile>();
+                cfg.AddProfile<GastronomyProfile>();
                 cfg.AddProfile<DefaultProfile>();
-                cfg.AddProfile<BoxConfigurationProfile>();
             });
 
             mapper = config.CreateMapper();
@@ -71,6 +68,8 @@ namespace NoPersa.Tests.ManagementTests
             List<CustomersMenuPlan> customersMenuPlans = [];
             customersMenuPlans.AddRange(StaticCustomersMenuPlan.GetCustomersMenuPlan());
             context.BulkInsert(customersMenuPlans);
+
+            context.BulkInsert(StaticDeliveryLocation.GetDeliveryLocations());
         }
 
         [TestMethod]
@@ -78,7 +77,9 @@ namespace NoPersa.Tests.ManagementTests
         public void UpdateCustomers()
         {
             List<Customer> customers = [.. context.Customers.AsNoTracking().Include(c => c.MonthlyOverviews).ThenInclude(m => m.DailyOverviews)
-                                                                           .Include(w => w.Workdays).Include(h => h.Holidays)];
+                                                                           .Include(w => w.Workdays).Include(h => h.Holidays)
+                                                                           .Include(dl => dl.DeliveryLocation)
+                                                                           .Include(a => a.Article)];
             Customer customer = customers.FirstOrDefault(c => c.Id == 1)!;
             customer.Name = "Customer 0";
                 

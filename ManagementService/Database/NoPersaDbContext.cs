@@ -20,6 +20,7 @@ namespace ManagementService.Database
         public DbSet<BoxContent> BoxContents { get; set; }
         public DbSet<PortionSize> PortionSizes { get; set; }
         public DbSet<CustomersMenuPlan> CustomerMenuPlans { get; set; }
+        public DbSet<Article> Articles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -57,6 +58,10 @@ namespace ManagementService.Database
 
             modelBuilder.Entity<PortionSize>()
                         .ToTable("PortionSize")
+                        .HasKey(d => d.Id);
+
+            modelBuilder.Entity<Article>()
+                        .ToTable("Article")
                         .HasKey(d => d.Id);
 
             modelBuilder.Entity<CustomersMenuPlan>()

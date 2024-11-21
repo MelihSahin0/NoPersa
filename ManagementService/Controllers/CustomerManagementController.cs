@@ -105,6 +105,9 @@ namespace ManagementService.Controllers
                                                           .Select(c => (int?)c.Position)
                                                           .Max() ?? -1) + 1;
 
+                customer.ArticleId = dTOCustomerOverview.ArticleId;
+                customer.Article = context.Articles.First(a => a.Id == dTOCustomerOverview.ArticleId);
+
                 List<MonthlyOverview> overviewsToRemove = [];
                 foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
                 {
@@ -142,7 +145,7 @@ namespace ManagementService.Controllers
                 context.SaveChanges();
                 transaction.Commit();
 
-                return Ok(dTOCustomerOverview);
+                return Ok();
             }
             catch (ValidationException e)
             {
@@ -168,13 +171,13 @@ namespace ManagementService.Controllers
                 DateTime today = DateTime.Today;
                 Customer customer = mapper.Map<Customer>(dTOCustomerOverview);
 
-
                 Customer? dbCustomer = context.Customers.Where(c => c.Id == customer.Id)
                                        .Include(dl => dl.DeliveryLocation)
                                        .Include(w => w.Workdays).Include(h => h.Holidays)
                                        .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                        .Include(cld => cld.CustomersLightDiets)
                                        .Include(cmp => cmp.CustomerMenuPlans)
+                                       .Include(a => a.Article)
                                        .FirstOrDefault();
 
                 if (dbCustomer == null)
@@ -187,16 +190,18 @@ namespace ManagementService.Controllers
                 dbCustomer.Name = customer.Name;
                 dbCustomer.ContactInformation = customer.ContactInformation;
                 dbCustomer.Article = customer.Article;
-                dbCustomer.DefaultPrice = customer.DefaultPrice;
                 dbCustomer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
                 dbCustomer.TemporaryDelivery = customer.TemporaryDelivery;
                 dbCustomer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
 
-                dbCustomer.DeliveryLocation.Address = customer.DeliveryLocation.Address;
+                dbCustomer.DeliveryLocation!.Address = customer.DeliveryLocation!.Address;
                 dbCustomer.DeliveryLocation.Region = customer.DeliveryLocation.Region;
                 dbCustomer.DeliveryLocation.Latitude = customer.DeliveryLocation.Latitude;
                 dbCustomer.DeliveryLocation.Longitude = customer.DeliveryLocation.Longitude;
                 dbCustomer.DeliveryLocation.DeliveryWhishes = customer.DeliveryLocation.DeliveryWhishes;
+
+                dbCustomer.ArticleId = dTOCustomerOverview.ArticleId;
+                dbCustomer.Article = context.Articles.First(a => a.Id == dTOCustomerOverview.ArticleId);
 
                 dbCustomer.Workdays.Monday = customer.Workdays.Monday;
                 dbCustomer.Workdays.Tuesday = customer.Workdays.Tuesday;
@@ -267,7 +272,7 @@ namespace ManagementService.Controllers
                 context.SaveChanges();
                 transaction.Commit();
 
-                return Ok(dTOCustomerOverview);
+                return Ok();
             }
             catch (ValidationException e)
             {

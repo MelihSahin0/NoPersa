@@ -6,6 +6,7 @@ using Holiday = SharedLibrary.Models.Holiday;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Util;
 using SharedLibrary.DTOs.Maintenance;
+using Microsoft.OpenApi.Extensions;
 
 namespace MaintenanceService.Services
 {
@@ -67,16 +68,17 @@ namespace MaintenanceService.Services
             using var transaction2 = await context.Database.BeginTransactionAsync();
             try
             {
-                DateTime lowestDate = maintenance.NextDailyDeliverySave;
+                DateTime lowestDate = maintenance.Date;
 
-                List<Customer> dbCustomers = await context.Customer.Where(r => r.RouteId != int.MinValue || (r.RouteId == int.MinValue && r.MonthlyOverviews.Any(x => x.Year == maintenance.NextDailyDeliverySave.Year && x.Month == maintenance.NextDailyDeliverySave.Month)))
+                List<Customer> dbCustomers = await context.Customer.Where(r => r.RouteId != int.MinValue || (r.RouteId == int.MinValue && r.MonthlyOverviews.Any(x => x.Year == maintenance.Date.Year && x.Month == maintenance.Date.Month)))
                                                                    .Include(w => w.Workdays)
                                                                    .Include(h => h.Holidays)
-                                                                   .Include(m => m.MonthlyOverviews.Where(x => x.Year > maintenance.NextDailyDeliverySave.Year || (x.Year == maintenance.NextDailyDeliverySave.Year && x.Month >= maintenance.NextDailyDeliverySave.Month)))
+                                                                   .Include(m => m.MonthlyOverviews.Where(x => x.Year > maintenance.Date.Year || (x.Year == maintenance.Date.Year && x.Month >= maintenance.Date.Month)))
                                                                        .ThenInclude(d => d.DailyOverviews)
+                                                                   .Include(a => a.Article)
                                                                    .ToListAsync();
 
-                DateTime time = new(maintenance.NextDailyDeliverySave.Year, maintenance.NextDailyDeliverySave.Month, maintenance.NextDailyDeliverySave.Day);
+                DateTime time = new(maintenance.Date.Year, maintenance.Date.Month, maintenance.Date.Day);
                 while (DateTime.Today.Date >= time.Date)
                 {
                     Holiday? holiday = await context.Holiday.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == time.Year && h.Month == time.Month && h.Day == time.Day);
@@ -103,7 +105,7 @@ namespace MaintenanceService.Services
                                     && dbCustomer.RouteId != int.MinValue)
                                 {
                                     dbDailyOverview.NumberOfBoxes = dbCustomer.DefaultNumberOfBoxes;
-                                    dbDailyOverview.Price = dbCustomer.DefaultPrice;
+                                    dbDailyOverview.Price = dbCustomer.Article.Price;
                                 }
                                 else
                                 {
@@ -113,7 +115,7 @@ namespace MaintenanceService.Services
                             }
                             else if (dbDailyOverview.Price == null)
                             {
-                                dbDailyOverview.Price = dbCustomer.DefaultPrice;
+                                dbDailyOverview.Price = dbCustomer.Article.Price;
                             }
                         }
                     }
@@ -127,7 +129,7 @@ namespace MaintenanceService.Services
                     await context.BulkInsertOrUpdateAsync(batch);
                 }
 
-                (await context.Maintenance.FirstAsync(m => m.Id == 1)).NextDailyDeliverySave = DateTime.Today.AddDays(1).Date;
+                (await context.Maintenance.FirstAsync(m => m.Id == 1)).Date = DateTime.Today.AddDays(1).Date;
                 await context.SaveChangesAsync();
 
                 await transaction2.CommitAsync();
@@ -147,10 +149,10 @@ namespace MaintenanceService.Services
                 {
                     var context = scope.ServiceProvider.GetRequiredService<NoPersaDbContext>();
 
-                    var maintenance = await context.Maintenance.FirstOrDefaultAsync(m => m.Id == 1);
+                    var maintenance = await context.Maintenance.FirstOrDefaultAsync(m => m.Type == MaintenanceTypes.DailyDelivery.GetDisplayName());
                     if (maintenance != null)
                     {
-                        if (DateTime.Today.Date >= maintenance.NextDailyDeliverySave)
+                        if (DateTime.Today.Date >= maintenance.Date)
                         {
                             await CatchUp(context, maintenance);
                         }
@@ -159,7 +161,7 @@ namespace MaintenanceService.Services
                     {
                         //Do it so everything works again
                         using var transaction = await context.Database.BeginTransactionAsync();
-                        await context.Maintenance.AddAsync(new Maintenance() { Id = 1, NextDailyDeliverySave = DateTime.Today.Date });
+                        await context.Maintenance.AddAsync(new Maintenance() { Id = 1, Type = MaintenanceTypes.DailyDelivery.GetDisplayName(), Date = DateTime.Today.Date });
                         await context.SaveChangesAsync();
                         await transaction.CommitAsync();
                     }

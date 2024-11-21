@@ -35,13 +35,9 @@ namespace NoPersa.Tests.GastronomyTests
 
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile<CustomerProfile>();
-                cfg.AddProfile<DailyOverviewProfile>();
-                cfg.AddProfile<MonthlyOverviewProfile>();
-                cfg.AddProfile<WeekdaysProfile>();
-                cfg.AddProfile<RouteProfile>();
-                cfg.AddProfile<DefaultProfile>();
-                cfg.AddProfile<BoxConfigurationProfile>();
+                cfg.AddProfile<ManagementProfile>();
+                cfg.AddProfile<DeliveryProfile>();
+                cfg.AddProfile<GastronomyProfile>();
             });
 
             mapper = config.CreateMapper();

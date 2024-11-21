@@ -3,6 +3,7 @@ using System;
 using MaintenanceService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaintenanceService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    partial class NoPersaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241121160140_V4")]
+    partial class V4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,14 +38,14 @@ namespace MaintenanceService.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
-                    b.Property<double>("NewPrice")
-                        .HasColumnType("double precision");
+                    b.Property<int>("NewPrice")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double precision");
+                    b.Property<int>("Price")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -524,7 +527,8 @@ namespace MaintenanceService.Database.Migrations
 
                     b.Navigation("CustomersLightDiets");
 
-                    b.Navigation("DeliveryLocation");
+                    b.Navigation("DeliveryLocation")
+                        .IsRequired();
 
                     b.Navigation("MonthlyOverviews");
                 });

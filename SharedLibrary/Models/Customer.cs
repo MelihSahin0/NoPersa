@@ -19,17 +19,16 @@ namespace SharedLibrary.Models
         [MaxLength(64)]
         public required string Name {  get; set; }
 
-        public required DeliveryLocation DeliveryLocation { get; set; }
+        public DeliveryLocation? DeliveryLocation { get; set; }
 
         [MaxLength(64)]
         public string? ContactInformation { get; set; }
 
-        [Required]
-        public required int Article { get; set; }
+        [ForeignKey("ArticleId")]
+        public int ArticleId { get; set; }
 
         [Required]
-        [DoubleType(min: 0)]
-        public required double DefaultPrice { get; set; }
+        public required Article Article { get; set; }
 
         [Required]
         [IntType(min: 0)]

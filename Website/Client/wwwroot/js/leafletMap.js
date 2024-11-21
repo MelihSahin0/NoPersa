@@ -104,6 +104,7 @@ function initialize(elementId, lat, lng, zoom, baseUrl, pointsJson) {
         maxBoundsViscosity: 1.0,
         useCache: true,
         crossOrigin: true,
+        cacheMaxAge: 14 * 24 * 60 * 60 * 1000,
         pouchdb: new PouchDB('mapTilesCache')
     }).addTo(leafletMap);
 }

@@ -15,9 +15,7 @@
                 {
                     <li>
                         <a class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} text-left select-none border-black px-1 inline-block border-2 text-black rounded-lg")"
-                           onclick="@(() => OpenCustomerOverview(customer.Id))">
-                            @customer.Name
-                        </a>
+                           onclick="@(() => OpenCustomerOverview(customer.Id))">@customer.Name</a>
                     </li>
                 }
             }

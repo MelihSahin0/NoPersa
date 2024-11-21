@@ -9,6 +9,9 @@ namespace SharedLibrary.Models
         public int Id { get; set; }
 
         [Required]
-        public DateTime NextDailyDeliverySave { get; set; }
+        public required string Type { get; set; }
+
+        [Required]
+        public required DateTime Date { get; set; }
     }
 }

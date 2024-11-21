@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core.GeoJson;
 using DeliveryService.Database;
 using DeliveryService.Model;
 using EFCore.BulkExtensions;
@@ -10,8 +9,6 @@ using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
-using System.Net.Http;
-using System.Text;
 using Holiday = SharedLibrary.Models.Holiday;
 using Route = SharedLibrary.Models.Route;
 
@@ -119,7 +116,7 @@ namespace DeliveryService.Controllers
                 context.SaveChanges();
                 transaction.Commit();
 
-                return Ok(dTORouteSummary);
+                return Ok();
             }
             catch (ValidationException e)
             {
@@ -342,21 +339,44 @@ namespace DeliveryService.Controllers
                     return NoContent();
                 }
 
-                var response = await httpClient.GetFromJsonAsync<RouteResponse>($"https://api.tomtom.com/routing/1/calculateRoute/{string.Join(":", coordinatesList)}/json?key={Environment.GetEnvironmentVariable("ROUTING_API")}");
+                const int maxWaypoints = 150; // TomTom limit
+                List<DTOPoints> allPoints = [];
 
-                if (response != null)
+                for (int i = 0; i < coordinatesList.Count; i += (maxWaypoints - 1)) // Overlap by 1 waypoint
                 {
-                    List<DTOPoints> points = response.Routes
-                                                .SelectMany(route => route.Legs)
-                                                .SelectMany(leg => leg.Points)
-                                                .Select(point => new DTOPoints
-                                                {
-                                                    Latitude = point.Latitude,
-                                                    Longitude = point.Longitude
-                                                })
-                                                .ToList();
+                    var chunk = coordinatesList.Skip(i).Take(maxWaypoints).ToList();
+  
+                    var response = await httpClient.GetFromJsonAsync<RouteResponse>($"https://api.tomtom.com/routing/1/calculateRoute/{string.Join(":", chunk)}/json?key={Environment.GetEnvironmentVariable("ROUTING_API")}");
 
-                    return Ok(points);
+                    if (response?.Routes != null)
+                    {
+                        var chunkPoints = response.Routes
+                                                  .SelectMany(route => route.Legs)
+                                                  .SelectMany(leg => leg.Points)
+                                                  .Select(point => new DTOPoints
+                                                  {
+                                                      Latitude = point.Latitude,
+                                                      Longitude = point.Longitude
+                                                  })
+                                                  .ToList();
+
+                        if (allPoints.Count > 0 && chunkPoints.Count > 0)
+                        {
+                            chunkPoints.RemoveAt(0);
+                        }
+
+                        allPoints.AddRange(chunkPoints);
+                    }
+
+                    if (chunk.Count < maxWaypoints)
+                    {
+                        break;
+                    }
+                }
+
+                if (allPoints.Count > 0)
+                {
+                    return Ok(allPoints);
                 }
                 else
                 {

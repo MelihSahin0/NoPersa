@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using SharedLibrary.Models;
+using SharedLibrary.Util;
 using Route = SharedLibrary.Models.Route;
 
 namespace MaintenanceService.Database
@@ -20,6 +22,7 @@ namespace MaintenanceService.Database
         public DbSet<CustomersLightDiet> CustomersLightDiet { get; set; }
         public DbSet<LightDiet> LightDiet { get; set; }
         public DbSet<CustomersMenuPlan> CustomersMenuPlan { get; set; }
+        public DbSet<Article> Article { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,8 +97,14 @@ namespace MaintenanceService.Database
                 .HasForeignKey(cmp => cmp.PortionSizeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Customer>()
+                .HasOne(a => a.Article)
+                .WithMany(c => c.Customers)
+                .HasForeignKey(c => c.ArticleId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<Maintenance>()
-                .Property(e => e.NextDailyDeliverySave)
+                .Property(e => e.Date)
                 .HasColumnType("date");
         }
 
@@ -117,7 +126,8 @@ namespace MaintenanceService.Database
                 Maintenance.Add(new Maintenance
                 {
                     Id = 1,
-                    NextDailyDeliverySave = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1)
+                    Type = MaintenanceTypes.DailyDelivery.GetDisplayName(),
+                    Date = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1)
                 });
                 SaveChanges();
             }

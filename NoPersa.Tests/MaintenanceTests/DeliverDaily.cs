@@ -2,7 +2,6 @@
 using MaintenanceService.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.Playwright;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;

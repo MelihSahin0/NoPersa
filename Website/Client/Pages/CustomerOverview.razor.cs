@@ -218,7 +218,7 @@ namespace Website.Client.Pages
             IsSubmitting = false;
         }
 
-        private void OnLocationChanged(object sender, LocationChangedEventArgs args)
+        private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
         {
             NavigationContainer.CustomerId = null;
         }

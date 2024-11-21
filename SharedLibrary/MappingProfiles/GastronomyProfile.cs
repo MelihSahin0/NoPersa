@@ -5,9 +5,9 @@ using SharedLibrary.Models;
 
 namespace SharedLibrary.MappingProfiles
 {
-    public class BoxConfigurationProfile : Profile
+    public class GastronomyProfile : Profile
     {
-        public BoxConfigurationProfile()
+        public GastronomyProfile()
         {
             CreateMap<DTOLightDiet, LightDiet>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
