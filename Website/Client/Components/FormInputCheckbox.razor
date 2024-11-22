@@ -1,8 +1,8 @@
 ﻿@using Website.Client.Validations;
 @using Website.Client.Styles;
 
-<div class="@($"flex {(IsColumn ? "flex-col" : "flex-row")}")">
+<div class="@($"{Class} flex items-center {(IsColumn ? "flex-col" : "flex-row")}")">
     <label for="@Id" class="@Scaling.GetTextScaling() text-center select-none min-w-fit mr-1">@Label</label>
-    <InputCheckbox id="@Id" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {(IsColumn ? "" : "mr-3")}")"
+    <InputCheckbox id="@Id" class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {(IsColumn ? "" : "mr-3")} h-5")"
                    @bind-Value="Value" @oninput="OnValueChanged" />
 </div>

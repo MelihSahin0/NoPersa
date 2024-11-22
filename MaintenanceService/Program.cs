@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MaintenanceService.Database;
 using MaintenanceService.Services;
+using SharedLibrary.MappingProfiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,29 @@ var connectionString = $"Host={dbHost};Port={dbPort};Database={dbName};Username=
 
 builder.Services.AddDbContext<NoPersaDbContext>(options =>
     options.UseNpgsql(connectionString));
-builder.Services.AddHostedService<DailyDelivery>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-
+builder.Services.AddHostedService<DailyDelivery>();
+builder.Services.AddHostedService<ArticleService>();
+builder.Services.AddAutoMapper(typeof(ManagementProfile), typeof(DeliveryProfile), typeof(GastronomyProfile), typeof(DefaultProfile));
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -33,4 +52,8 @@ using (var scope = app.Services.CreateScope())
     db.SeedData();
 }
 
+app.UseHttpsRedirection();
+app.UseCors("AllowSpecificOrigins");
+app.UseAuthorization();
+app.MapControllers();
 app.Run();

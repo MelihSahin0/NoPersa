@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Components.Default;
@@ -44,7 +43,7 @@ namespace Website.Client.Pages
             DateTime dateTime = DateTime.Today;
 
             List<DailyDelivery> dailyOverviews = [];
-            for (int day = 1; day <= 31; day++)
+            for (int day = 1; day <= DateTime.DaysInMonth(dateTime.Year, dateTime.Month); day++)
             {
                 dailyOverviews.Add(new DailyDelivery()
                 {
@@ -72,9 +71,10 @@ namespace Website.Client.Pages
                     Month = (Months)(dateTime.Month),
                     Year = dateTime.Year
                 },
-                Article = "0",
-                DefaultPrice = "0",
-                DefaultNumberOfBoxes = "0",
+                ArticleId = 0,
+                Articles = [],
+                ArticlesPrice = [],
+                DefaultNumberOfBoxes = "1",
                 MonthlyDeliveries = [
                     new MonthlyDelivery()
                     {
@@ -125,8 +125,7 @@ namespace Website.Client.Pages
                         CustomerOverviewModel.DeliveryLocation.GeoLocation = customer.DeliveryLocation.GeoLocation;
                         CustomerOverviewModel.DeliveryLocation.DeliveryWhishes = customer.DeliveryLocation.DeliveryWhishes;
                         CustomerOverviewModel.ContactInformation = customer.ContactInformation;
-                        CustomerOverviewModel.Article = customer.Article;
-                        CustomerOverviewModel.DefaultPrice = customer.DefaultPrice;
+                        CustomerOverviewModel.ArticleId = customer.ArticleId;
                         CustomerOverviewModel.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
                         CustomerOverviewModel.MonthlyDeliveries =[.. customer.MonthlyDeliveries];
                         CustomerOverviewModel.TemporaryDelivery = customer.TemporaryDelivery;
@@ -182,6 +181,25 @@ namespace Website.Client.Pages
                 else
                 {
                     NotificationService.SetError(await responseRoute.Content.ReadAsStringAsync());
+                }
+
+                using var responseArticle = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/ArticleManagement/GetArticlesForCustomer")!;
+
+                if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    var articles = JsonSerializer.Deserialize<List<ArticlesForCustomer>>(await responseArticle.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+
+                    CustomerOverviewModel.Articles = articles.Select(a => new SelectInput() { Id = a.Id, Value = a.Name}).ToList();
+                    CustomerOverviewModel.ArticlesPrice = articles;
+
+                    if (CustomerOverviewModel.ArticleId == 0)
+                    {
+                        CustomerOverviewModel.ArticleId = articles.FirstOrDefault()?.Id ?? 0;
+                    }
+                }
+                else
+                {
+                    NotificationService.SetError(await responseArticle.Content.ReadAsStringAsync());
                 }
             }
             catch

@@ -13,6 +13,23 @@ namespace MaintenanceService.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Article",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Position = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false),
+                    NewName = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    NewPrice = table.Column<double>(type: "double precision", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Article", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BoxContent",
                 columns: table => new
                 {
@@ -60,7 +77,8 @@ namespace MaintenanceService.Database.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    NextDailyDeliverySave = table.Column<DateTime>(type: "date", nullable: false)
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    Date = table.Column<DateTime>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -124,8 +142,7 @@ namespace MaintenanceService.Database.Migrations
                     Title = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
                     Name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     ContactInformation = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
-                    Article = table.Column<int>(type: "integer", nullable: false),
-                    DefaultPrice = table.Column<double>(type: "double precision", nullable: false),
+                    ArticleId = table.Column<int>(type: "integer", nullable: false),
                     DefaultNumberOfBoxes = table.Column<int>(type: "integer", nullable: false),
                     Position = table.Column<int>(type: "integer", nullable: false),
                     TemporaryDelivery = table.Column<bool>(type: "boolean", nullable: false),
@@ -137,6 +154,12 @@ namespace MaintenanceService.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customer", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Customer_Article_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Article",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Customer_Route_RouteId",
                         column: x => x.RouteId,
@@ -221,8 +244,8 @@ namespace MaintenanceService.Database.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Address = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     Region = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    Latitude = table.Column<int>(type: "integer", nullable: false),
-                    Longitude = table.Column<int>(type: "integer", nullable: false),
+                    Latitude = table.Column<double>(type: "double precision", nullable: false),
+                    Longitude = table.Column<double>(type: "double precision", nullable: false),
                     DeliveryWhishes = table.Column<string>(type: "text", nullable: true),
                     CustomerId = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -277,6 +300,11 @@ namespace MaintenanceService.Database.Migrations
                         principalTable: "MonthlyOverview",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customer_ArticleId",
+                table: "Customer",
+                column: "ArticleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customer_HolidaysId",
@@ -362,6 +390,9 @@ namespace MaintenanceService.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "Customer");
+
+            migrationBuilder.DropTable(
+                name: "Article");
 
             migrationBuilder.DropTable(
                 name: "Route");

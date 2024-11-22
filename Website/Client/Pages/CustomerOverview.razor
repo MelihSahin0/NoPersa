@@ -20,25 +20,34 @@
                 <FormMonthYearPicker Label="Month picker" OnMonthYearSelected="@(() => CustomerOverviewModel.OnMonthYearSelected())" @bind-Year="@CustomerOverviewModel.DisplayMonth.Year" @bind-Month="@CustomerOverviewModel.DisplayMonth.Month" />
                 
                 <div class="flex flex-col mt-1">
-                    <div class="grid grid-cols-5 gap-4">
-                        <FormTextInput Class="col-span-1" TextOrientation="text-center" LabelTextOrientation="center" Label="Article" @bind-Value="@CustomerOverviewModel.Article" For="@(() => CustomerOverviewModel.Article)" />
-                        <FormTextInput Class="col-span-2" TextOrientation="text-center" LabelTextOrientation="center" Label="Price per Box" @bind-Value="@CustomerOverviewModel.DefaultPrice" For="@(() => CustomerOverviewModel.DefaultPrice)" ValidationFunction="OnInputValidation.Double" />
-                        <FormTextInput Class="col-span-2" TextOrientation="text-center" LabelTextOrientation="center" Label="Number of Boxes" @bind-Value="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => CustomerOverviewModel.DefaultNumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                    <div class="grid grid-cols-8 gap-2">
+                        <FormDefaultSelect Class="col-span-2" IsColumn="true" Label="Article" @bind-Value="CustomerOverviewModel.ArticleId" SelectInputs="CustomerOverviewModel.Articles" />
+                        @if (CustomerOverviewModel.ArticlesPrice.FirstOrDefault(ap => ap.Id == CustomerOverviewModel.ArticleId) != null)
+                        {
+                            <FormTextDisplay Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Price" Value="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()"/>
+                        }
+                        <FormTextInput Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Number of Boxes" @bind-Value="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => CustomerOverviewModel.DefaultNumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
                     </div>
-                     <div class="grid grid-cols-5 gap-4">
-                        <a class="font-semibold col-span-1 text-center select-none">Day</a>
-                        <a class="font-semibold col-span-2 text-center select-none">Price per Box</a>
-                        <a class="font-semibold col-span-2 text-center select-none">Number of Boxes</a>
+                        <div class="grid grid-cols-8 gap-2">
+                        <a class="font-semibold col-span-2 text-center select-none">Day</a>
+                        <a class="font-semibold col-span-3 text-center select-none">Price per Box</a>
+                        <a class="font-semibold col-span-3 text-center select-none">Number of Boxes</a>
                     </div>
 
-                    @for (int i = 1; i < 31 + 1; i++)
+                    @if (CustomerOverviewModel.ArticlesPrice.FirstOrDefault(ap => ap.Id == CustomerOverviewModel.ArticleId) != null)
                     {
-                        var dailyDelivery = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries].DailyDeliveries.First(d => d.DayOfMonth == i);
-                        <div class="grid grid-cols-5 gap-4 mt-1">
-                            <a class="text-center col-span-1 select-none">@i</a>
-                            <FormTextInput Class="col-span-2" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@CustomerOverviewModel.DefaultPrice" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
-                            <FormTextInput Class="col-span-2" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
-                        </div>
+                        var monthlyDeliveries = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries];
+                        @for (int i = 1; i <= monthlyDeliveries.DailyDeliveries.Last().DayOfMonth; i++)
+                        {
+                            var dailyDelivery = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries].DailyDeliveries.First(d => d.DayOfMonth == i);
+                            var dayOfWeek = new DateTime(monthlyDeliveries.MonthOfTheYear.Year, (int)monthlyDeliveries.MonthOfTheYear.Month, i).DayOfWeek;
+
+                            <div class="grid grid-cols-8 gap-2 mt-1">
+                                <a class="@($"text-center col-span-2 select-none {(dayOfWeek == DayOfWeek.Saturday ? "text-yellow" : dayOfWeek == DayOfWeek.Sunday ? "text-red" : "text-black")}")">@i</a>
+                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
+                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                            </div>
+                        }
                     }
                 </div>
             </div>
@@ -56,7 +65,7 @@
                     <FormTextInput Label="Address" @bind-Value="CustomerOverviewModel.DeliveryLocation.Address" For="@(() => CustomerOverviewModel.DeliveryLocation.Address)" />
                     <FormTextInput Label="Contact Information" @bind-Value="CustomerOverviewModel.ContactInformation" For="@(() => CustomerOverviewModel.ContactInformation)" />
                     <FormTextInput Label="Region" @bind-Value="CustomerOverviewModel.DeliveryLocation.Region" For="@(() => CustomerOverviewModel.DeliveryLocation.Region)" />
-                    <FormTextInput Label="Geographical Location" @bind-Value="CustomerOverviewModel.DeliveryLocation.GeoLocation" For="@(() => CustomerOverviewModel.DeliveryLocation.GeoLocation)" ValidationFunction="OnInputValidation.GeoCoordinates" />
+                    <FormTextInput Class="col-span-2" Label="Geographical Location" @bind-Value="CustomerOverviewModel.DeliveryLocation.GeoLocation" For="@(() => CustomerOverviewModel.DeliveryLocation.GeoLocation)" ValidationFunction="OnInputValidation.GeoCoordinates" />
                 </div>
             </div>
 

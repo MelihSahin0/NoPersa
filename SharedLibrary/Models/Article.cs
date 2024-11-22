@@ -21,6 +21,10 @@ namespace SharedLibrary.Models
         public required double Price { get; set; }
 
         [Required]
+        [MaxLength(64)]
+        public required string NewName { get; set; }
+
+        [Required]
         [DoubleType(min: 0)]
         public required double NewPrice { get; set; }
 

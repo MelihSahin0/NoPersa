@@ -1,12 +1,12 @@
 ﻿@using Website.Client.Models
 @using Website.Client.Styles
 
-<div class="@($"{Class} flex flex-row")">
+<div class="@($"{Class} flex {(IsColumn ? "flex-col" : "items-center flex-row")}")">
     @if (!string.IsNullOrWhiteSpace(Label))
     {
-        <label class="@($"{Scaling.GetTextScaling()} text-center select-none mr-2")">@($"{Label} :")</label>
+        <label for="@Id" class="@($"{Scaling.GetTextScaling()} text-center select-none {(IsColumn ? "mb-0.5" : "mr-2")}")">@($"{Label}{(IsColumn ? "" : ":")}")</label>
     }
-    <InputSelect class="@($"{Scaling.GetTextScaling()} ring-black ring-1 rounded-md hover:ring-skyHover text-center select-none")" 
+    <InputSelect id="@Id" class="@($"{Scaling.GetTextScaling()} ring-black ring-1 rounded-md hover:ring-skyHover text-center select-none")" 
                 @bind-Value="Value" @oninput="OnValueChanged">
         @foreach (SelectInput route in SelectInputs ?? [])
         {

@@ -74,7 +74,7 @@ namespace Website.Client.Components.Base
 
         private void ChangeMonth(int change)
         {
-            Month = (Months)((12 + (int)Month + change) % 12);
+            Month = (Months)(((12 + (int)Month + change - 1) % 12) + 1);
         }
     }
 }

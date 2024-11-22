@@ -70,14 +70,17 @@ namespace Website.Client.FormModels
         public required MonthOfTheYear DisplayMonth { get; set; }
 
         [Required]
-        public required string Article { get; set; }
+        [IntType(min:1)]
+        public required int ArticleId { get; set; }
 
-        [Required(ErrorMessage = "Price is required.")]
-        [DoubleType(min: 0)]
-        public required string DefaultPrice { get; set; }
+        [JsonIgnore]
+        public List<SelectInput>? Articles { get; set; }
+
+        [JsonIgnore]
+        public List<ArticlesForCustomer> ArticlesPrice { get; set; }
 
         [Required(ErrorMessage = "Number of Boxes is required")]
-        [IntType(min: 0)]
+        [IntType(min: 1)]
         public required string DefaultNumberOfBoxes { get; set; }
 
         [ValidateComplexType]
@@ -109,16 +112,14 @@ namespace Website.Client.FormModels
         public int selectedMonthlyDeliveries = 0;
         public async Task OnMonthYearSelected()
         {
-            int i = 0;
-            foreach (MonthlyDelivery monthlyDelivery in MonthlyDeliveries)
+            for (int i = 0; i < MonthlyDeliveries.Count; i++)
             {
-                if (monthlyDelivery.MonthOfTheYear.Month.Equals(DisplayMonth.Month) &&
-                    monthlyDelivery.MonthOfTheYear.Year.Equals(DisplayMonth.Year))
+                if (MonthlyDeliveries[i].MonthOfTheYear.Month.Equals(DisplayMonth.Month) &&
+                    MonthlyDeliveries[i].MonthOfTheYear.Year.Equals(DisplayMonth.Year))
                 {
                     selectedMonthlyDeliveries = i;
                     return;
                 }
-                i++;
             }
 
             try
@@ -134,27 +135,7 @@ namespace Website.Client.FormModels
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     MonthlyDeliveries.Add(JsonSerializer.Deserialize<MonthlyDelivery>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!);
-                }
-                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    DateTime dateTime = DateTime.Today;
-
-                    List<DailyDelivery> dailyOverviews = [];
-                    for (int day = 1; day <= 31; day++)
-                    {
-                        dailyOverviews.Add(new DailyDelivery()
-                        {
-                            DayOfMonth = day,
-                            Price = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
-                            NumberOfBoxes = ((int)DisplayMonth.Month < dateTime.Month || DisplayMonth.Year < dateTime.Year) ? "0" : "",
-                        });
-                    }
-
-                    MonthlyDeliveries.Add(new MonthlyDelivery()
-                    {
-                        MonthOfTheYear = new MonthOfTheYear() { Month = DisplayMonth.Month, Year = DisplayMonth.Year },
-                        DailyDeliveries = dailyOverviews
-                    });
+                    selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;
                 }
                 else
                 {
@@ -165,8 +146,6 @@ namespace Website.Client.FormModels
             {
                 NotificationService.SetError("Server is not reachable.");
             }
-
-            selectedMonthlyDeliveries = MonthlyDeliveries.Count - 1;
         }
     }
 }

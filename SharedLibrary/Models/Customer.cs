@@ -58,7 +58,7 @@ namespace SharedLibrary.Models
         public required Weekday Holidays { get; set; }
 
         [ForeignKey("RouteId")]
-        public int? RouteId { get; set; }
+        public int RouteId { get; set; }
 
         public Route? Route { get; set; }
 

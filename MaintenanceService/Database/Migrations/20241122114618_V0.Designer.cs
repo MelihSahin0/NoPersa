@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaintenanceService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    [Migration("20241113105819_V1")]
-    partial class V1
+    [Migration("20241122114618_V0")]
+    partial class V0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,38 @@ namespace MaintenanceService.Database.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("SharedLibrary.Models.Article", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("NewName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<double>("NewPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Article");
+                });
 
             modelBuilder.Entity("SharedLibrary.Models.BoxContent", b =>
                 {
@@ -50,7 +82,7 @@ namespace MaintenanceService.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Article")
+                    b.Property<int>("ArticleId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ContactInformation")
@@ -59,9 +91,6 @@ namespace MaintenanceService.Database.Migrations
 
                     b.Property<int>("DefaultNumberOfBoxes")
                         .HasColumnType("integer");
-
-                    b.Property<double>("DefaultPrice")
-                        .HasColumnType("double precision");
 
                     b.Property<int>("HolidaysId")
                         .HasColumnType("integer");
@@ -95,6 +124,8 @@ namespace MaintenanceService.Database.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ArticleId");
 
                     b.HasIndex("HolidaysId")
                         .IsUnique();
@@ -261,8 +292,12 @@ namespace MaintenanceService.Database.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("NextDailyDeliverySave")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("date");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -370,6 +405,12 @@ namespace MaintenanceService.Database.Migrations
 
             modelBuilder.Entity("SharedLibrary.Models.Customer", b =>
                 {
+                    b.HasOne("SharedLibrary.Models.Article", "Article")
+                        .WithMany("Customers")
+                        .HasForeignKey("ArticleId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
+
                     b.HasOne("SharedLibrary.Models.Weekday", "Holidays")
                         .WithOne()
                         .HasForeignKey("SharedLibrary.Models.Customer", "HolidaysId")
@@ -386,6 +427,8 @@ namespace MaintenanceService.Database.Migrations
                         .HasForeignKey("SharedLibrary.Models.Customer", "WorkdaysId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Article");
 
                     b.Navigation("Holidays");
 
@@ -473,6 +516,11 @@ namespace MaintenanceService.Database.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("SharedLibrary.Models.Article", b =>
+                {
+                    b.Navigation("Customers");
+                });
+
             modelBuilder.Entity("SharedLibrary.Models.BoxContent", b =>
                 {
                     b.Navigation("CustomerMenuPlans");
@@ -484,8 +532,7 @@ namespace MaintenanceService.Database.Migrations
 
                     b.Navigation("CustomersLightDiets");
 
-                    b.Navigation("DeliveryLocation")
-                        .IsRequired();
+                    b.Navigation("DeliveryLocation");
 
                     b.Navigation("MonthlyOverviews");
                 });

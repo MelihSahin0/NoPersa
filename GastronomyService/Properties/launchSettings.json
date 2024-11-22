@@ -2,8 +2,6 @@
   "profiles": {
     "https": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "weatherforecast",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -25,7 +23,7 @@
       "environmentVariables": {
         "ASPNETCORE_HTTPS_PORTS": "8083"
       },
-      "publishAllPorts": true,
+      "publishAllPorts": false,
       "useSSL": true
     }
   },

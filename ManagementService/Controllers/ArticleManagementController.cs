@@ -2,9 +2,11 @@
 using ManagementService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SharedLibrary.DTOs.AnswerDTO;
 using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace ManagementService.Controllers
 {
@@ -28,7 +30,7 @@ namespace ManagementService.Controllers
         {
             try
             {
-                return Ok(mapper.Map<List<DTOArticle>>(context.Articles.AsNoTracking().ToList()));
+                return Ok(mapper.Map<List<DTOArticle>>(context.Articles.AsNoTracking().Include(c => c.Customers).ToList()));
             }
             catch (ValidationException e)
             {
@@ -43,7 +45,7 @@ namespace ManagementService.Controllers
         }
 
         [HttpPost("UpdateArticles", Name = "UpdateArticles")]
-        public IActionResult UpdateArticlesAsync([FromBody] DTOArticle dTOArticle)
+        public IActionResult UpdateArticlesAsync([FromBody] List<DTOArticle> dTOArticle)
         {
             using var transaction = context.Database.BeginTransaction();
 
@@ -51,22 +53,27 @@ namespace ManagementService.Controllers
             {
                 List<Article> articles = mapper.Map<List<Article>>(dTOArticle);
 
-                List<Article> toRemove = [.. context.Articles.Where(article => !articles.Any(a => a.Id == article.Id)).Include(c => c.Customers)];
-                context.Articles.RemoveRange(toRemove);
-
                 var existingArticles = context.Articles.ToDictionary(a => a.Id);
                 foreach (var article in articles)
                 {
                     if (existingArticles.TryGetValue(article.Id, out var foundArticle))
                     {
                         foundArticle.Position = article.Position;
+                        foundArticle.NewName = article.NewName;
+                        foundArticle.NewPrice = article.NewPrice;
+                    }
+                    else
+                    {
+                        context.Articles.Add(article);
                     }
                 }
-
-                context.Articles.AddRange(articles.Where(a => a.Id == 0));
                 context.SaveChanges();
 
-                Article defaultArticle = context.Articles.First(a => a.Id == 0);
+                var articleIds = new HashSet<int>(articles.Select(a => a.Id));
+                List<Article> toRemove = [.. context.Articles.Include(a => a.Customers).Where(a => !articleIds.Contains(a.Id))];
+                var toRemoveIds = new HashSet<int>(toRemove.Select(a => a.Id));
+
+                Article defaultArticle = context.Articles.First(a => a.Position == 0 && !toRemoveIds.Contains(a.Id));
                 foreach (var article in toRemove) 
                 {
                     foreach (var customer in article.Customers)
@@ -75,6 +82,7 @@ namespace ManagementService.Controllers
                         customer.Article = defaultArticle;
                     }
                 }
+                context.Articles.RemoveRange(toRemove);
 
                 context.SaveChanges();
                 transaction.Commit();
@@ -91,6 +99,37 @@ namespace ManagementService.Controllers
             {
                 transaction.Rollback();
                 logger.LogError(e, "failed updating articles");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpGet("GetArticlesForCustomer", Name = "GetArticlesForCustomer")]
+        public IActionResult GetArticlesForCustomer()
+        {
+            try
+            {
+                List<DTOSelectArticleWithPrice> articleWithPrices = [];
+
+                foreach (var article in context.Articles.AsNoTracking().OrderBy(x => x.Position).Select(a => new { a.Id, a.Name, a.Price }).ToList())
+                {
+                    articleWithPrices.Add(new()
+                    {
+                        Id = article.Id,
+                        Name = article.Name,
+                        Price = article.Price
+                    });
+                }
+
+                return Ok(articleWithPrices);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map articles");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "failed getting articles");
                 return BadRequest("An error occurred while processing your request.");
             }
         }

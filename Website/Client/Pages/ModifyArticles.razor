@@ -1,0 +1,29 @@
+﻿@page "/modifyArticles"
+@using Website.Client.Components
+@using Website.Client.FormModels
+@using Website.Client.Styles
+@using Website.Client.Validations
+
+<LoadingPopup IsVisible="@IsSubmitting" />
+<EditForm Model="ModifyArticlesModel" OnValidSubmit="@Submit" class="w-full flex flex-col">
+    <ObjectGraphDataAnnotationsValidator />
+
+    <Form2InputDragDropList Class="w-4/6 flex self-center" MaxHeight="max-h-96" @bind-ArticleSummary="@ModifyArticlesModel.Articles"
+                            TitleLeft="Insert new / remove article" PlaceholderLeft="Article name"
+                            TitleRight="Update article" PlaceholderRight="Price" ValidationRightFunction="@OnInputValidation.Double" />
+
+    <div class="flex justify-end">
+        <div class="w-1/2 flex flex-row justify-start mt-5">
+            <FormInputCheckbox Class="ml-5" Label="Change articles" @bind-Value="@ModifyArticlesModel.IsTaskSet" IsColumn="false" />
+            @if (ModifyArticlesModel.IsTaskSet)
+            {
+                <FormDayPicker Label="at:" @bind-Year="@ModifyArticlesModel.Year" @bind-Month="@ModifyArticlesModel.Month" @bind-Day="@ModifyArticlesModel.Day" />
+            }
+        </div>
+    </div>
+
+   <div class="flex flex-row self-center mt-5">
+        <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightRed w-20 mx-2")" @onclick="() => Cancel()">Cancel</button>
+        <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
+    </div>          
+</EditForm>

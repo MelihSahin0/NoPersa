@@ -5,8 +5,13 @@ namespace Website.Client.Components.Default
 {
     public partial class FormDefaultSelect
     {
+        private readonly string Id = Guid.NewGuid().ToString();
+
         [Parameter]
         public required string Class { get; init; }
+
+        [Parameter]
+        public bool IsColumn { get; set; } = false;
 
         [Parameter]
         public required string Label { get; init; }

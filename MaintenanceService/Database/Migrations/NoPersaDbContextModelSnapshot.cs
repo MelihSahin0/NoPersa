@@ -35,6 +35,11 @@ namespace MaintenanceService.Database.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
 
+                    b.Property<string>("NewName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<double>("NewPrice")
                         .HasColumnType("double precision");
 
@@ -95,7 +100,7 @@ namespace MaintenanceService.Database.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RouteId")
+                    b.Property<int>("RouteId")
                         .HasColumnType("integer");
 
                     b.Property<string>("SerialNumber")
@@ -412,7 +417,8 @@ namespace MaintenanceService.Database.Migrations
                     b.HasOne("SharedLibrary.Models.Route", "Route")
                         .WithMany("Customers")
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.Weekday", "Workdays")
                         .WithOne()

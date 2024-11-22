@@ -2,6 +2,7 @@
 {
     public enum MaintenanceTypes
     {
-        DailyDelivery
+        DailyDelivery,
+        Article
     }
 }

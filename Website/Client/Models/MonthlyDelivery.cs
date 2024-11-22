@@ -10,7 +10,7 @@ namespace Website.Client.Models
         public required MonthOfTheYear MonthOfTheYear { get; set; }
 
         [Required]
-        [ExactChildren(31)]
+        [MinChildren(28)]
         public required List<DailyDelivery> DailyDeliveries { get; set; }
     }
 

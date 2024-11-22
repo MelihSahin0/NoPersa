@@ -16,6 +16,9 @@ namespace Website.Client.Components.Base
         [Parameter]
         public Func<string?, bool>? ValidationFunction { get; set; }
 
+        [Parameter]
+        public EventCallback<string> TextChanged { get; set; }
+
         protected override bool TryParseValueFromString(string? value, out string? result, out string validationErrorMessage)
         {
             validationErrorMessage = "";
@@ -29,6 +32,7 @@ namespace Website.Client.Components.Base
 
             result = value;
             previousValidValue = result;
+            TextChanged.InvokeAsync(value);
             return true;
         }
 

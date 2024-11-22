@@ -2,7 +2,7 @@
 const color = require('tailwindcss/colors');
 
 const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-const numbersFull = [0, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96];
+const numbersFull = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96];
 
 const sizes = ["none","sm", "md", "lg", "xl", "2xl", "3xl", "full"]
 
@@ -101,7 +101,7 @@ module.exports = {
         ...Object.keys(customColors).flatMap(colorName => generateColorClasses(colorName)),
         ...numbers.flatMap(number => generateBorderSize(number)),
         ...sizes.flatMap(size => generateBorderRadius(size)),
-        ...numbers.flatMap(number => generatePaddingAndMargin(number)),
+        ...numbersFull.flatMap(number => generatePaddingAndMargin(number)),
         ...numbersFull.flatMap(number => generateDistanceClasses(number)),
         "sm:text-[10px]", "md:text-[12px]", "lg:text-[14px]", "xl:text-[16px]",
         "inline-block"

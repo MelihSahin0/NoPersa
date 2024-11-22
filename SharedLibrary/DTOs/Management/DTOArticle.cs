@@ -9,8 +9,12 @@ namespace SharedLibrary.DTOs.Management
 
         public string? Name { get; set; }
 
-        public double Price { get; set; }
+        public string? Price { get; set; }
 
-        public double NewPrice { get; set; }
+        public string? NewName { get; set; }
+
+        public string? NewPrice { get; set; }
+
+        public int? NumberOfCustomers { get; set; }
     }
 }

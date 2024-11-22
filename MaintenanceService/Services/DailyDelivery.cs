@@ -6,7 +6,6 @@ using Holiday = SharedLibrary.Models.Holiday;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.Util;
 using SharedLibrary.DTOs.Maintenance;
-using Microsoft.OpenApi.Extensions;
 
 namespace MaintenanceService.Services
 {
@@ -149,7 +148,7 @@ namespace MaintenanceService.Services
                 {
                     var context = scope.ServiceProvider.GetRequiredService<NoPersaDbContext>();
 
-                    var maintenance = await context.Maintenance.FirstOrDefaultAsync(m => m.Type == MaintenanceTypes.DailyDelivery.GetDisplayName());
+                    var maintenance = await context.Maintenance.FirstOrDefaultAsync(m => m.Type == MaintenanceTypes.DailyDelivery.ToString());
                     if (maintenance != null)
                     {
                         if (DateTime.Today.Date >= maintenance.Date)
@@ -161,9 +160,17 @@ namespace MaintenanceService.Services
                     {
                         //Do it so everything works again
                         using var transaction = await context.Database.BeginTransactionAsync();
-                        await context.Maintenance.AddAsync(new Maintenance() { Id = 1, Type = MaintenanceTypes.DailyDelivery.GetDisplayName(), Date = DateTime.Today.Date });
-                        await context.SaveChangesAsync();
-                        await transaction.CommitAsync();
+                        try
+                        {
+                            await context.Maintenance.AddAsync(new Maintenance() { Id = 1, Type = MaintenanceTypes.DailyDelivery.ToString(), Date = DateTime.Today.Date });
+                            await context.SaveChangesAsync();
+                            await transaction.CommitAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            await transaction.RollbackAsync();
+                            logger.LogError(ex, "An error occurred while processing maintenance and updating articles.");
+                        }
                     }
                 }
 

@@ -126,7 +126,7 @@ namespace MaintenanceService.Database
                 Maintenance.Add(new Maintenance
                 {
                     Id = 1,
-                    Type = MaintenanceTypes.DailyDelivery.GetDisplayName(),
+                    Type = MaintenanceTypes.DailyDelivery.ToString(),
                     Date = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1)
                 });
                 SaveChanges();

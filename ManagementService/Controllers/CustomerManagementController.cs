@@ -105,7 +105,7 @@ namespace ManagementService.Controllers
                                                           .Select(c => (int?)c.Position)
                                                           .Max() ?? -1) + 1;
 
-                customer.ArticleId = dTOCustomerOverview.ArticleId;
+                customer.ArticleId = (int)dTOCustomerOverview.ArticleId!;
                 customer.Article = context.Articles.First(a => a.Id == dTOCustomerOverview.ArticleId);
 
                 List<MonthlyOverview> overviewsToRemove = [];
@@ -189,7 +189,6 @@ namespace ManagementService.Controllers
                 dbCustomer.Title = customer.Title;
                 dbCustomer.Name = customer.Name;
                 dbCustomer.ContactInformation = customer.ContactInformation;
-                dbCustomer.Article = customer.Article;
                 dbCustomer.DefaultNumberOfBoxes = customer.DefaultNumberOfBoxes;
                 dbCustomer.TemporaryDelivery = customer.TemporaryDelivery;
                 dbCustomer.TemporaryNoDelivery = customer.TemporaryNoDelivery;
@@ -200,7 +199,7 @@ namespace ManagementService.Controllers
                 dbCustomer.DeliveryLocation.Longitude = customer.DeliveryLocation.Longitude;
                 dbCustomer.DeliveryLocation.DeliveryWhishes = customer.DeliveryLocation.DeliveryWhishes;
 
-                dbCustomer.ArticleId = dTOCustomerOverview.ArticleId;
+                dbCustomer.ArticleId = (int)dTOCustomerOverview.ArticleId!;
                 dbCustomer.Article = context.Articles.First(a => a.Id == dTOCustomerOverview.ArticleId);
 
                 dbCustomer.Workdays.Monday = customer.Workdays.Monday;
@@ -317,14 +316,14 @@ namespace ManagementService.Controllers
                 MonthlyOverview? monthlyOverview = context.MonthlyOverviews.AsNoTracking().FirstOrDefault(m => m.CustomerId == dTOMonthOfTheYear.ReferenceId &&
                                                                                                           m.Year == dTOMonthOfTheYear.Year &&
                                                                                                           m.Month == dTOMonthOfTheYear.Month);
+               
                 if (monthlyOverview == null)
                 {
-                    return NotFound();
+                    monthlyOverview = CheckMonthlyOverview.Generate(null, new DateTime(dTOMonthOfTheYear.Year, dTOMonthOfTheYear.Month, DateTime.DaysInMonth(dTOMonthOfTheYear.Year, dTOMonthOfTheYear.Month)));
                 }
-                else
-                {
-                    return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
-                }
+                
+                return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
+                
             }
             catch (ValidationException e)
             {

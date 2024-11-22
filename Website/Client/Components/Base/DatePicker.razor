@@ -32,7 +32,7 @@
 
             <!-- Days Grid -->
             <div class="grid grid-cols-4 gap-2 px-4 py-2 place-content-center">
-                @for (int i = 1; i <= DateTime.DaysInMonth(Year, (int)Month + 1); i++)
+                @for (int i = 1; i <= DateTime.DaysInMonth(Year, (int)Month); i++)
                 {
                     var currentValue = i;
                     <button type="button"

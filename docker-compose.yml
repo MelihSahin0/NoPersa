@@ -18,6 +18,8 @@ services:
     build:
       context: .
       dockerfile: MaintenanceService/Dockerfile
+    ports:
+      - "8084:8084"
     pull_policy: always
     restart: always
     depends_on:

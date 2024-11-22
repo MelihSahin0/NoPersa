@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaintenanceService.Database.Migrations
 {
     [DbContext(typeof(NoPersaDbContext))]
-    [Migration("20241121161130_V5")]
-    partial class V5
+    [Migration("20241122184338_V1")]
+    partial class V1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,6 +34,11 @@ namespace MaintenanceService.Database.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("NewName")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)");
@@ -98,7 +103,7 @@ namespace MaintenanceService.Database.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("RouteId")
+                    b.Property<int>("RouteId")
                         .HasColumnType("integer");
 
                     b.Property<string>("SerialNumber")
@@ -415,7 +420,8 @@ namespace MaintenanceService.Database.Migrations
                     b.HasOne("SharedLibrary.Models.Route", "Route")
                         .WithMany("Customers")
                         .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired();
 
                     b.HasOne("SharedLibrary.Models.Weekday", "Workdays")
                         .WithOne()

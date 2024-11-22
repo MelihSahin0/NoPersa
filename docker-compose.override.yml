@@ -1,4 +1,14 @@
 services:
+  maintenanceservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTPS_PORTS=8084
+    ports:
+      - "8084:8084"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
   managementservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
