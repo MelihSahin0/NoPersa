@@ -9,9 +9,9 @@ namespace MaintenanceService.Services
     {
         private Timer? timer;
         private readonly IServiceProvider serviceProvider;
-        private readonly ILogger<DailyDelivery> logger;
+        private readonly ILogger<ArticleService> logger;
       
-        public ArticleService(IServiceProvider serviceProvider, ILogger<DailyDelivery> logger)
+        public ArticleService(IServiceProvider serviceProvider, ILogger<ArticleService> logger)
         {
             this.serviceProvider = serviceProvider;
             this.logger = logger;
@@ -33,6 +33,27 @@ namespace MaintenanceService.Services
             return Task.CompletedTask;
         }
 
+        public async Task CatchUp(NoPersaDbContext context, Maintenance maintenance)
+        {
+            using var transaction = await context.Database.BeginTransactionAsync();
+            try
+            {
+                foreach (Article article in context.Article)
+                {
+                    article.Name = article.NewName;
+                    article.Price = article.NewPrice;
+                }
+                context.Maintenance.Remove(maintenance);
+                await context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                logger.LogError(ex, "An error occurred while processing maintenance and updating articles.");
+            }
+        }
+
         private void DoWork(object? state)
         {
             Task.Run(async () =>
@@ -44,25 +65,9 @@ namespace MaintenanceService.Services
                     var maintenance = await context.Maintenance.FirstOrDefaultAsync(m => m.Type == MaintenanceTypes.Article.ToString());
                     if (maintenance != null)
                     {
-                        if (DateTime.Today.Date == maintenance.Date)
+                        if (DateTime.Today.Date >= maintenance.Date)
                         {
-                            using var transaction = await context.Database.BeginTransactionAsync();
-                            try
-                            {
-                                foreach (Article article in context.Article)
-                                {
-                                    article.Name = article.NewName;
-                                    article.Price = article.NewPrice;
-                                }
-                                context.Maintenance.Remove(maintenance);
-                                await context.SaveChangesAsync();
-                                await transaction.CommitAsync();
-                            }
-                            catch (Exception ex)
-                            {
-                                await transaction.RollbackAsync();
-                                logger.LogError(ex, "An error occurred while processing maintenance and updating articles.");
-                            }
+                            await CatchUp(context, maintenance);
                         }
                     }
                 }

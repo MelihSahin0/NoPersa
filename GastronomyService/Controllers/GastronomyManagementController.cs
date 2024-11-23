@@ -408,7 +408,7 @@ namespace GastronomyService.Controllers
                                        .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month))
                                                                  .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDay.Day))
                                        .Include(r => r.Customers).ThenInclude(cmp => cmp.CustomerMenuPlans)
-                                       .Include(r => r.Customers).ThenInclude(cld => cld.CustomersLightDiets)
+                                       .Include(r => r.Customers).ThenInclude(cld => cld.CustomersLightDiets)                                       .Include(r => r.Customers).ThenInclude(a => a.Article)
                                        .ToListAsync();
                 Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDay.Year && h.Month == dTOSelectedDay.Month && h.Day == dTOSelectedDay.Day);
 
@@ -443,10 +443,11 @@ namespace GastronomyService.Controllers
                         bool toDeliver = false;
 
                         MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
-                      
+
+                        int? numberOfBoxes = null;
                         if (dbFoundOverview != null)
                         {
-                            int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
+                            numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
                             toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day));
                         }
                         else //Safety Measure
@@ -460,16 +461,16 @@ namespace GastronomyService.Controllers
                             {
                                 if (lightDiet.Selected)
                                 {
-                                    dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += 1;
-                                    dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += 1;
+                                    dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
+                                    dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
 
                                 }
                             }
 
                             foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
                             {
-                                dTORoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
-                                dTOSummaryRoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += 1;
+                                dTORoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
+                                dTOSummaryRoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes; 
                             }
                         }
                     }
@@ -520,9 +521,10 @@ namespace GastronomyService.Controllers
 
                         MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDay.Year && x.Month == dTOSelectedDay.Month);
 
+                        int? numberOfBoxes = null;
                         if (dbFoundOverview != null)
                         {
-                            int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
+                            numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDay.Day)).NumberOfBoxes;
                             toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDay.Year, dTOSelectedDay.Month, dTOSelectedDay.Day));
                         }
                         else //Safety Measure
@@ -556,6 +558,7 @@ namespace GastronomyService.Controllers
                             {
                                 Name = dbCustomer.Name,
                                 Position = dbCustomer.Position,
+                                NumberOfBoxes = numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes,
                                 LightDiets = lightDiets,
                                 BoxContents = dTOCustomersBoxContents
                             });

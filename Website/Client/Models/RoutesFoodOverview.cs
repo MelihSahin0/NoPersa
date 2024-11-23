@@ -23,6 +23,9 @@ namespace Website.Client.Models
         public required int Position { get; set; }
 
         [Required]
+        public required int NumberOfBoxes { get; set; }
+
+        [Required]
         public required List<string> LightDiets { get; set; }
 
         [Required]

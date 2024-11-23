@@ -82,11 +82,25 @@ namespace NoPersa.Tests.ManagementTests
                                                                            .Include(a => a.Article)];
             Customer customer = customers.FirstOrDefault(c => c.Id == 1)!;
             customer.Name = "Customer 0";
-                
+            Article article = context.Articles.First(a => a.Id == 2);
+            customer.ArticleId = article.Id;
+            customer.Article = article;
+
+            List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking()];
+            List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking()];
+            List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
+            List<Article> articles = [.. context.Articles.AsNoTracking()];
+
             controller.UpdateCustomer(mapper.Map<DTOCustomerOverview>(customer));
             Customer dbCustomer = context.Customers.FirstOrDefault(c => c.Id == 1)!;
 
             Assert.AreEqual(customer.Name, dbCustomer.Name);
+            Assert.AreEqual(lightDiets.Count, context.LightDiets.AsNoTracking().Count());
+            Assert.AreEqual(boxContents.Count, context.BoxContents.AsNoTracking().Count());
+            Assert.AreEqual(portionSizes.Count, context.PortionSizes.AsNoTracking().Count());
+            Assert.AreEqual(lightDiets.Count, dbCustomer.CustomersLightDiets.Count);
+            Assert.AreEqual(boxContents.Count, dbCustomer.CustomerMenuPlans.Count);
+            Assert.AreEqual(articles.Count, context.Articles.AsNoTracking().Count());
         }
 
         [TestMethod]
@@ -105,6 +119,7 @@ namespace NoPersa.Tests.ManagementTests
             List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking()];
             List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking()];
             List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
+            List<Article> articles = [.. context.Articles.AsNoTracking()];
 
             controller.InsertCustomer(mapper.Map<DTOCustomerOverview>(customer));
             Customer dbCustomer = context.Customers.FirstOrDefault(c => c.Name == "Customer new")!;
@@ -115,6 +130,7 @@ namespace NoPersa.Tests.ManagementTests
             Assert.AreEqual(portionSizes.Count, context.PortionSizes.AsNoTracking().Count());
             Assert.AreEqual(lightDiets.Count, dbCustomer.CustomersLightDiets.Count);
             Assert.AreEqual(boxContents.Count, dbCustomer.CustomerMenuPlans.Count);
+            Assert.AreEqual(articles.Count, context.Articles.AsNoTracking().Count());
         }
 
         [TestCleanup]

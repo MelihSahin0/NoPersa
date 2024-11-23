@@ -34,7 +34,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-builder.Services.AddHostedService<DailyDelivery>();
+builder.Services.AddHostedService<DailyDeliveryService>();
 builder.Services.AddHostedService<ArticleService>();
 builder.Services.AddAutoMapper(typeof(ManagementProfile), typeof(DeliveryProfile), typeof(GastronomyProfile), typeof(DefaultProfile));
 var app = builder.Build();

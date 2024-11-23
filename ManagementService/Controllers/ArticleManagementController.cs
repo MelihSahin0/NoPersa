@@ -6,7 +6,6 @@ using SharedLibrary.DTOs.AnswerDTO;
 using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace ManagementService.Controllers
 {
@@ -15,10 +14,10 @@ namespace ManagementService.Controllers
     public class ArticleManagementController : ControllerBase
     {
         private readonly NoPersaDbContext context;
-        private readonly ILogger<CustomerManagementController> logger;
+        private readonly ILogger<ArticleManagementController> logger;
         private readonly IMapper mapper;
 
-        public ArticleManagementController(ILogger<CustomerManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
+        public ArticleManagementController(ILogger<ArticleManagementController> logger, NoPersaDbContext noPersaDbContext, IMapper mapper)
         {
             this.context = noPersaDbContext;
             this.logger = logger;
@@ -45,7 +44,7 @@ namespace ManagementService.Controllers
         }
 
         [HttpPost("UpdateArticles", Name = "UpdateArticles")]
-        public IActionResult UpdateArticlesAsync([FromBody] List<DTOArticle> dTOArticle)
+        public IActionResult UpdateArticles([FromBody] List<DTOArticle> dTOArticle)
         {
             using var transaction = context.Database.BeginTransaction();
 

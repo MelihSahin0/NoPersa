@@ -10,12 +10,12 @@ using SharedLibrary.Models;
 namespace NoPersa.Tests.MaintenanceTests
 {
     [TestClass]
-    public class DeliverDaily : ITest
+    public class DeliverDailyTest : ITest
     {
         private NoPersaDbContext context;
-        private DailyDelivery service;
+        private DailyDeliveryService service;
         private IServiceProvider serviceProvider;
-        private ILogger<DailyDelivery> logger;
+        private ILogger<DailyDeliveryService> logger;
 
         [TestInitialize]
         public void Setup()
@@ -28,7 +28,7 @@ namespace NoPersa.Tests.MaintenanceTests
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 
-            logger = new Mock<ILogger<DailyDelivery>>().Object;
+            logger = new Mock<ILogger<DailyDeliveryService>>().Object;
 
             var httpClient = new HttpClient();
             var serviceProviderMock = new Mock<IServiceProvider>();
@@ -38,7 +38,7 @@ namespace NoPersa.Tests.MaintenanceTests
 
             serviceProvider = serviceProviderMock.Object;
 
-            service = new DailyDelivery(serviceProvider, logger, httpClient);
+            service = new DailyDeliveryService(serviceProvider, logger, httpClient);
 
             SeedTestData();
         }

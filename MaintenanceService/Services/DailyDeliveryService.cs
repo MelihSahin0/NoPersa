@@ -9,15 +9,15 @@ using SharedLibrary.DTOs.Maintenance;
 
 namespace MaintenanceService.Services
 {
-    public class DailyDelivery : IHostedService, IDisposable
+    public class DailyDeliveryService : IHostedService, IDisposable
     {
         private Timer? timer;
         private readonly IServiceProvider serviceProvider;
-        private readonly ILogger<DailyDelivery> logger;
+        private readonly ILogger<DailyDeliveryService> logger;
         private readonly HttpClient httpClient;
         private readonly string currentCountry = "at"; //TODO: Will be removed in the future
 
-        public DailyDelivery(IServiceProvider serviceProvider, ILogger<DailyDelivery> logger, HttpClient httpClient)
+        public DailyDeliveryService(IServiceProvider serviceProvider, ILogger<DailyDeliveryService> logger, HttpClient httpClient)
         {
             this.serviceProvider = serviceProvider;
             this.logger = logger;

@@ -105,11 +105,16 @@
                         }
                     </div>
                     <div class="w-2/6 m-2">
-                            @if (FillBoxesOverviewModel.DisplayCustomer != null)
-                            {
-                                <div>
+                        @if (FillBoxesOverviewModel.DisplayCustomer != null)
+                        {
+                            <div>
+                                <div class="flex flex-row justify-between">
                                     <h3 class="text-xl font-semibold text-gray-700">@(FillBoxesOverviewModel.DisplayCustomer.Position + 1). @FillBoxesOverviewModel.DisplayCustomer.Name</h3>
-
+                                    @if (FillBoxesOverviewModel.DisplayCustomer.NumberOfBoxes > 1)
+                                    {
+                                        <h3 class="text-xl font-semibold text-gray-700">x@(FillBoxesOverviewModel.DisplayCustomer.NumberOfBoxes) Boxes</h3>
+                                    }
+                                </div>
                                     <h5 class="text-lg font-semibold mt-4">Light diets:</h5>
                                     @foreach (string lightDiet in FillBoxesOverviewModel.DisplayCustomer.LightDiets)
                                     {

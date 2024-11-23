@@ -6,6 +6,8 @@
 
         public int Position { get; set; }
 
+        public int NumberOfBoxes { get; set; }
+
         public List<string>? LightDiets { get; set; }
 
         public List<DTOCustomersBoxContent>? BoxContents { get; set; }
