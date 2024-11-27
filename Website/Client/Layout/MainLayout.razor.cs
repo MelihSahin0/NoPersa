@@ -13,11 +13,13 @@ namespace Website.Client.Layout
 
         private string? successMessage;
         private string? errorMessage;
+        private int? countDown;
 
         protected override void OnInitialized()
         {
             NotificationService.OnSuccess += ShowSuccessMessage;
             NotificationService.OnError += ShowErrorMessage;
+            NotificationService.OnCountdown += ShowCountDown;
             errorBoundary = new();
         }
 
@@ -32,6 +34,12 @@ namespace Website.Client.Layout
         {
             errorMessage = message;
             successMessage = string.Empty;
+            StateHasChanged();
+        }
+
+        private void ShowCountDown(int message)
+        {
+            countDown = message;
             StateHasChanged();
         }
 

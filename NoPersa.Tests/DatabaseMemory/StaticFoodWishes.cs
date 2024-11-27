@@ -1,0 +1,14 @@
+﻿
+using SharedLibrary.Models;
+
+namespace NoPersa.Tests.DatabaseMemory
+{
+    public class StaticFoodWishes
+    {
+        public static List<FoodWish> GetFoodWishes() =>
+        [
+            new() { Id = 1, Name = "Salat", IsIngredient = false},
+            new() { Id = 2, Name = "Sugar", IsIngredient = true}
+        ];
+    }
+}

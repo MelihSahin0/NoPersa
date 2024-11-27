@@ -27,7 +27,7 @@
                             @ondragstart="() => draggedItem = customer"
                             @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
                             <div class="flex flex-row">
-                                <label class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {TextOrientation} border-black select-none")">
+                                <label class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} {TextOrientation} bg-white border-black select-none")">
                                     @customer.Name
                                 </label>
                             </div>

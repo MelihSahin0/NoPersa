@@ -91,6 +91,16 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Value, opt => opt.MapFrom(src => 0));
+
+            CreateMap<DTOFoodWish, FoodWish>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.IsIngredient, opt => opt.MapFrom(src => src.IsIngredient));
+
+            CreateMap<FoodWish, DTOFoodWish>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.IsIngredient, opt => opt.MapFrom(src => src.IsIngredient));
         }
     }
 }

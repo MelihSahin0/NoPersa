@@ -58,41 +58,31 @@ namespace DeliveryService.Controllers
 
             try
             {
-                List<Route> newRoutes = [];
-                List<Route> oldRoutes = [];
-                foreach (var routeSummary in dTORouteSummary ?? [])
-                {
-                    Route route = mapper.Map<Route>(routeSummary);
-                    route.Customers = [];
+                List<Route> routes = mapper.Map<List<Route>>(dTORouteSummary);
 
-                    if (route.Id == 0)
-                    {
-                        newRoutes.Add(route);
-                    }
-                    else
-                    {
-                        oldRoutes.Add(route);
-                    }
-                }
-
-                var oldRouteIds = oldRoutes.Select(d => d.Id).ToHashSet();
-                var dbExistingRoutes = context.Routes.Where(r => oldRouteIds.Contains(r.Id)).ToList();
-                foreach (var dbExistingRoute in dbExistingRoutes)
+                var existingRoutes = context.Routes.ToDictionary(a => a.Id);
+                foreach (var route in routes)
                 {
-                    var dbUpdatedRoute = oldRoutes.FirstOrDefault(or => or.Id == dbExistingRoute.Id);
-                    if (dbUpdatedRoute != null)
+                    //update
+                    if (existingRoutes.TryGetValue(route.Id, out var foundRoute))
                     {
-                        dbExistingRoute.Position = dbUpdatedRoute.Position;
-                        dbExistingRoute.Name = dbUpdatedRoute.Name;
+                        foundRoute.Position = route.Position;
+                        foundRoute.Name = route.Name;
+                    }
+                    else //insert
+                    {
+                        context.Routes.Add(route);
                     }
                 }
 
                 //without Archive
-                var dbNotFoundRoutes = context.Routes.Where(er => !oldRouteIds.Contains(er.Id) && er.Id != int.MinValue).Include(r => r.Customers).ToList();
+                var routeIds = new HashSet<int>(routes.Select(a => a.Id));
+                List<Route> toRemove = [.. context.Routes.Where(er => !routeIds.Contains(er.Id) && er.Id != int.MinValue).Include(r => r.Customers)];
+              
                 int i = (context.Customers.Where(c => c.RouteId == int.MinValue)
                                           .Select(c => (int?)c.Position)
                                           .Max() ?? -1) + 1;
-                foreach (var dbObsoleteRoute in dbNotFoundRoutes)
+                foreach (var dbObsoleteRoute in toRemove)
                 {
                     foreach (Customer dbCustomer in dbObsoleteRoute.Customers)
                     {
@@ -100,18 +90,17 @@ namespace DeliveryService.Controllers
                         dbCustomer.Position = i;
                         i++;
                     }
-                    context.Routes.Remove(dbObsoleteRoute);
-                }                
+                }
 
                 //dbNotFoundRoutes can update many customers
                 const int batchSize = 1000;
-                for (int j = 0; j < dbNotFoundRoutes.SelectMany(r => r.Customers).ToList().Count; j += batchSize)
+                for (int j = 0; j < toRemove.SelectMany(r => r.Customers).ToList().Count; j += batchSize)
                 {
-                    var batch = dbNotFoundRoutes.SelectMany(r => r.Customers).ToList().Skip(j).Take(batchSize).ToList();
+                    var batch = toRemove.SelectMany(r => r.Customers).ToList().Skip(j).Take(batchSize).ToList();
                     context.BulkUpdate(batch);
                 }
 
-                context.Routes.AddRange(newRoutes);
+                context.Routes.RemoveRange(toRemove);
 
                 context.SaveChanges();
                 transaction.Commit();

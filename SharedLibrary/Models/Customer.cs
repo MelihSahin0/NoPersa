@@ -67,5 +67,9 @@ namespace SharedLibrary.Models
         public List<LightDiet> LightDiets { get; set; } = [];
 
         public List<CustomersMenuPlan> CustomerMenuPlans { get; set; } = [];
+
+        public List<CustomersFoodWish> CustomersFoodWish { get; set; } = [];
+
+        public List<FoodWish> FoodWishes { get; set; } = [];
     }
 }

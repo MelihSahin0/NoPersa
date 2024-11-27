@@ -3,9 +3,9 @@ using EFCore.BulkExtensions;
 using GastronomyService.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using SharedLibrary.DTOs.Gastro;
 using SharedLibrary.DTOs.GetDTOs;
+using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
@@ -65,54 +65,41 @@ namespace GastronomyService.Controllers
 
             try
             {
-                bool updateCustomersLightDiets = dTOLightDiets.Any(l => l.Id == 0);
+                List<LightDiet> lightDiets = mapper.Map<List<LightDiet>>(dTOLightDiets);
+                bool updateCustomersLightDiets = lightDiets.Any(l => l.Id == 0);
 
-                List<LightDiet> newLightDiets = [];
-                List<LightDiet> oldLightDiets = [];
-                foreach (var dTOLightDiet in dTOLightDiets)
+                var existingLightDiets = context.LightDiets.ToDictionary(a => a.Id);
+                foreach (var lightDiet in lightDiets)
                 {
-                    LightDiet lightDiet = mapper.Map<LightDiet>(dTOLightDiet);
-
-                    if (lightDiet.Id == 0)
+                    if (existingLightDiets.TryGetValue(lightDiet.Id, out var foundLightDiet))
                     {
-                        newLightDiets.Add(lightDiet);
+                        foundLightDiet.Name = lightDiet.Name;
                     }
                     else
                     {
-                        oldLightDiets.Add(lightDiet);
+                        context.LightDiets.Add(lightDiet);
                     }
                 }
 
-                var oldDietIds = oldLightDiets.Select(d => d.Id).ToHashSet();
-                var dbExistingLightDiets = context.LightDiets.Where(d => oldDietIds.Contains(d.Id)).ToList();
-                foreach (var dbExistingLightDiet in dbExistingLightDiets)
-                {
-                    var dbUpdatedLightDiet = oldLightDiets.FirstOrDefault(or => or.Id == dbExistingLightDiet.Id);
-                    if (dbUpdatedLightDiet != null)
-                    {
-                        dbExistingLightDiet.Name = dbUpdatedLightDiet.Name;
-                    }
-                }
-
-                var dbNotFoundLightDiets = context.LightDiets.Where(er => !oldDietIds.Contains(er.Id)).ToList();
-                
+                var lightDietsIds = new HashSet<int>(lightDiets.Select(a => a.Id));
+                List<LightDiet> toRemove = [.. context.LightDiets.Where(er => !lightDietsIds.Contains(er.Id))];
+              
                 const int batchSize = 1000;
-                for (int j = 0; j < dbNotFoundLightDiets.Count; j += batchSize)
+                for (int j = 0; j < toRemove.Count; j += batchSize)
                 {
-                    var batch = dbNotFoundLightDiets.Skip(j).Take(batchSize).ToList();
+                    var batch = toRemove.Skip(j).Take(batchSize).ToList();
                     context.BulkDelete(batch);
                 }
 
-                context.LightDiets.AddRange(newLightDiets);
                 context.SaveChanges();
 
                 if (updateCustomersLightDiets)
                 {
-                    List<LightDiet> lightDiets = [.. context.LightDiets]; 
+                    List<LightDiet> dbLightDiets = [.. context.LightDiets]; 
 
                     foreach (Customer customer in context.Customers.Include(cld => cld.CustomersLightDiets))
                     {
-                        foreach (LightDiet lightDiet in lightDiets)
+                        foreach (LightDiet lightDiet in dbLightDiets)
                         {
                             CustomersLightDiet? dbCustomersLightDiet = customer.CustomersLightDiets.FirstOrDefault(cld => cld.LightDietId == lightDiet.Id);
 
@@ -187,55 +174,42 @@ namespace GastronomyService.Controllers
 
             try
             {
-                bool updateCustomersMenu = dTOBoxContents.Any(l => l.Id == 0) && context.PortionSizes.AsNoTracking().Any();
+                List<BoxContent> boxContents = mapper.Map<List<BoxContent>>(dTOBoxContents);
+                bool updateCustomersMenu = boxContents.Any(l => l.Id == 0) && context.PortionSizes.AsNoTracking().Any();
 
-                List<BoxContent> newBoxContents = [];
-                List<BoxContent> oldBoxContents = [];
-                foreach (var dTOBoxContent in dTOBoxContents)
+                var existingBoxContents = context.BoxContents.ToDictionary(a => a.Id);
+                foreach (var boxContent in boxContents)
                 {
-                    BoxContent boxContent = mapper.Map<BoxContent>(dTOBoxContent);
-
-                    if (boxContent.Id == 0)
+                    if (existingBoxContents.TryGetValue(boxContent.Id, out var foundBoxContent))
                     {
-                        newBoxContents.Add(boxContent);
+                        foundBoxContent.Name = boxContent.Name;
                     }
                     else
                     {
-                        oldBoxContents.Add(boxContent);
+                        context.BoxContents.Add(boxContent);
                     }
                 }
 
-                var oldBoxId = oldBoxContents.Select(d => d.Id).ToHashSet();
-                var dbExistingLightDiets = context.BoxContents.Where(d => oldBoxId.Contains(d.Id)).ToList();
-                foreach (var dbExistingLightDiet in dbExistingLightDiets)
-                {
-                    var dbUpdatedLightDiet = oldBoxContents.FirstOrDefault(or => or.Id == dbExistingLightDiet.Id);
-                    if (dbUpdatedLightDiet != null)
-                    {
-                        dbExistingLightDiet.Name = dbUpdatedLightDiet.Name;
-                    }
-                }
-
-                var dbNotFoundLightDiets = context.BoxContents.Where(er => !oldBoxId.Contains(er.Id)).ToList();
+                var boxContentIds = new HashSet<int>(boxContents.Select(a => a.Id));
+                List<BoxContent> toRemove = [.. context.BoxContents.Where(er => !boxContentIds.Contains(er.Id))];
 
                 const int batchSize = 1000;
-                for (int j = 0; j < dbNotFoundLightDiets.Count; j += batchSize)
+                for (int j = 0; j < toRemove.Count; j += batchSize)
                 {
-                    var batch = dbNotFoundLightDiets.Skip(j).Take(batchSize).ToList();
+                    var batch = toRemove.Skip(j).Take(batchSize).ToList();
                     context.BulkDelete(batch);
                 }
 
-                context.BoxContents.AddRange(newBoxContents);
                 context.SaveChanges();
 
                 if (updateCustomersMenu)
                 {
-                    List<BoxContent> boxContents = [.. context.BoxContents];
+                    List<BoxContent> dbBoxContents = [.. context.BoxContents];
                     PortionSize portionSize = context.PortionSizes.First(p => p.Position == 0);
 
                     foreach (Customer customer in context.Customers.Include(cmp => cmp.CustomerMenuPlans))
                     {
-                        foreach (BoxContent boxContent in boxContents)
+                        foreach (BoxContent boxContent in dbBoxContents)
                         {
                             CustomersMenuPlan? dBCustomersMenuPlan = customer.CustomerMenuPlans.FirstOrDefault(cmp => cmp.BoxContentId == boxContent.Id);
 
@@ -304,60 +278,48 @@ namespace GastronomyService.Controllers
 
             try
             {
-                bool updateCustomersMenu = dTOPortionSizes.Count != 0 && dTOPortionSizes.FirstOrDefault(p => p.Position == 0)?.Id == 0;
+                List<PortionSize> portionSizes = mapper.Map<List<PortionSize>>(dTOPortionSizes);
+                bool updateCustomersMenu = portionSizes.Count != 0 && portionSizes.FirstOrDefault(p => p.Position == 0)?.Id == 0;
 
-                List<PortionSize> newPortionSizes = [];
-                List<PortionSize> oldPortionSizes = [];
-                foreach (var dTOPortionSize in dTOPortionSizes)
+                var existingPortionSizes = context.PortionSizes.ToDictionary(a => a.Id);
+                foreach (var portionSize in portionSizes)
                 {
-                    PortionSize portionSize = mapper.Map<PortionSize>(dTOPortionSize);
-
-                    if (portionSize.Id == 0)
+                    if (existingPortionSizes.TryGetValue(portionSize.Id, out var foundPortionSize))
                     {
-                        newPortionSizes.Add(portionSize);
+                        foundPortionSize.Position = portionSize.Position;
+                        foundPortionSize.Name = portionSize.Name;
                     }
                     else
                     {
-                        oldPortionSizes.Add(portionSize);
+                        context.PortionSizes.Add(portionSize);
                     }
                 }
 
-                var oldPortionId = oldPortionSizes.Select(p => p.Id).ToHashSet();
-                var dbExistingPortionSizes = context.PortionSizes.Where(p => oldPortionId.Contains(p.Id)).ToList();
-                foreach (var dbExistingPortionSize in dbExistingPortionSizes)
-                {
-                    var dbUpdatedPortionSize = oldPortionSizes.FirstOrDefault(or => or.Id == dbExistingPortionSize.Id);
-                    if (dbUpdatedPortionSize != null)
-                    {
-                        dbExistingPortionSize.Name = dbUpdatedPortionSize.Name;
-                        dbExistingPortionSize.Position = dbUpdatedPortionSize.Position;
-                    }
-                }
+                var portionSizeIds = new HashSet<int>(portionSizes.Select(a => a.Id));
+                List<PortionSize> toRemove = [.. context.PortionSizes.Where(er => !portionSizeIds.Contains(er.Id))];
 
-                var dbNotFoundPortionSizes = context.PortionSizes.Where(er => !oldPortionId.Contains(er.Id)).ToList();
-                if (dbNotFoundPortionSizes.Count > 0)
+                if (toRemove.Count > 0)
                 {
                     updateCustomersMenu = true;
                 }
 
                 const int batchSize = 1000;
-                for (int j = 0; j < dbNotFoundPortionSizes.Count; j += batchSize)
+                for (int j = 0; j < toRemove.Count; j += batchSize)
                 {
-                    var batch = dbNotFoundPortionSizes.Skip(j).Take(batchSize).ToList();
+                    var batch = toRemove.Skip(j).Take(batchSize).ToList();
                     context.BulkDelete(batch);
                 }
 
-                context.PortionSizes.AddRange(newPortionSizes);
                 context.SaveChanges();
 
                 if (updateCustomersMenu)
                 {
-                    List<BoxContent> boxContents = [.. context.BoxContents];
-                    PortionSize portionSize = context.PortionSizes.First(p => p.Position == 0);
+                    List<BoxContent> dbBoxContents = [.. context.BoxContents];
+                    PortionSize dbPortionSize = context.PortionSizes.First(p => p.Position == 0);
 
                     foreach (Customer customer in context.Customers.Include(cmp => cmp.CustomerMenuPlans))
                     {
-                        foreach (BoxContent boxContent in boxContents)
+                        foreach (BoxContent boxContent in dbBoxContents)
                         {
                             CustomersMenuPlan? dBCustomersMenuPlan = customer.CustomerMenuPlans.FirstOrDefault(cmp => cmp.BoxContentId == boxContent.Id);
 
@@ -369,8 +331,8 @@ namespace GastronomyService.Controllers
                                     CustomerId = customer.Id,
                                     BoxContentId = boxContent.Id,
                                     BoxContent = boxContent,
-                                    PortionSize = portionSize,
-                                    PortionSizeId = portionSize.Id
+                                    PortionSize = dbPortionSize,
+                                    PortionSizeId = dbPortionSize.Id
                                 };
                                 customer.CustomerMenuPlans.Add(dBCustomersMenuPlan);
                             }
@@ -583,6 +545,85 @@ namespace GastronomyService.Controllers
             catch (Exception e)
             {
                 logger.LogError(e, "Getting map food overview failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpGet("GetFoodWishes", Name = "GetFoodWishes")]
+        public IActionResult GetFoodWishes()
+        {
+            try
+            {
+                List<DTOFoodWish> dTOFoodWishes = mapper.Map<List<DTOFoodWish>>(context.FoodWishes.AsNoTracking());
+
+                int i = 0;
+                foreach (DTOFoodWish dTOFoodWish in dTOFoodWishes.OrderBy(d => d.Name))
+                {
+                    dTOFoodWish.Position = i;
+                    i++;
+                }
+
+                return Ok(dTOFoodWishes);
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map food wishes");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Getting food wishes failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpPost("UpdateFoodWishes", Name = "UpdateFoodWishes")]
+        public IActionResult UpdateFoodWishes(List<DTOFoodWish> dTOFoodWishes)
+        {
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                List<FoodWish> foodWishes = mapper.Map<List<FoodWish>>(dTOFoodWishes);
+
+                var existingFoodWishes = context.FoodWishes.ToDictionary(a => a.Id);
+                foreach (var foodWish in foodWishes)
+                {
+                    if (existingFoodWishes.TryGetValue(foodWish.Id, out var foundFoodWishes))
+                    {
+                        foundFoodWishes.Name = foodWish.Name;
+                    }
+                    else
+                    {
+                        context.FoodWishes.Add(foodWish);
+                    }
+                }
+
+                var foodWishIds = new HashSet<int>(foodWishes.Select(a => a.Id));
+                List<FoodWish> toRemove = [.. context.FoodWishes.Where(er => !foodWishIds.Contains(er.Id))];
+
+                const int batchSize = 1000;
+                for (int j = 0; j < toRemove.Count; j += batchSize)
+                {
+                    var batch = toRemove.Skip(j).Take(batchSize).ToList();
+                    context.BulkDelete(batch);
+                }
+
+                context.SaveChanges();
+                transaction.Commit();
+
+                return Ok();
+            }
+            catch (ValidationException e)
+            {
+                transaction.Rollback();
+                logger.LogError(e, "Could not map food wishes");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+                logger.LogError(e, "Updating food wishes failed");
                 return BadRequest("An error occurred while processing your request.");
             }
         }

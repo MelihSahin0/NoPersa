@@ -9,74 +9,78 @@
            Message="This article still has customers left. All customers will receive the first articles price in this list after the article is deleted. Do you wish to proceed?"
            OnClose="HandlePopupClose" />
     <div class="w-full mx-5">
-        <h3 class="text-lg text-center font-semibold mb-4 select-none">@TitleLeft</h3>
-        <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")"
-            ondragover="event.preventDefault();"
-            ondragstart="event.dataTransfer.setData('', event.target.id);">
-            @foreach (var article in ArticleSummary.OrderBy(x => x.Position))
-            {      
-                <li @ondrop="()=>HandleDrop(article)" @key="article"
-                    @ondragleave="@(() => {article.IsDragOver = false;})"
-                    @ondragenter="@(() => {article.IsDragOver = true;})"
-                    @ondragstart="() => draggedItem = article"
-                    @ondragend="() => draggedItem = null" draggable="@(Draggable.ToString())">
-                    <div class="flex flex-row">
-                        <div class="flex flex-col mr-1">
-                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => article.Name)} {InputStyles.GetInputDefaultStyle()}")"
-                                        Placeholder="@PlaceholderLeft"
-                                        @bind-Value="@article.Name"
-                                        ValidationFunction="@ValidationLeftFunction"
-                                        TextChanged="@((value) => NameChanged(value, article))"
-                                        IsDisabled="@article.IsDisabled"/>
-                            <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.Name)" />
+        <div class="p-4 bg-gray-100 rounded-md justify-center w-full m-2">
+            <h3 class="text-lg font-semibold mb-4 select-none">@TitleLeft</h3>
+            <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")"
+                ondragover="event.preventDefault();"
+                ondragstart="event.dataTransfer.setData('', event.target.id);">
+                @foreach (var article in ArticleSummary.OrderBy(x => x.Position))
+                {      
+                    <li @ondrop="()=>HandleDrop(article)" @key="article"
+                        @ondragleave="@(() => {article.IsDragOver = false;})"
+                        @ondragenter="@(() => {article.IsDragOver = true;})"
+                        @ondragstart="() => draggedItem = article"
+                        @ondragend="() => draggedItem = null" draggable="@(Draggable.ToString())">
+                        <div class="flex flex-row">
+                            <div class="flex flex-col mr-1">
+                                <TextInput class="@($"{Scaling.GetTextScaling()} {ValidStateCss(() => article.Name)} {InputStyles.GetInputDefaultStyle()} bg-white")"
+                                            Placeholder="@PlaceholderLeft"
+                                            @bind-Value="@article.Name"
+                                            ValidationFunction="@ValidationLeftFunction"
+                                            TextChanged="@((value) => NameChanged(value, article))"
+                                            IsDisabled="@article.IsDisabled"/>
+                                <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.Name)" />
+                            </div>
+                            <div class="flex flex-col">
+                                <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => article.Price)} {InputStyles.GetInputDefaultStyle()} bg-white")"
+                                            Placeholder="@PlaceholderRight"
+                                            @bind-Value="@article.Price"
+                                            ValidationFunction="@ValidationRightFunction"
+                                            TextChanged="@((value) => PriceChanged(value, article))"
+                                            IsDisabled="@article.IsDisabled" />
+                                <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.Price)" />
+                            </div>
+                            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} min-w-fit ml-1")"
+                                    @onclick="() => DeleteArticle(article.Position)">
+                                Delete Article
+                            </button>
                         </div>
-                        <div class="flex flex-col">
-                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => article.Price)} {InputStyles.GetInputDefaultStyle()}")"
-                                        Placeholder="@PlaceholderRight"
-                                        @bind-Value="@article.Price"
-                                        ValidationFunction="@ValidationRightFunction"
-                                        TextChanged="@((value) => PriceChanged(value, article))"
-                                        IsDisabled="@article.IsDisabled" />
-                            <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.Price)" />
-                        </div>
-                        <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} min-w-fit ml-1")"
-                                @onclick="() => DeleteArticle(article.Position)">
-                            Delete Article
-                        </button>
-                    </div>
-                </li>
-            }
-            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddArticle()">Add new Article</button>
-        </ul>
+                    </li>
+                }
+                <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddArticle()">Add new Article</button>
+            </ul>
+        </div>
     </div>
     <div class="w-full mx-5">
-        <h3 class="text-lg text-center font-semibold mb-4 select-none">@TitleRight</h3>
-        <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")">
-            @foreach (var article in ArticleSummary.OrderBy(x => x.Position))
-            {
-                <li @ondrop="()=>HandleDrop(article)" @key="article"
-                    @ondragleave="@(() => {article.IsDragOver = false;})"
-                    @ondragenter="@(() => {article.IsDragOver = true;})"
-                    @ondragstart="() => draggedItem = article"
-                    @ondragend="() => draggedItem = null" draggable="@(Draggable.ToString())">
-                    <div class="flex flex-row">
-                        <div class="flex flex-col mr-1">
-                            <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => article.NewName)} {InputStyles.GetInputDefaultStyle()}")"
-                                       Placeholder="@PlaceholderLeft"
-                                       @bind-Value="@article.NewName"
-                                       ValidationFunction="@ValidationLeftFunction"/>
-                            <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.NewName)" />
+        <div class="p-4 bg-gray-100 rounded-md justify-center w-full m-2">
+            <h3 class="text-lg font-semibold mb-4 select-none">@TitleRight</h3>
+            <ul class="@($"{MaxHeight} w-full space-y-2 flex flex-col overflow-y-auto")">
+                @foreach (var article in ArticleSummary.OrderBy(x => x.Position))
+                {
+                    <li @ondrop="()=>HandleDrop(article)" @key="article"
+                        @ondragleave="@(() => {article.IsDragOver = false;})"
+                        @ondragenter="@(() => {article.IsDragOver = true;})"
+                        @ondragstart="() => draggedItem = article"
+                        @ondragend="() => draggedItem = null" draggable="@(Draggable.ToString())">
+                        <div class="flex flex-row">
+                            <div class="flex flex-col mr-1">
+                                <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => article.NewName)} {InputStyles.GetInputDefaultStyle()} bg-white")"
+                                           Placeholder="@PlaceholderLeft"
+                                           @bind-Value="@article.NewName"
+                                           ValidationFunction="@ValidationLeftFunction"/>
+                                <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.NewName)" />
+                            </div>
+                            <div class="flex flex-col">
+                                <TextInput class="@($"{Scaling.GetTextScaling()} {ValidStateCss(() => article.NewPrice)} {InputStyles.GetInputDefaultStyle()}bg-white")"
+                                           Placeholder="@PlaceholderRight"
+                                           @bind-Value="@article.NewPrice"
+                                           ValidationFunction="@ValidationRightFunction"/>
+                                <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.NewPrice)" />
+                            </div>
                         </div>
-                        <div class="flex flex-col">
-                            <TextInput class="@($"{Scaling.GetTextScaling()} {ValidStateCss(() => article.NewPrice)} {InputStyles.GetInputDefaultStyle()}")"
-                                       Placeholder="@PlaceholderRight"
-                                       @bind-Value="@article.NewPrice"
-                                       ValidationFunction="@ValidationRightFunction"/>
-                            <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => article.NewPrice)" />
-                        </div>
-                    </div>
-                </li>
-            }
-        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
     </div>
 </div>

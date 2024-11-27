@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Extensions;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
 using Route = SharedLibrary.Models.Route;
@@ -19,13 +18,14 @@ namespace MaintenanceService.Database
         public DbSet<DailyOverview> DailyOverview { get; set; }
         public DbSet<Route> Route { get; set; }
         public DbSet<Holiday> Holiday { get; set; }
-        public DbSet<CustomersLightDiet> CustomersLightDiet { get; set; }
-        public DbSet<LightDiet> LightDiet { get; set; }
-        public DbSet<CustomersMenuPlan> CustomersMenuPlan { get; set; }
         public DbSet<Article> Article { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Maintenance>()
+                .Property(e => e.Date)
+                .HasColumnType("date");
+
             modelBuilder.Entity<Customer>()
                 .HasOne(dl => dl.DeliveryLocation)
                 .WithOne(c => c.Customer)
@@ -60,6 +60,12 @@ namespace MaintenanceService.Database
                 .HasOne(c => c.Route)
                 .WithMany(r => r.Customers)
                 .HasForeignKey(c => c.RouteId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Customer>()
+                .HasOne(a => a.Article)
+                .WithMany(c => c.Customers)
+                .HasForeignKey(c => c.ArticleId)
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Customer>()
@@ -98,14 +104,18 @@ namespace MaintenanceService.Database
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Customer>()
-                .HasOne(a => a.Article)
-                .WithMany(c => c.Customers)
-                .HasForeignKey(c => c.ArticleId)
-                .OnDelete(DeleteBehavior.SetNull);
-
-            modelBuilder.Entity<Maintenance>()
-                .Property(e => e.Date)
-                .HasColumnType("date");
+                .HasMany(c => c.FoodWishes)
+                .WithMany(ld => ld.Customers)
+                .UsingEntity<CustomersFoodWish>(
+                    i => i
+                        .HasOne<FoodWish>(cld => cld.FoodWish)
+                        .WithMany(ld => ld.CustomersFoodWishes)
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j
+                        .HasOne<Customer>(cld => cld.Customer)
+                        .WithMany(c => c.CustomersFoodWish)
+                        .OnDelete(DeleteBehavior.Restrict)
+                );
         }
 
         public void SeedData()

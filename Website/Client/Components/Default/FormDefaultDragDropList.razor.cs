@@ -85,7 +85,7 @@ namespace Website.Client.Components.Default
 
         private void AddItem()
         {
-            DragDropInputs.Add(new DragDropInput() { Id = 0, Position = DragDropInputs.Count, Value = "" });
+            DragDropInputs.Add(new DragDropInput() { Id = 0, Position = DragDropInputs.Count, Value = ""});
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)

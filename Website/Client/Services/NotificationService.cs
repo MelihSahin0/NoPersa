@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Website.Client.Services
 {
     public class NotificationService : IDisposable
     {
         private readonly NavigationManager navigationManager;
+        private Timer? clearNotificationTimer;
+        private int remainingSeconds;
 
         public event Action<string>? OnSuccess;
         public event Action<string>? OnError;
+        public event Action<int>? OnCountdown;
 
         public NotificationService(NavigationManager navigationManager)
         {
@@ -26,22 +31,51 @@ namespace Website.Client.Services
             OnError?.Invoke(message);
         }
 
-        private bool secondChange = true;
         private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            secondChange = !secondChange;
-
-            if (secondChange)
-            {
-                OnSuccess?.Invoke(string.Empty);
-            }
-
-            OnError?.Invoke(string.Empty);
+            StartClearTimer();
         }
+
+        private void StartClearTimer()
+        {
+            remainingSeconds = 5;
+
+            clearNotificationTimer?.Stop();
+            clearNotificationTimer?.Dispose();
+
+            clearNotificationTimer = new Timer(1000)
+            {
+                AutoReset = true
+            };
+            clearNotificationTimer.Elapsed += CountdownElapsed;
+            clearNotificationTimer.Start();
+        }
+
+        private void CountdownElapsed(object? sender, ElapsedEventArgs e)
+        {
+            if (remainingSeconds > 0)
+            {
+                OnCountdown?.Invoke(remainingSeconds);
+                remainingSeconds--;
+            }
+            else
+            {
+                ClearNotifications();
+            }
+        }
+
+        private void ClearNotifications()
+        {
+            OnSuccess?.Invoke(string.Empty);
+            OnError?.Invoke(string.Empty);
+
+            clearNotificationTimer?.Dispose();
+            clearNotificationTimer = null;
+        }
+
         public void Dispose()
         {
             navigationManager.LocationChanged -= OnLocationChanged;
         }
     }
-
 }

@@ -7,9 +7,10 @@
 <EditForm Model="ModifyRoutesModel" OnValidSubmit="@Submit" class="w-full flex flex-col">
     <ObjectGraphDataAnnotationsValidator />
 
-    <FormDragDropList Class="w-2/6 flex self-center" MaxHeight="max-h-96" 
+
+    <FormDragDropList Class="w-2/6 flex self-center p-4 bg-gray-100 rounded-md" MaxHeight="max-h-96"
                       @bind-RouteOverviews="ModifyRoutesModel.RouteSummary" Placeholder="Route name"/>
-   
+
    <div class="flex flex-row self-center mt-5">
         <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightRed w-20 mx-2")" @onclick="() => Cancel()">Cancel</button>
         <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>

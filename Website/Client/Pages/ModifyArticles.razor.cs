@@ -91,7 +91,7 @@ namespace Website.Client.Pages
                 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK && response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    NotificationService.SetSuccess("Successfully added/updated article(s)");
+                    NotificationService.SetSuccess("Successfully updated articles");
                     NavigationManager.NavigateTo("/");
                 }
                 else
