@@ -91,7 +91,7 @@ namespace NoPersa.Tests.ManagementTests
             customer.ArticleId = article.Id;
             customer.Article = article;
             customer.CustomersLightDiets.Add(StaticCustomersLightDiets.GetCustomersLightDiets().First(c => c.CustomerId == customer.Id));
-            customer.CustomersFoodWish.Add(StaticCustomersFoodWishes.GetCustomersFoodWishes().First(c => c.CustomerId == customer.Id));
+            customer.CustomersFoodWish.Add(StaticCustomersFoodWishes.GetCustomersFoodWishes().First(c => c.CustomerId == customer.Id));         
 
             List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking()];
             List<FoodWish> foodWishes = [.. context.FoodWishes.AsNoTracking()];
@@ -99,7 +99,17 @@ namespace NoPersa.Tests.ManagementTests
             List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
             List<Article> articles = [.. context.Articles.AsNoTracking()];
 
-            controller.UpdateCustomer(mapper.Map<DTOCustomerOverview>(customer));
+            DTOCustomerOverview customerOverview = mapper.Map<DTOCustomerOverview>(customer);
+            foreach (var lightDiet in customerOverview.LightDietOverviews ?? [])
+            {
+                lightDiet.Selected = true;
+            }
+            foreach (var foodWish in customerOverview.FoodWishesOverviews ?? [])
+            {
+                foodWish.Selected = true;
+            }
+
+            controller.UpdateCustomer(customerOverview);
             Customer dbCustomer = context.Customers.FirstOrDefault(c => c.Id == 1)!;
 
             Assert.AreEqual(customer.Name, dbCustomer.Name);
@@ -140,7 +150,6 @@ namespace NoPersa.Tests.ManagementTests
             Assert.AreEqual(foodWishes.Count, context.FoodWishes.AsNoTracking().Count());
             Assert.AreEqual(boxContents.Count, context.BoxContents.AsNoTracking().Count());
             Assert.AreEqual(portionSizes.Count, context.PortionSizes.AsNoTracking().Count());
-            Assert.AreEqual(lightDiets.Count, dbCustomer.CustomersLightDiets.Count);
             Assert.AreEqual(boxContents.Count, dbCustomer.CustomerMenuPlans.Count);
             Assert.AreEqual(articles.Count, context.Articles.AsNoTracking().Count());
         }

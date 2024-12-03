@@ -6,8 +6,8 @@ namespace NoPersa.Tests.DatabaseMemory
     {
         public static List<BoxContent> GetBoxContents() =>
         [
-            new() { Id = 1, Name = "Soup"},
-            new() { Id = 2, Name = "Dessert"}
+            new() { Id = 1, Name = "Soup", Position = 0},
+            new() { Id = 2, Name = "Dessert", Position = 1}
         ];
     }
 }

@@ -76,7 +76,7 @@ namespace NoPersa.Tests.GastronomyTests
         public void AddLightDiet()
         {
             List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking()];
-            lightDiets.Add(new() { Id = 0, Name = "Schweinefleisch" });
+            lightDiets.Add(new() { Id = 0, Name = "Schweinefleisch", Position = 99 });
 
             List<DTOLightDiet> dTOLightDiets = mapper.Map<List<DTOLightDiet>>(lightDiets);
 

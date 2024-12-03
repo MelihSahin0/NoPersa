@@ -6,8 +6,8 @@ namespace NoPersa.Tests.DatabaseMemory
     {
         public static List<LightDiet> GetLightDiets() =>
         [
-            new() { Id = 1, Name = "Vegan"},
-            new() { Id = 2, Name = "Diabetes"}
+            new() { Id = 1, Name = "Vegan", Position = 0},
+            new() { Id = 2, Name = "Diabetes", Position = 1}
         ];
     }
 }

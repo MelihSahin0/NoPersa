@@ -71,7 +71,7 @@ namespace NoPersa.Tests.GastronomyTests
         public void AddFoodWish()
         {
             List<FoodWish> foodWishes = [.. context.FoodWishes.AsNoTracking()];
-            foodWishes.Add(new() { Id = 0, Name = "Milch", IsIngredient = true });
+            foodWishes.Add(new() { Id = 0, Name = "Milch", IsIngredient = true, Position = 99 });
 
             List<DTOFoodWish> dTOFoodWishes = mapper.Map<List<DTOFoodWish>>(foodWishes);
 

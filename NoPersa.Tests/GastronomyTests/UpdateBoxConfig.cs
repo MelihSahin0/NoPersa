@@ -120,7 +120,7 @@ namespace NoPersa.Tests.GastronomyTests
         public void AddBoxContent()
         {
             List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking()];
-            boxContents.Add(new() { Id = 0, Name = "Surprise" });
+            boxContents.Add(new() { Id = 0, Name = "Surprise", Position = 99 });
 
             List<DTOBoxContent> dTOBoxContents = mapper.Map<List<DTOBoxContent>>(boxContents);
 
