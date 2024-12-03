@@ -60,6 +60,7 @@ namespace ManagementService.Controllers
                         foundArticle.Position = article.Position;
                         foundArticle.NewName = article.NewName;
                         foundArticle.NewPrice = article.NewPrice;
+                        foundArticle.IsDefault = article.IsDefault;
                     }
                     else
                     {
@@ -109,13 +110,14 @@ namespace ManagementService.Controllers
             {
                 List<DTOSelectArticleWithPrice> articleWithPrices = [];
 
-                foreach (var article in context.Articles.AsNoTracking().OrderBy(x => x.Position).Select(a => new { a.Id, a.Name, a.Price }).ToList())
+                foreach (var article in context.Articles.AsNoTracking().OrderBy(x => x.Position).Select(a => new { a.Id, a.Name, a.Price, a.IsDefault }).ToList())
                 {
                     articleWithPrices.Add(new()
                     {
                         Id = article.Id,
                         Name = article.Name,
-                        Price = article.Price
+                        Price = article.Price,
+                        IsDefault = article.IsDefault
                     });
                 }
 

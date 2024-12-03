@@ -481,7 +481,7 @@ namespace ManagementService.Controllers
 
                 if (dTOId.Id == null)
                 {
-                    int id = portionSizes.FirstOrDefault(ps => ps.Position == 0)!.Id;
+                    int id = portionSizes.First(ps => ps.IsDefault).Id;
                     dTOBoxContentSelectedList = [.. context.BoxContents.AsNoTracking().Select(boxContent => new DTOBoxContentSelected
                     {
                         Id = boxContent.Id,

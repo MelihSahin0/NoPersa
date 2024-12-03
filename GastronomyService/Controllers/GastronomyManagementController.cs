@@ -245,6 +245,7 @@ namespace GastronomyService.Controllers
                     {
                         foundPortionSize.Position = portionSize.Position;
                         foundPortionSize.Name = portionSize.Name;
+                        foundPortionSize.IsDefault = portionSize.IsDefault;
                     }
                     else
                     {

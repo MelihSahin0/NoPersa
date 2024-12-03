@@ -42,6 +42,9 @@ namespace Website.Client.Components.Default
         public string StartFilter { get; set; } = string.Empty;
 
         [Parameter]
+        public bool HasDefault { get; set; } = false;
+
+        [Parameter]
         public required List<DragDropInput> DragDropInputs { get; set; }
 
         [Parameter]
@@ -73,16 +76,23 @@ namespace Website.Client.Components.Default
         {
             DragDropInputs.Remove(DragDropInputs.FirstOrDefault(r => r.Position == position)!);
 
+            bool hasDefault = false;
             int i = 0;
             foreach (var item in DragDropInputs.OrderBy(x => x.Position).ToList())
             {
                 item.Position = i++;
+                hasDefault = item.IsDefault;
+            }
+
+            if (!hasDefault && DragDropInputs.Count != 0)
+            {
+                DragDropInputs.First().IsDefault = true;
             }
         }
 
         private void AddItem()
         {
-            DragDropInputs.Add(new DragDropInput() { Id = 0, Position = DragDropInputs.Count, Value = ""});
+            DragDropInputs.Add(new DragDropInput() { Id = 0, Position = DragDropInputs.Count, Value = "", IsDefault = DragDropInputs.Count == 0 });
         }
 
         private void SortByName()
@@ -91,6 +101,21 @@ namespace Website.Client.Components.Default
             foreach (var item in DragDropInputs.OrderBy(x => x.Value).ToList())
             {
                 item.Position = i++;
+            }
+        }
+
+        private void HandleIsDefault(DragDropInput dragDropInput)
+        {
+            foreach (var item in DragDropInputs)
+            {
+                if (item.Id == dragDropInput.Id)
+                {
+                    item.IsDefault = true;
+                }
+                else
+                {
+                    item.IsDefault = false;
+                }
             }
         }
 
@@ -119,6 +144,8 @@ namespace Website.Client.Components.Default
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public required string Value { get; set; }
+
+        public bool IsDefault { get; set; } = false;
 
         public bool IsDragOver { get; set; }
     }

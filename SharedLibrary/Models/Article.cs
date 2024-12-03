@@ -28,6 +28,9 @@ namespace SharedLibrary.Models
         [DoubleType(min: 0)]
         public required double NewPrice { get; set; }
 
+        [Required]
+        public required bool IsDefault { get; set; }
+
         public List<Customer> Customers { get; set; } = [];
     }
 }

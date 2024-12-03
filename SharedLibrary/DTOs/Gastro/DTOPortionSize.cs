@@ -1,4 +1,5 @@
-﻿namespace SharedLibrary.DTOs.Gastro
+﻿
+namespace SharedLibrary.DTOs.Gastro
 {
     public class DTOPortionSize
     {
@@ -7,5 +8,7 @@
         public int Position { get; set; }
 
         public string? Value { get; set; }
+
+        public bool IsDefault { get; set; }
     }
 }

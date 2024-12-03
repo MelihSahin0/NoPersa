@@ -82,7 +82,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.Price) ? (double?)null : double.Parse(src.Price)))
                 .ForMember(dest => dest.NewName, opt => opt.MapFrom(src => src.NewName))
-                .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.NewPrice) ? (double?)null : double.Parse(src.NewPrice)));
+                .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => string.IsNullOrWhiteSpace(src.NewPrice) ? (double?)null : double.Parse(src.NewPrice)))
+                .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(src => src.IsDefault));
 
             CreateMap<Article, DTOArticle>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
@@ -91,7 +92,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price.ToString()))
                 .ForMember(dest => dest.NewName, opt => opt.MapFrom(src => src.NewName))
                 .ForMember(dest => dest.NewPrice, opt => opt.MapFrom(src => src.NewPrice.ToString()))
-                .ForMember(dest => dest.NumberOfCustomers, opt => opt.MapFrom(src => src.Customers.Count));
+                .ForMember(dest => dest.NumberOfCustomers, opt => opt.MapFrom(src => src.Customers.Count))
+                .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(src => src.IsDefault));
         }
     }
 }

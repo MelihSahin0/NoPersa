@@ -73,7 +73,7 @@ namespace NoPersa.Tests.ManagementTests
         public void InsertArticle()
         {
             List<Article> articles = [.. context.Articles];
-            articles.Add(new() { Name = "abcd", Position = 9, Price = 1, NewName = "ef", NewPrice = 2 });
+            articles.Add(new() { Name = "abcd", Position = 9, Price = 1, NewName = "ef", NewPrice = 2, IsDefault = false });
 
             controller.UpdateArticles(mapper.Map<List<DTOArticle>>(articles));
             List<Article> dbArticles = [..context.Articles.AsNoTracking()];

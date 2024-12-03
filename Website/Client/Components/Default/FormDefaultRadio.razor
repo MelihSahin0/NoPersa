@@ -1,0 +1,17 @@
+﻿@using Website.Client.Components.Base
+@using Website.Client.Validations;
+@using Website.Client.Styles;
+
+<div class="@($"{Class} flex flex-col")">
+    <div class="flex items-center justify-center relative w-full">
+        <InputCheckbox class="absolute opacity-0 cursor-pointer w-5 h-5"
+                       disabled="@Value"
+                       @bind-Value="Value"
+                       @oninput="(e) => OnValueChanged(e)" />
+        <span class="@($"{Scaling.GetTextScaling()} {(Value ? "bg-blue ring-blue hover:bg-blueHover hover:ring-blueHover" : "bg-white ring-gray-400 hover:ring-gray-500")} w-5 h-5 ring-1 rounded-full flex items-center justify-center cursor-pointer transition duration-200 ease-in-out")">
+            <svg class="@($"{(Value ? "" : "hidden")} w-5 h-5 text-white")" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </span>
+    </div>
+</div>

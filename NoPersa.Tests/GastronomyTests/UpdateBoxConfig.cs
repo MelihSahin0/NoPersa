@@ -78,7 +78,7 @@ namespace NoPersa.Tests.GastronomyTests
         public void AddPortionSize()
         {
             List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
-            portionSizes.Add(new() { Id = 0, Name = "tiny", Position = 2 });
+            portionSizes.Add(new() { Id = 0, Name = "tiny", Position = 2, IsDefault = false });
 
             List<DTOPortionSize> dTOPortionSizes = mapper.Map<List<DTOPortionSize>>(portionSizes);
 

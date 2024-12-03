@@ -27,6 +27,8 @@ namespace Website.Client.Models
         [DoubleType(min: 0)]
         public string? NewPrice { get; set; }
 
+        public bool IsDefault { get; set; } = false;
+
         [Required]
         [IntType(min: 0)]
         public required int NumberOfCustomers { get; set; }

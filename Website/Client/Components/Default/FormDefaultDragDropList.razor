@@ -21,14 +21,18 @@
                         @ondragenter="@(()=>{item.IsDragOver = true;})"
                         @ondragstart="() => draggedItem = item"
                         @ondragend="()=> draggedItem = null" draggable="@(Draggable.ToString())">
-                        <div class="flex flex-row">
+                        <div class="flex flex-row items-center">
+                            @if (HasDefault)
+                            {
+                                <FormDefaultRadio Class="ml-1 mr-1" @bind-Value="@item.IsDefault" SelectedValue="@(() => HandleIsDefault(item))"/>
+                            }
                             <TextInput class="@($"{Scaling.GetTextScaling()}  {ValidStateCss(() => item.Value)} {InputStyles.GetInputDefaultStyle()} {TextOrientation}")"
                                        Placeholder="@Placeholder"
                                        @bind-Value="@item.Value"
                                        ValidationFunction="@ValidationFunction" />
                             <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} min-w-fit ml-1")"
                                     @onclick="() => DeleteItem(item.Position)">
-                                @RemoveButtonDisplay
+                                    @RemoveButtonDisplay
                             </button>
                         </div>
                         <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red")" For="@(() => item.Value)" />

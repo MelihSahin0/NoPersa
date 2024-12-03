@@ -9,7 +9,7 @@
     <ObjectGraphDataAnnotationsValidator />
 
     <Form2InputDragDropList Class="w-4/6 flex self-center" MaxHeight="max-h-96" @bind-ArticleSummary="@ModifyArticlesModel.Articles"
-                            TitleLeft="Insert new / remove article" PlaceholderLeft="Article name"
+                            TitleLeft="Insert new / remove article" PlaceholderLeft="Article name" HasDefault="true"
                             TitleRight="Update article" PlaceholderRight="Price" ValidationRightFunction="@OnInputValidation.Double" />
 
     <div class="flex justify-end">

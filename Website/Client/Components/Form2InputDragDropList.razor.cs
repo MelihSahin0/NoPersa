@@ -40,6 +40,9 @@ namespace Website.Client.Components
         public Func<string?, bool>? ValidationRightFunction { get; set; }
 
         [Parameter]
+        public bool HasDefault { get; set; } = false;
+
+        [Parameter]
         public required List<ArticleSummary> ArticleSummary { get; set; }
 
         [Parameter]
@@ -86,7 +89,7 @@ namespace Website.Client.Components
 
         private void AddArticle()
         {
-            ArticleSummary.Add(new ArticleSummary() { Id = 0, Position = ArticleSummary.Count, Name = "", Price = "", NewName = "", NewPrice = "", NumberOfCustomers = 0, IsDisabled = false });
+            ArticleSummary.Add(new ArticleSummary() { Id = 0, Position = ArticleSummary.Count, Name = "", Price = "", NewName = "", NewPrice = "", NumberOfCustomers = 0, IsDefault = ArticleSummary.Count == 0, IsDisabled = false });
         }
 
         private void SortByName()
@@ -95,6 +98,21 @@ namespace Website.Client.Components
             foreach (var item in ArticleSummary.OrderBy(x => x.Name).ToList())
             {
                 item.Position = i++;
+            }
+        }
+
+        private void HandleIsDefault(ArticleSummary dragDropInput)
+        {
+            foreach (var item in ArticleSummary)
+            {
+                if (item.Id == dragDropInput.Id)
+                {
+                    item.IsDefault = true;
+                }
+                else
+                {
+                    item.IsDefault = false;
+                }
             }
         }
 
@@ -127,13 +145,20 @@ namespace Website.Client.Components
             {
                 ArticleSummary.Remove(ArticleSummary.FirstOrDefault((Func<ArticleSummary, bool>)(r => r.Position == toDeletePosition))!);
 
+                bool hasDefault = false;
                 int i = 0;
                 foreach (var article in ArticleSummary.OrderBy(x => x.Position).ToList())
                 {
                     article.Position = i++;
-
                     article.IsDragOver = false;
+                    hasDefault = article.IsDefault;
                 }
+
+                if (!hasDefault && ArticleSummary.Count != 0)
+                {
+                    ArticleSummary.First().IsDefault = true;
+                }
+
 
                 toDeletePosition = null;
             }

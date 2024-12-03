@@ -7,5 +7,7 @@
         public required string Name { get; set; }
 
         public required int Price { get; set; }
+
+        public required bool IsDefault { get; set; }
     }
 }

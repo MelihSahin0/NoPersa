@@ -178,7 +178,7 @@ namespace Website.Client.Pages
 
                     if (CustomerOverviewModel.ArticleId == 0)
                     {
-                        CustomerOverviewModel.ArticleId = articles.FirstOrDefault()?.Id ?? 0;
+                        CustomerOverviewModel.ArticleId = articles.FirstOrDefault(a => a.IsDefault)?.Id ?? 0;
                     }
                 }
                 else

@@ -15,6 +15,9 @@ namespace SharedLibrary.Models
         [Required]
         public required string Name { get; set; }
 
+        [Required]
+        public required bool IsDefault { get; set; }
+
         public List<CustomersMenuPlan> CustomerMenuPlans { get; set; } = [];
     }
 }

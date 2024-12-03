@@ -15,6 +15,8 @@ namespace SharedLibrary.DTOs.Management
 
         public string? NewPrice { get; set; }
 
+        public bool IsDefault { get; set; }
+
         public int? NumberOfCustomers { get; set; }
     }
 }
