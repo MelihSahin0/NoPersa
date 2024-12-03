@@ -57,6 +57,7 @@ namespace NoPersa.Tests.ManagementTests
             context.SaveChanges();
 
             context.LightDiets.AddRange(StaticLightDiets.GetLightDiets());
+            context.FoodWishes.AddRange(StaticFoodWishes.GetFoodWishes());
             context.BoxContents.AddRange(StaticBoxContents.GetBoxContents());
             context.PortionSizes.AddRange(StaticPortionSizes.GetPortionSizes());
             context.SaveChanges();
@@ -64,6 +65,10 @@ namespace NoPersa.Tests.ManagementTests
             List<CustomersLightDiet> customersLightDiets = [];
             customersLightDiets.AddRange(StaticCustomersLightDiets.GetCustomersLightDiets());
             context.BulkInsert(customersLightDiets);
+
+            List<CustomersFoodWish> customersFoodWishes = [];
+            customersFoodWishes.AddRange(StaticCustomersFoodWishes.GetCustomersFoodWishes());
+            context.BulkInsert(customersFoodWishes);
 
             List<CustomersMenuPlan> customersMenuPlans = [];
             customersMenuPlans.AddRange(StaticCustomersMenuPlan.GetCustomersMenuPlan());
@@ -85,8 +90,11 @@ namespace NoPersa.Tests.ManagementTests
             Article article = context.Articles.First(a => a.Id == 2);
             customer.ArticleId = article.Id;
             customer.Article = article;
+            customer.CustomersLightDiets.Add(StaticCustomersLightDiets.GetCustomersLightDiets().First(c => c.CustomerId == customer.Id));
+            customer.CustomersFoodWish.Add(StaticCustomersFoodWishes.GetCustomersFoodWishes().First(c => c.CustomerId == customer.Id));
 
             List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking()];
+            List<FoodWish> foodWishes = [.. context.FoodWishes.AsNoTracking()];
             List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking()];
             List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
             List<Article> articles = [.. context.Articles.AsNoTracking()];
@@ -96,9 +104,11 @@ namespace NoPersa.Tests.ManagementTests
 
             Assert.AreEqual(customer.Name, dbCustomer.Name);
             Assert.AreEqual(lightDiets.Count, context.LightDiets.AsNoTracking().Count());
+            Assert.AreEqual(foodWishes.Count, context.FoodWishes.AsNoTracking().Count());
             Assert.AreEqual(boxContents.Count, context.BoxContents.AsNoTracking().Count());
             Assert.AreEqual(portionSizes.Count, context.PortionSizes.AsNoTracking().Count());
-            Assert.AreEqual(lightDiets.Count, dbCustomer.CustomersLightDiets.Count);
+            Assert.AreEqual(customer.CustomersLightDiets.Count, dbCustomer.CustomersLightDiets.Count);
+            Assert.AreEqual(customer.CustomersFoodWish.Count, dbCustomer.CustomersFoodWish.Count);
             Assert.AreEqual(boxContents.Count, dbCustomer.CustomerMenuPlans.Count);
             Assert.AreEqual(articles.Count, context.Articles.AsNoTracking().Count());
         }
@@ -117,6 +127,7 @@ namespace NoPersa.Tests.ManagementTests
             customer.Id = 0;
 
             List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking()];
+            List<FoodWish> foodWishes = [.. context.FoodWishes.AsNoTracking()];
             List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking()];
             List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
             List<Article> articles = [.. context.Articles.AsNoTracking()];
@@ -126,6 +137,7 @@ namespace NoPersa.Tests.ManagementTests
 
             Assert.AreEqual(customer.Name, dbCustomer.Name);
             Assert.AreEqual(lightDiets.Count, context.LightDiets.AsNoTracking().Count());
+            Assert.AreEqual(foodWishes.Count, context.FoodWishes.AsNoTracking().Count());
             Assert.AreEqual(boxContents.Count, context.BoxContents.AsNoTracking().Count());
             Assert.AreEqual(portionSizes.Count, context.PortionSizes.AsNoTracking().Count());
             Assert.AreEqual(lightDiets.Count, dbCustomer.CustomersLightDiets.Count);

@@ -83,7 +83,6 @@ namespace NoPersa.Tests.GastronomyTests
             controller.UpdateLightDiets(dTOLightDiets);
 
             Assert.AreEqual(lightDiets.Count, context.LightDiets.Count());
-            Assert.AreEqual(lightDiets.Count, context.CustomersLightDiets.Where(c => c.CustomerId == 1).Count());
         }
 
         [TestMethod]

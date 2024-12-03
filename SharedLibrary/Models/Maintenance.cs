@@ -1,5 +1,4 @@
-﻿using SharedLibrary.Validations;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SharedLibrary.Models
 {

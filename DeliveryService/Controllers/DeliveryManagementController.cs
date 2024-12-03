@@ -209,7 +209,7 @@ namespace DeliveryService.Controllers
                 {
                     foreach (DTOCustomerSequence dTOCustomerSequence in dTOCustomerInRoute.CustomerSequence ?? [])
                     {
-                        Customer? dbCustomer = context.Customers.FirstOrDefault(c => c.Id == dTOCustomerSequence.Id);
+                        Customer? dbCustomer = context.Customers.Include(a => a.Article).FirstOrDefault(c => c.Id == dTOCustomerSequence.Id);
 
                         if (dbCustomer != null)
                         {
@@ -233,6 +233,7 @@ namespace DeliveryService.Controllers
                     context.BulkUpdate(batch);
                 }
 
+                context.SaveChanges();
                 transaction.Commit();
 
                 return Ok();

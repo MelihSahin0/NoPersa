@@ -24,14 +24,16 @@ namespace SharedLibrary.Util
                 Month = generateMonth.Month
             };
 
+            var today = DateTime.Today;
             List<DailyOverview> dailyOverviews = Enumerable.Range(1, DateTime.DaysInMonth(generateMonth.Year, generateMonth.Month)).Select(i =>
             {
-                var today = DateTime.Today;
+                var currentDay = new DateTime(generateMonth.Year, generateMonth.Month, i);
+
                 return new DailyOverview
                 {
                     DayOfMonth = i,
-                    Price = generateMonth < today ? customer == null ? 0 : customer.Article.Price : null,
-                    NumberOfBoxes = generateMonth < today ? 0 : null,
+                    Price = currentDay < today ? (customer?.Article.Price ?? 0) : null,
+                    NumberOfBoxes = currentDay < today ? 0 : null,
                     MonthlyOverview = monthlyOverview
                 };
             }).ToList();

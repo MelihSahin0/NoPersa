@@ -2,9 +2,11 @@
 using SharedLibrary.Util;
 using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Website.Client.Components;
 using Website.Client.Components.Default;
 using Website.Client.Models;
 using Website.Client.Services;
@@ -87,6 +89,31 @@ namespace Website.Client.FormModels
         [Required(ErrorMessage = "Monthly Delivery is required")]
         public required List<MonthlyDelivery> MonthlyDeliveries { get; set; }
 
+        public string TotalPrice()
+        {
+            double total = 0;
+            if (MonthlyDeliveries[selectedMonthlyDeliveries] != null)
+            {
+                foreach (var dailyOverview in MonthlyDeliveries[selectedMonthlyDeliveries].DailyDeliveries)
+                {
+                    double price = 0;
+                    int number = 0;
+                
+                    if (!string.IsNullOrWhiteSpace(dailyOverview.Price))
+                    {
+                        price = double.Parse(dailyOverview.Price.Replace(",", "."), CultureInfo.InvariantCulture);
+                    }
+                    if (!string.IsNullOrWhiteSpace(dailyOverview.NumberOfBoxes))
+                    {
+                        number = int.Parse(dailyOverview.NumberOfBoxes);
+                    }
+
+                    total += price * number;
+                }
+            }
+            return total.ToString();
+        }
+
         [JsonIgnore]
         public bool ModifyMonthlyDelivery => DateTimeCalc.MonthDifferenceMax1(DateTime.Today.Year, MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Year, DateTime.Today.Month, (int)MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Month);
 
@@ -99,7 +126,15 @@ namespace Website.Client.FormModels
 
         [ValidateComplexType]
         [Required]
-        public required List<SelectedLightDiet> LightDietOverviews { get; set; }
+        public required List<SelectedInputCheckbox> LightDietOverviews { get; set; }
+
+        [ValidateComplexType]
+        [Required]
+        public required List<SelectedInputCheckbox> FoodWishesOverviews { get; set; }
+
+        [ValidateComplexType]
+        [Required]
+        public required List<SelectedInputCheckbox> IngredientWishesOverviews { get; set; }
 
         [ValidateComplexType]
         [Required]

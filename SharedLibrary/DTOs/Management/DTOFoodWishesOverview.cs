@@ -1,6 +1,6 @@
 ﻿namespace SharedLibrary.DTOs.Management
 {
-    public class DTOBoxContentSelected
+    public class DTOFoodWishesOverview
     {
         public int Id { get; set; }
 
@@ -8,6 +8,6 @@
 
         public string? Name { get; set; }
 
-        public int PortionSizeId { get; set; }
+        public bool Selected { get; set; }
     }
 }

@@ -38,10 +38,9 @@ namespace Website.Client.Services
 
         private void StartClearTimer()
         {
-            remainingSeconds = 5;
-
             clearNotificationTimer?.Stop();
             clearNotificationTimer?.Dispose();
+            clearNotificationTimer = null;
 
             clearNotificationTimer = new Timer(1000)
             {
@@ -66,11 +65,15 @@ namespace Website.Client.Services
 
         private void ClearNotifications()
         {
+            clearNotificationTimer?.Stop();
+            clearNotificationTimer?.Dispose();
+            clearNotificationTimer = null;
+
             OnSuccess?.Invoke(string.Empty);
             OnError?.Invoke(string.Empty);
 
-            clearNotificationTimer?.Dispose();
-            clearNotificationTimer = null;
+            remainingSeconds = 5;
+            OnCountdown?.Invoke(remainingSeconds);
         }
 
         public void Dispose()

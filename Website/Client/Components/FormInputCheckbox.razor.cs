@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.ComponentModel.DataAnnotations;
 
 namespace Website.Client.Components
 {
@@ -24,7 +25,6 @@ namespace Website.Client.Components
         [Parameter]
         public EventCallback<bool> OnValueChangedCallback { get; set; }
 
-
         private async Task OnValueChanged(ChangeEventArgs e)
         {
             var newValue = (bool?)Convert.ChangeType(e.Value, typeof(bool));
@@ -32,5 +32,18 @@ namespace Website.Client.Components
             await ValueChanged.InvokeAsync(Value);
             await OnValueChangedCallback.InvokeAsync(Value);
         }
+    }
+
+    public class SelectedInputCheckbox
+    {
+        [Required]
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
+        public required string Name { get; set; }
+
+        [Required]
+        public required bool Selected { get; set; }
     }
 }

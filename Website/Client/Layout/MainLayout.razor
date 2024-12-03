@@ -14,7 +14,10 @@
                     <div id="blazor-message-ui" class="flex flex-row justify-between p-4 m-4 @(!string.IsNullOrWhiteSpace(errorMessage) ? "bg-red" : "bg-green")">
                         <a class="select-none text-white">@successMessage @errorMessage</a>
                         <div class="flex flex-row justify-between">
-                            <a class="select-none text-white mr-4">@($"{countDown}s remaining")</a>
+                            @if (countDown > 0)
+                            {
+                                <a class="select-none text-white mr-4">@($"{countDown}s remaining")</a>
+                            }
                             <button class="select-none text-white" @onclick="Dismiss">X</button>
                         </div>
                     </div>

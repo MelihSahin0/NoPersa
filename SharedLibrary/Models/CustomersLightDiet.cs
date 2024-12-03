@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace SharedLibrary.Models
+﻿namespace SharedLibrary.Models
 {
     public class CustomersLightDiet
     {
@@ -11,8 +9,5 @@ namespace SharedLibrary.Models
         public int LightDietId { get; set; }
 
         public required LightDiet LightDiet { get; set; }
-
-        [Required]
-        public required bool Selected { get; set; }
     }
 }

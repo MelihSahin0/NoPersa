@@ -35,7 +35,8 @@
                     </li>
                 }
             }
-            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddItem()">@AddButtonDisplay</button>
+            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} mr-1")" @onclick="() => AddItem()">@AddButtonDisplay</button>
+            <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} ml-1")" @onclick="() => SortByName()">Sort by name</button>
         </ul>
     </div>
 </div>

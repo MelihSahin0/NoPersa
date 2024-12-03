@@ -9,11 +9,11 @@ namespace SharedLibrary.Models
         public int Id { get; set; }
 
         [Required]
-        public required string Name { get; set; }
-
-        [Required]
         [IntType(min: 0)]
         public required int Position { get; set; }
+
+        [Required]
+        public required string Name { get; set; }
 
         public List<CustomersMenuPlan> CustomerMenuPlans { get; set; } = [];
     }

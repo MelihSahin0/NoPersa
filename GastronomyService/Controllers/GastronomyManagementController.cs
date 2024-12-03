@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SharedLibrary.DTOs.Gastro;
 using SharedLibrary.DTOs.GetDTOs;
-using SharedLibrary.DTOs.Management;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
@@ -37,13 +36,6 @@ namespace GastronomyService.Controllers
             {
                 List<DTOLightDiet> dTOLightDiets = mapper.Map<List<DTOLightDiet>>(context.LightDiets.AsNoTracking());
 
-                int i = 0;
-                foreach (DTOLightDiet dTOLightDiet in dTOLightDiets.OrderBy(d => d.Value))
-                {
-                    dTOLightDiet.Position = i;
-                    i++;
-                }
-
                 return Ok(dTOLightDiets);
             }
             catch (ValidationException e)
@@ -66,13 +58,13 @@ namespace GastronomyService.Controllers
             try
             {
                 List<LightDiet> lightDiets = mapper.Map<List<LightDiet>>(dTOLightDiets);
-                bool updateCustomersLightDiets = lightDiets.Any(l => l.Id == 0);
 
                 var existingLightDiets = context.LightDiets.ToDictionary(a => a.Id);
                 foreach (var lightDiet in lightDiets)
                 {
                     if (existingLightDiets.TryGetValue(lightDiet.Id, out var foundLightDiet))
                     {
+                        foundLightDiet.Position = lightDiet.Position;
                         foundLightDiet.Name = lightDiet.Name;
                     }
                     else
@@ -92,35 +84,6 @@ namespace GastronomyService.Controllers
                 }
 
                 context.SaveChanges();
-
-                if (updateCustomersLightDiets)
-                {
-                    List<LightDiet> dbLightDiets = [.. context.LightDiets]; 
-
-                    foreach (Customer customer in context.Customers.Include(cld => cld.CustomersLightDiets))
-                    {
-                        foreach (LightDiet lightDiet in dbLightDiets)
-                        {
-                            CustomersLightDiet? dbCustomersLightDiet = customer.CustomersLightDiets.FirstOrDefault(cld => cld.LightDietId == lightDiet.Id);
-
-                            if (dbCustomersLightDiet == null)
-                            {
-                                dbCustomersLightDiet = new()
-                                {
-                                    Customer = customer,
-                                    CustomerId = customer.Id,
-                                    LightDietId = lightDiet.Id,
-                                    LightDiet = lightDiet,
-                                    Selected = false
-                                };
-                                customer.CustomersLightDiets.Add(dbCustomersLightDiet);
-                            }
-                        }
-                    }
-
-                    context.BulkSaveChanges();
-                }
-
                 transaction.Commit();
 
                 return Ok();
@@ -145,13 +108,6 @@ namespace GastronomyService.Controllers
             try
             {
                 List<DTOBoxContent> dTOBoxContents= mapper.Map<List<DTOBoxContent>>(context.BoxContents.AsNoTracking());
-
-                int i = 0;
-                foreach (DTOBoxContent dTOBoxContent in dTOBoxContents.OrderBy(d => d.Value))
-                {
-                    dTOBoxContent.Position = i;
-                    i++;
-                }
 
                 return Ok(dTOBoxContents);
             }
@@ -182,6 +138,7 @@ namespace GastronomyService.Controllers
                 {
                     if (existingBoxContents.TryGetValue(boxContent.Id, out var foundBoxContent))
                     {
+                        foundBoxContent.Position = boxContent.Position;
                         foundBoxContent.Name = boxContent.Name;
                     }
                     else
@@ -421,12 +378,8 @@ namespace GastronomyService.Controllers
                         {
                             foreach (CustomersLightDiet lightDiet in dbCustomer.CustomersLightDiets)
                             {
-                                if (lightDiet.Selected)
-                                {
-                                    dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
-                                    dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
-
-                                }
+                                dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
+                                dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
                             }
 
                             foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
@@ -501,10 +454,7 @@ namespace GastronomyService.Controllers
 
                             foreach (CustomersLightDiet lightDiet in dbCustomer.CustomersLightDiets)
                             {
-                                if (lightDiet.Selected)
-                                {
-                                    lightDiets.Add(lightDiet.LightDiet.Name);
-                                }
+                                lightDiets.Add(lightDiet.LightDiet.Name);
                             }
 
                             foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
@@ -556,13 +506,6 @@ namespace GastronomyService.Controllers
             {
                 List<DTOFoodWish> dTOFoodWishes = mapper.Map<List<DTOFoodWish>>(context.FoodWishes.AsNoTracking());
 
-                int i = 0;
-                foreach (DTOFoodWish dTOFoodWish in dTOFoodWishes.OrderBy(d => d.Name))
-                {
-                    dTOFoodWish.Position = i;
-                    i++;
-                }
-
                 return Ok(dTOFoodWishes);
             }
             catch (ValidationException e)
@@ -591,6 +534,7 @@ namespace GastronomyService.Controllers
                 {
                     if (existingFoodWishes.TryGetValue(foodWish.Id, out var foundFoodWishes))
                     {
+                        foundFoodWishes.Position = foodWish.Position;
                         foundFoodWishes.Name = foodWish.Name;
                     }
                     else

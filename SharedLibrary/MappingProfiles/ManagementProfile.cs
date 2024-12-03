@@ -18,6 +18,7 @@ namespace SharedLibrary.MappingProfiles
                .ForMember(dest => dest.MonthlyOverviews, opt => opt.MapFrom(src => src.MonthlyDeliveries))
                .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId ?? (int?)null))
                .ForMember(dest => dest.CustomersLightDiets, opt => opt.MapFrom(src => src.LightDietOverviews))
+               .ForMember(dest => dest.CustomersFoodWish, opt => opt.MapFrom(src => (src.FoodWishesOverviews ?? new List<DTOFoodWishesOverview>()).Concat(src.IngredientWishesOverviews ?? new List<DTOFoodWishesOverview>())))
                .ForMember(dest => dest.CustomerMenuPlans, opt => opt.MapFrom(src => src.BoxContentSelectedList));
 
             CreateMap<Customer, DTOCustomerOverview>()
@@ -28,6 +29,8 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.MonthlyDeliveries, opt => opt.MapFrom(src => src.MonthlyOverviews))
                 .ForMember(dest => dest.RouteId, opt => opt.MapFrom(src => src.RouteId))
                 .ForMember(dest => dest.LightDietOverviews, opt => opt.MapFrom(src => src.CustomersLightDiets))
+                .ForPath(dest => dest.FoodWishesOverviews, opt => opt.MapFrom(src => src.CustomersFoodWish.Where(cfw => !cfw.FoodWish.IsIngredient)))
+                .ForPath(dest => dest.IngredientWishesOverviews, opt => opt.MapFrom(src => src.CustomersFoodWish.Where(cfw => cfw.FoodWish.IsIngredient)))
                 .ForMember(dest => dest.BoxContentSelectedList, opt => opt.MapFrom(src => src.CustomerMenuPlans));
 
             CreateMap<DTOWeekdays, Weekday>();

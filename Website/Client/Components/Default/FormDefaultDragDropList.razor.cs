@@ -42,9 +42,6 @@ namespace Website.Client.Components.Default
         public string StartFilter { get; set; } = string.Empty;
 
         [Parameter]
-        public bool SortByName { get; set; } = false;
-
-        [Parameter]
         public required List<DragDropInput> DragDropInputs { get; set; }
 
         [Parameter]
@@ -65,7 +62,7 @@ namespace Website.Client.Components.Default
             draggedItem.Position = originalOrderLanding;
 
             int i = 0;
-            foreach (var item in SortByName ? DragDropInputs.OrderBy(x => x.Value).ToList() : DragDropInputs.OrderBy(x => x.Position).ToList())
+            foreach (var item in DragDropInputs.OrderBy(x => x.Position).ToList())
             {
                 item.Position = i++;
                 item.IsDragOver = false;
@@ -77,7 +74,7 @@ namespace Website.Client.Components.Default
             DragDropInputs.Remove(DragDropInputs.FirstOrDefault(r => r.Position == position)!);
 
             int i = 0;
-            foreach (var item in SortByName ? DragDropInputs.OrderBy(x => x.Value).ToList() : DragDropInputs.OrderBy(x => x.Position).ToList())
+            foreach (var item in DragDropInputs.OrderBy(x => x.Position).ToList())
             {
                 item.Position = i++;
             }
@@ -86,6 +83,15 @@ namespace Website.Client.Components.Default
         private void AddItem()
         {
             DragDropInputs.Add(new DragDropInput() { Id = 0, Position = DragDropInputs.Count, Value = ""});
+        }
+
+        private void SortByName()
+        {
+            int i = 0;
+            foreach (var item in DragDropInputs.OrderBy(x => x.Value).ToList())
+            {
+                item.Position = i++;
+            }
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)

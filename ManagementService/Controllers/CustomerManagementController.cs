@@ -64,16 +64,14 @@ namespace ManagementService.Controllers
                                         .Include(dl => dl.DeliveryLocation)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews.Where(n => n.Year == DateTime.Today.Year && n.Month == DateTime.Today.Month)).ThenInclude(d => d.DailyOverviews)
-                                        .Include(cld => cld.CustomersLightDiets).ThenInclude(ld => ld.LightDiet)
-                                        .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(b => b.BoxContent)
-                                        .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(p => p.PortionSize)
+                                        .Include(a => a.Article)
                                         .First();
 
                 if (dbCustomer != null)
                 {
-                    DTOCustomerOverview dTOCustomerOverview = mapper.Map<DTOCustomerOverview>(dbCustomer);
-                    dTOCustomerOverview.PortionSizes = mapper.Map<List<DTOSelectInput>>(context.PortionSizes.AsNoTracking().ToList());
+                    CheckMonthlyOverview.CheckAndAdd(dbCustomer);
 
+                    DTOCustomerOverview dTOCustomerOverview = mapper.Map<DTOCustomerOverview>(dbCustomer);
                     return Ok(dTOCustomerOverview);
                 }
 
@@ -98,6 +96,10 @@ namespace ManagementService.Controllers
 
             try
             {
+                dTOCustomerOverview.LightDietOverviews = dTOCustomerOverview.LightDietOverviews?.Where(ldo => ldo.Selected).ToList();
+                dTOCustomerOverview.FoodWishesOverviews = dTOCustomerOverview.FoodWishesOverviews?.Where(fwo => fwo.Selected).ToList();
+                dTOCustomerOverview.IngredientWishesOverviews = dTOCustomerOverview.IngredientWishesOverviews?.Where(fwo => fwo.Selected).ToList();
+
                 DateTime today = DateTime.Today;
                 Customer customer = mapper.Map<Customer>(dTOCustomerOverview);
 
@@ -124,10 +126,22 @@ namespace ManagementService.Controllers
 
                 foreach (CustomersLightDiet customersLightDiet in customer.CustomersLightDiets)
                 {
-                    customersLightDiet.Customer = customer;
+                    LightDiet dbLightDiet = context.LightDiets.First(d => d.Id == customersLightDiet.LightDietId);
+
                     customersLightDiet.CustomerId = customer.Id;
-                    customersLightDiet.LightDietId = customersLightDiet.LightDietId;
-                    customersLightDiet.LightDiet = context.LightDiets.FirstOrDefault(d => d.Id == customersLightDiet.LightDietId)!;
+                    customersLightDiet.Customer = customer;
+                    customersLightDiet.LightDiet.Id = dbLightDiet.Id;
+                    customersLightDiet.LightDiet = dbLightDiet;
+                }
+
+                foreach (CustomersFoodWish customersFoodWish in customer.CustomersFoodWish)
+                {
+                    FoodWish dbFoodWish = context.FoodWishes.First(d => d.Id == customersFoodWish.FoodWishId);
+
+                    customersFoodWish.CustomerId = customer.Id;
+                    customersFoodWish.Customer = customer;
+                    customersFoodWish.FoodWishId = dbFoodWish.Id;
+                    customersFoodWish.FoodWish = dbFoodWish;
                 }
 
                 foreach (CustomersMenuPlan customerMenuPlan in customer.CustomerMenuPlans)
@@ -168,6 +182,10 @@ namespace ManagementService.Controllers
 
             try
             {
+                dTOCustomerOverview.LightDietOverviews = dTOCustomerOverview.LightDietOverviews?.Where(ldo => ldo.Selected).ToList();
+                dTOCustomerOverview.FoodWishesOverviews = dTOCustomerOverview.FoodWishesOverviews?.Where(fwo => fwo.Selected).ToList();
+                dTOCustomerOverview.IngredientWishesOverviews = dTOCustomerOverview.IngredientWishesOverviews?.Where(fwo => fwo.Selected).ToList();
+
                 DateTime today = DateTime.Today;
                 Customer customer = mapper.Map<Customer>(dTOCustomerOverview);
 
@@ -177,6 +195,7 @@ namespace ManagementService.Controllers
                                        .Include(m => m.MonthlyOverviews).ThenInclude(d => d.DailyOverviews)
                                        .Include(cld => cld.CustomersLightDiets)
                                        .Include(cmp => cmp.CustomerMenuPlans)
+                                       .Include(cfw => cfw.CustomersFoodWish)
                                        .Include(a => a.Article)
                                        .FirstOrDefault();
 
@@ -217,6 +236,21 @@ namespace ManagementService.Controllers
                 dbCustomer.Holidays.Saturday = customer.Holidays.Saturday;
                 dbCustomer.Holidays.Sunday = customer.Holidays.Sunday;
 
+                #region Monthly
+                List<MonthlyOverview> overviewsToRemove = [];
+                foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
+                {
+                    if (!DateTimeCalc.MonthDifferenceMax1(today.Year, monthlyOverview.Year, today.Month, monthlyOverview.Month))
+                    {
+                        overviewsToRemove.Add(monthlyOverview);
+                    }
+                }
+
+                foreach (MonthlyOverview overviewToRemove in overviewsToRemove)
+                {
+                    customer.MonthlyOverviews.Remove(overviewToRemove);
+                }
+
                 List<MonthlyOverview> newMonthlyOverviews = [];
                 foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
                 {
@@ -230,32 +264,68 @@ namespace ManagementService.Controllers
                     }
                     else
                     {
-                        if (DateTimeCalc.MonthDifferenceMax1(today.Year, monthlyOverview.Year, today.Month, monthlyOverview.Month))
+                        foreach (DailyOverview dailyOverview in monthlyOverview.DailyOverviews)
                         {
-                            foreach (DailyOverview dailyOverview in monthlyOverview.DailyOverviews)
-                            {
-                                DailyOverview? dbDailyOverview = dbMonthlyOverview.DailyOverviews.FirstOrDefault(d => d.DayOfMonth == dailyOverview.DayOfMonth);
+                            DailyOverview? dbDailyOverview = dbMonthlyOverview.DailyOverviews.FirstOrDefault(d => d.DayOfMonth == dailyOverview.DayOfMonth);
 
-                                if (dbDailyOverview != null)
-                                {
-                                    dbDailyOverview.Price = dailyOverview.Price;
-                                    dbDailyOverview.NumberOfBoxes = dailyOverview.NumberOfBoxes;
-                                }
+                            if (dbDailyOverview != null)
+                            {
+                                dbDailyOverview.Price = dailyOverview.Price;
+                                dbDailyOverview.NumberOfBoxes = dailyOverview.NumberOfBoxes;
                             }
-                        }
+                        }                        
                     }
                 }
                 context.MonthlyOverviews.AddRange(newMonthlyOverviews);
+                #endregion
 
-                foreach (CustomersLightDiet customersLightDiet in customer.CustomersLightDiets)
+                #region lightDiets
+                var existingLightDiet = dbCustomer.CustomersLightDiets.ToDictionary(cl => cl.LightDietId);
+                foreach (var lightDiet in customer.CustomersLightDiets)
                 {
-                    CustomersLightDiet? dbCustomersLightDiet = dbCustomer.CustomersLightDiets.FirstOrDefault(cld => cld.LightDietId == customersLightDiet.LightDietId);
-
-                    if (dbCustomersLightDiet != null)
+                    if (!existingLightDiet.TryGetValue(lightDiet.LightDietId, out var foundLightDiet))
                     {
-                        dbCustomersLightDiet.Selected = customersLightDiet.Selected;
+                        LightDiet dbLightDiet = context.LightDiets.First(d => d.Id == lightDiet.LightDietId);
+
+                        lightDiet.CustomerId = dbCustomer.Id;
+                        lightDiet.Customer = dbCustomer;
+                        lightDiet.LightDiet.Id = dbLightDiet.Id;
+                        lightDiet.LightDiet = dbLightDiet;
+                        dbCustomer.CustomersLightDiets.Add(lightDiet);
                     }
                 }
+
+                var lightDietsIds = new HashSet<int>(customer.CustomersLightDiets.Select(a => a.LightDietId));
+                List<CustomersLightDiet> toRemoveLightDiets = [..dbCustomer.CustomersLightDiets.Where(er => !lightDietsIds.Contains(er.LightDietId))];
+                foreach (var toRemoveLightDiet in toRemoveLightDiets)
+                {
+                    dbCustomer.CustomersLightDiets.Remove(toRemoveLightDiet);
+                }
+                #endregion
+
+                #region foodwishes
+                var existingFoodWishes = dbCustomer.CustomersFoodWish.ToDictionary(cl => cl.FoodWishId);
+                foreach (var foodWish in customer.CustomersFoodWish)
+                {
+                    if (!existingFoodWishes.TryGetValue(foodWish.FoodWishId, out var foundFoodWish))
+                    {
+                        FoodWish dbFoodWish = context.FoodWishes.First(d => d.Id == foodWish.FoodWishId);
+
+                        foodWish.CustomerId = dbCustomer.Id;
+                        foodWish.Customer = dbCustomer;
+                        foodWish.FoodWishId = dbFoodWish.Id;
+                        foodWish.FoodWish = dbFoodWish;
+                        dbCustomer.CustomersFoodWish.Add(foodWish);
+                    }
+                }
+
+                var foodWishesIds = new HashSet<int>(customer.CustomersFoodWish.Select(a => a.FoodWishId));
+                List<CustomersFoodWish> toRemoveFoodWishes = [.. dbCustomer.CustomersFoodWish.Where(er => !foodWishesIds.Contains(er.FoodWishId))];
+                foreach (var toRemoveFooDWish in toRemoveFoodWishes)
+                {
+                    dbCustomer.CustomersFoodWish.Remove(toRemoveFooDWish);
+                }
+                #endregion
 
                 foreach (CustomersMenuPlan customerMenuPlan in customer.CustomerMenuPlans)
                 {
@@ -337,69 +407,108 @@ namespace ManagementService.Controllers
             }
         }
 
-        //If customerId == 0 then the code below will be called and only then
-        [HttpGet("GetLightDiets", Name = "GetLightDiets")]
-        public IActionResult GetLightDiets()
+        [HttpPost("GetGastro", Name = "GetGastro")]
+        public IActionResult GetGastro([FromBody] DTOId dTOId)
         {
             try
             {
+                DTOCustomersGastro dTOCustomersGastro = new();
+
+                #region lightDiet
                 List<DTOLightDietOverview> dTOLightDietOverview = [.. context.LightDiets.AsNoTracking().Select(lightDiet => new DTOLightDietOverview
                 {
                     Id = lightDiet.Id,
+                    Position = lightDiet.Position,
                     Name = lightDiet.Name,
                     Selected = false
                 })];
 
-                return Ok(dTOLightDietOverview);
-            }
-            catch (ValidationException e)
-            {
-                logger.LogError(e, "Could not map customer daily delivery");
-                return ValidationProblem("The request contains invalid data: " + e.Message);
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "failed getting customer daily delivery");
-                return BadRequest("An error occurred while processing your request.");
-            }
-        }
+                if (dTOId.Id != null)
+                {
+                    HashSet<int> selectedIds = new(context.CustomersLightDiets.AsNoTracking().Where(cld => cld.CustomerId == dTOId.Id).Select(x => x.LightDietId));
+                    foreach (var lightDiet in dTOLightDietOverview)
+                    {
+                        lightDiet.Selected = selectedIds.Contains(lightDiet.Id);
+                    }
+                }
+                dTOCustomersGastro.LightDietOverview = [.. dTOLightDietOverview.OrderBy(x => x.Position)];
+                #endregion
 
-        [HttpGet("GetBoxContentOverview", Name = "GetBoxContentOverview")]
-        public IActionResult GetBoxContentOverview()
-        {
-            try
-            {
+                #region foodWishes
+                List<FoodWish> foodWishes = [.. context.FoodWishes.AsNoTracking()];
+
+                List<DTOFoodWishesOverview> dTOFoodWishes = [.. foodWishes.Where(f => !f.IsIngredient).Select(foodWishes => new DTOFoodWishesOverview
+                {
+                    Id = foodWishes.Id,
+                    Position = foodWishes.Position,
+                    Name = foodWishes.Name,
+                    Selected = false
+                })];
+
+                List<DTOFoodWishesOverview> dTOIngredientWishes = [.. foodWishes.Where(f => f.IsIngredient).Select(foodWishes => new DTOFoodWishesOverview
+                {
+                    Id = foodWishes.Id,
+                    Position = foodWishes.Position,
+                    Name = foodWishes.Name,
+                    Selected = false
+                })];
+
+                if (dTOId.Id != null)
+                {
+                    HashSet<int> selectedIds = new(context.CustomersFoodWishes.AsNoTracking().Where(cld => cld.CustomerId == dTOId.Id).Select(x => x.FoodWishId));
+                    foreach (var foodWish in dTOFoodWishes)
+                    {
+                        foodWish.Selected = selectedIds.Contains(foodWish.Id);
+                    }
+                    foreach (var ingredientWish in dTOIngredientWishes)
+                    {
+                        ingredientWish.Selected = selectedIds.Contains(ingredientWish.Id);
+                    }
+                }
+                dTOCustomersGastro.FoodWishesOverviews = [.. dTOFoodWishes.OrderBy(x => x.Position)];
+                dTOCustomersGastro.IngredientWishesOverviews = [.. dTOIngredientWishes.OrderBy(x => x.Position)];
+                #endregion
+
+                #region boxContent
                 if (!context.BoxContents.AsNoTracking().Any() || !context.PortionSizes.AsNoTracking().Any())
                 {
                     return NotFound("At least one box content and one portion size is required");
                 }
 
                 List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
-                int id = portionSizes.FirstOrDefault(ps => ps.Position == 0)!.Id;
 
-                List<DTOBoxContentSelected> dTOBoxContentSelectedList = [.. context.BoxContents.AsNoTracking().Select(boxContent => new DTOBoxContentSelected
+                List<DTOBoxContentSelected> dTOBoxContentSelectedList = [];
+
+                if (dTOId.Id == null)
                 {
-                    Id = boxContent.Id,
-                    Name = boxContent.Name,
-                    PortionSizeId = id
-                })];
-
-                DTOBoxContentOverview dTOBoxContentOverview = new() 
+                    int id = portionSizes.FirstOrDefault(ps => ps.Position == 0)!.Id;
+                    dTOBoxContentSelectedList = [.. context.BoxContents.AsNoTracking().Select(boxContent => new DTOBoxContentSelected
+                    {
+                        Id = boxContent.Id,
+                        Position = boxContent.Position,
+                        Name = boxContent.Name,
+                        PortionSizeId = id
+                    })];
+                }
+                else
                 {
-                    BoxContentSelectedList = dTOBoxContentSelectedList, 
-                    SelectInputs = mapper.Map<List<DTOSelectInput>>(portionSizes)
-                };
+                    dTOBoxContentSelectedList = mapper.Map<List<DTOBoxContentSelected>>(context.CustomerMenuPlans.AsNoTracking().Where(cmp => cmp.CustomerId == dTOId.Id).Include(b => b.BoxContent).Include(p => p.PortionSize));
+                }
 
-                return Ok(dTOBoxContentOverview);
+                dTOCustomersGastro.BoxContentSelectedList = [.. dTOBoxContentSelectedList.OrderBy(x => x.Position)];
+                dTOCustomersGastro.SelectInputs = [.. mapper.Map<List<DTOSelectInput>>(portionSizes).OrderBy(x => x.Position)];
+                #endregion
+
+                return Ok(dTOCustomersGastro);
             }
             catch (ValidationException e)
             {
-                logger.LogError(e, "Could not map customer box content overview");
+                logger.LogError(e, "Could not map customers gastronomy");
                 return ValidationProblem("The request contains invalid data: " + e.Message);
             }
             catch (Exception e)
             {
-                logger.LogError(e, "failed getting box content overview");
+                logger.LogError(e, "failed getting customers gastronomy");
                 return BadRequest("An error occurred while processing your request.");
             }
         }

@@ -39,5 +39,9 @@ namespace SharedLibrary.DTOs.Management
         public List<DTOBoxContentSelected>? BoxContentSelectedList { get; set; }
 
         public List<DTOSelectInput>? PortionSizes { get; set; }
+
+        public List<DTOFoodWishesOverview>? FoodWishesOverviews{ get; set; }
+
+        public List<DTOFoodWishesOverview>? IngredientWishesOverviews { get; set; }
     }
 }

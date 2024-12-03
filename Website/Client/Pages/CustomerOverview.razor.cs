@@ -59,8 +59,8 @@ namespace Website.Client.Pages
                 SerialNumber = string.Empty,
                 Name = string.Empty,
                 Title = string.Empty,
-                DeliveryLocation = new DeliveryLocation() 
-                { 
+                DeliveryLocation = new DeliveryLocation()
+                {
                     Address = string.Empty,
                     Region = string.Empty,
                     GeoLocation = string.Empty,
@@ -94,6 +94,8 @@ namespace Website.Client.Pages
                 RouteId = int.MinValue,
                 RouteDetails = [],
                 LightDietOverviews = [],
+                FoodWishesOverviews = [],
+                IngredientWishesOverviews = [],
                 PortionSizes = [],
                 BoxContentSelectedList = []
             };
@@ -103,15 +105,14 @@ namespace Website.Client.Pages
         {
             try
             {
+                var data = new
+                {
+                    Id = NavigationContainer.CustomerId
+                };
+
                 if (NavigationContainer.CustomerId != null)
                 {
-                    var data = new
-                    {
-                        Id = NavigationContainer.CustomerId
-                    };
-
                     using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomer", data, JsonSerializerOptions)!;
-
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         CustomerOverviewModel customer = JsonSerializer.Deserialize<CustomerOverviewModel>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -133,9 +134,6 @@ namespace Website.Client.Pages
                         CustomerOverviewModel.Workdays = customer.Workdays;
                         CustomerOverviewModel.Holidays = customer.Holidays;
                         CustomerOverviewModel.RouteId = customer.RouteId;
-                        CustomerOverviewModel.LightDietOverviews = [.. customer.LightDietOverviews];
-                        CustomerOverviewModel.PortionSizes = [.. customer.PortionSizes];
-                        CustomerOverviewModel.BoxContentSelectedList = [.. customer.BoxContentSelectedList];
                     }
                     else if (response1.StatusCode == System.Net.HttpStatusCode.NotFound)
                     {}
@@ -144,36 +142,23 @@ namespace Website.Client.Pages
                         NotificationService.SetError(await response1.Content.ReadAsStringAsync());
                     }
                 }
+
+                using var responseLightDiet = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetGastro", data, JsonSerializerOptions)!;
+                if (responseLightDiet.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    CustomersGastro customerGastro = JsonSerializer.Deserialize<CustomersGastro>(await responseLightDiet.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    CustomerOverviewModel.LightDietOverviews = customerGastro.LightDietOverview ?? [];
+                    CustomerOverviewModel.FoodWishesOverviews = customerGastro.FoodWishesOverviews ?? [];
+                    CustomerOverviewModel.IngredientWishesOverviews = customerGastro.IngredientWishesOverviews ?? [];
+                    CustomerOverviewModel.BoxContentSelectedList = customerGastro?.BoxContentSelectedList ?? [];
+                    CustomerOverviewModel.PortionSizes = customerGastro?.SelectInputs ?? [];
+                }
                 else
                 {
-                    using var response1 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetLightDiets")!;
-
-                    if (response1.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        List<SelectedLightDiet> lightDietOverviews = JsonSerializer.Deserialize<List<SelectedLightDiet>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-                        CustomerOverviewModel.LightDietOverviews = [.. lightDietOverviews];
-                    }
-                    else
-                    {
-                        NotificationService.SetError(await response1.Content.ReadAsStringAsync());
-                    }
-
-                    using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetBoxContentOverview")!;
-
-                    if (response2.StatusCode == System.Net.HttpStatusCode.OK)
-                    {
-                        BoxContentOverview boxContentOverview = JsonSerializer.Deserialize<BoxContentOverview>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-                        CustomerOverviewModel.BoxContentSelectedList = [.. boxContentOverview.BoxContentSelectedList];
-                        CustomerOverviewModel.PortionSizes = [.. boxContentOverview.SelectInputs];
-                    }
-                    else
-                    {
-                        NotificationService.SetError(await response2.Content.ReadAsStringAsync());
-                    }
+                    NotificationService.SetError(await responseLightDiet.Content.ReadAsStringAsync());
                 }
 
                 using var responseRoute = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetRoutesOverview")!;
-
                 if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     CustomerOverviewModel.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
@@ -184,7 +169,6 @@ namespace Website.Client.Pages
                 }
 
                 using var responseArticle = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/ArticleManagement/GetArticlesForCustomer")!;
-
                 if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var articles = JsonSerializer.Deserialize<List<ArticlesForCustomer>>(await responseArticle.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -203,7 +187,7 @@ namespace Website.Client.Pages
                 }
             }
             catch
-            { 
+            {
                 NotificationService.SetError("Server is not reachable.");
             }
         }

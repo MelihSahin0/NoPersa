@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using System.Linq.Expressions;
 using Website.Client.Models;
 using Website.Client.Styles;
+using Website.Client.Components.Default;
 
 namespace Website.Client.Components
 {
@@ -86,6 +87,15 @@ namespace Website.Client.Components
         private void AddArticle()
         {
             ArticleSummary.Add(new ArticleSummary() { Id = 0, Position = ArticleSummary.Count, Name = "", Price = "", NewName = "", NewPrice = "", NumberOfCustomers = 0, IsDisabled = false });
+        }
+
+        private void SortByName()
+        {
+            int i = 0;
+            foreach (var item in ArticleSummary.OrderBy(x => x.Name).ToList())
+            {
+                item.Position = i++;
+            }
         }
 
         private string ValidStateCss(Expression<Func<string>>? For)

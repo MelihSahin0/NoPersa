@@ -48,6 +48,7 @@
                     </li>
                 }
                 <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddArticle()">Add new Article</button>
+                <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} ml-1")" @onclick="() => SortByName()">Sort by name</button>
             </ul>
         </div>
     </div>

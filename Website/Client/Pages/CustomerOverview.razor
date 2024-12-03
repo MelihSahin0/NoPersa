@@ -12,48 +12,6 @@
 
     <div class="flex flex-row">
         <div class="flex flex-col w-1/2 items-center">
-
-            <!-- Delivery Information Section -->
-            <div class="p-4 bg-gray-100 w-4/6 rounded-md">
-                <h3 class="text-lg font-semibold mb-4 select-none">Delivery Information</h3>
-
-                <FormMonthYearPicker Label="Month picker" OnMonthYearSelected="@(() => CustomerOverviewModel.OnMonthYearSelected())" @bind-Year="@CustomerOverviewModel.DisplayMonth.Year" @bind-Month="@CustomerOverviewModel.DisplayMonth.Month" />
-                
-                <div class="flex flex-col mt-1">
-                    <div class="grid grid-cols-8 gap-2">
-                        <FormDefaultSelect Class="col-span-2" IsColumn="true" Label="Article" @bind-Value="CustomerOverviewModel.ArticleId" SelectInputs="CustomerOverviewModel.Articles" />
-                        @if (CustomerOverviewModel.ArticlesPrice.FirstOrDefault(ap => ap.Id == CustomerOverviewModel.ArticleId) != null)
-                        {
-                            <FormTextDisplay Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Price" Value="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()"/>
-                        }
-                        <FormTextInput Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Number of Boxes" @bind-Value="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => CustomerOverviewModel.DefaultNumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
-                    </div>
-                        <div class="grid grid-cols-8 gap-2">
-                        <a class="font-semibold col-span-2 text-center select-none">Day</a>
-                        <a class="font-semibold col-span-3 text-center select-none">Price per Box</a>
-                        <a class="font-semibold col-span-3 text-center select-none">Number of Boxes</a>
-                    </div>
-
-                    @if (CustomerOverviewModel.ArticlesPrice.FirstOrDefault(ap => ap.Id == CustomerOverviewModel.ArticleId) != null)
-                    {
-                        var monthlyDeliveries = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries];
-                        @for (int i = 1; i <= monthlyDeliveries.DailyDeliveries.Last().DayOfMonth; i++)
-                        {
-                            var dailyDelivery = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries].DailyDeliveries.First(d => d.DayOfMonth == i);
-                            var dayOfWeek = new DateTime(monthlyDeliveries.MonthOfTheYear.Year, (int)monthlyDeliveries.MonthOfTheYear.Month, i).DayOfWeek;
-
-                            <div class="grid grid-cols-8 gap-2 mt-1">
-                                <a class="@($"text-center col-span-2 select-none {(dayOfWeek == DayOfWeek.Saturday ? "text-yellow" : dayOfWeek == DayOfWeek.Sunday ? "text-red" : "text-black")}")">@i</a>
-                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
-                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
-                            </div>
-                        }
-                    }
-                </div>
-            </div>
-        </div>
-
-        <div class="flex flex-col w-1/2 items-center">
             <!-- General Info Section -->
             <div class="p-4 bg-gray-100 rounded-md w-4/6">
                 <h3 class="text-lg font-semibold mb-4 select-none">General Information</h3>
@@ -70,7 +28,7 @@
             </div>
 
             <!-- Workdays and Holidays Section -->
-            <div class="mt-6 bg-gray-100 rounded-md p-4 w-full">
+            <div class="mt-4 bg-gray-100 rounded-md p-4 w-11/12">
                 <h3 class="text-lg font-semibold mb-4">Delivery days</h3>
 
                 <div class="grid grid-row gap-4">
@@ -108,7 +66,7 @@
             </div>
 
             <!-- Box configuration Section -->
-            <div class="bg-gray-100 rounded-md p-4 mt-6 w-full">
+            <div class="bg-gray-100 rounded-md p-4 mt-4 w-11/12">
                 <h3 class="text-lg font-semibold mb-4">Box configuration</h3>
                 <p class="font-semibold">Light diet:</p>
                 <div class="flex flex-row flex-wrap">
@@ -133,14 +91,98 @@
                 </div>
             </div>
 
+            <!-- Food Wishes Section -->
+            <div class="bg-gray-100 rounded-md p-4 mt-4 w-11/12 flex flex-col">
+                <h3 class="text-lg font-semibold mb-4">Food Wishes</h3>
+
+                <div class="flex flex-row">
+                    <div class="flex flex-col w-1/2">
+                        <p class="font-semibold">Foods:</p>
+                        <div class="w-full pr-4">
+                            <ul class="@($"max-h-32 w-full space-y-2 flex flex-col overflow-y-auto")">
+                                @foreach (var foodWish in CustomerOverviewModel.FoodWishesOverviews)
+                                {
+                                    <li>
+                                        <FormInputCheckbox Class="w-full justify-between" Label="@foodWish.Name" @bind-Value="@foodWish.Selected" IsColumn="false"/>
+                                    </li>       
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col w-1/2">
+                        <p class="font-semibold">Ingredients:</p>
+                        <div class="w-full pr-4">
+                            <ul class="@($"max-h-32 w-full space-y-2 flex flex-col overflow-y-auto")">
+                                @foreach (var foodWish in CustomerOverviewModel.IngredientWishesOverviews)
+                                {
+                                    <li>
+                                        <FormInputCheckbox Class="w-full justify-between" Label="@foodWish.Name" @bind-Value="@foodWish.Selected" IsColumn="false" />
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Delivery Whishes Section -->
-            <div class="bg-gray-100 rounded-md p-4 mt-6 w-full">
+            <div class="bg-gray-100 rounded-md p-4 mt-4 w-11/12">
                 <h3 class="text-lg font-semibold mb-4">Delivery wishes</h3>
                 <InputTextArea class="w-full min-h-10 p-1" @bind-Value="@CustomerOverviewModel.DeliveryLocation.DeliveryWhishes"/>
             </div>
+        </div>
 
+        <div class="flex flex-col w-1/2 items-center">
+            <!-- Delivery Information Section -->
+            <div class="p-4 bg-gray-100 w-5/6 rounded-md">
+                <h3 class="text-lg font-semibold mb-4 select-none">Delivery Information</h3>
+
+                <FormMonthYearPicker Label="Month picker" OnMonthYearSelected="@(() => CustomerOverviewModel.OnMonthYearSelected())" @bind-Year="@CustomerOverviewModel.DisplayMonth.Year" @bind-Month="@CustomerOverviewModel.DisplayMonth.Month" />
+                
+                <div class="flex flex-col mt-1">
+                    <div class="grid grid-cols-8 gap-2">
+                        <FormDefaultSelect Class="col-span-2" IsColumn="true" Label="Article" @bind-Value="CustomerOverviewModel.ArticleId" SelectInputs="CustomerOverviewModel.Articles" />
+                        @if (CustomerOverviewModel.ArticlesPrice.FirstOrDefault(ap => ap.Id == CustomerOverviewModel.ArticleId) != null)
+                        {
+                            <FormTextDisplay Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Price" Value="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()"/>
+                        }
+                        <FormTextInput Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Number of Boxes" @bind-Value="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => CustomerOverviewModel.DefaultNumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                    </div>
+                        <div class="grid grid-cols-8 gap-2">
+                        <a class="font-semibold col-span-2 text-center select-none">Day</a>
+                        <a class="font-semibold col-span-3 text-center select-none">Price per Box</a>
+                        <a class="font-semibold col-span-3 text-center select-none">Number of Boxes</a>
+                    </div>
+
+                    @if (CustomerOverviewModel.ArticlesPrice.FirstOrDefault(ap => ap.Id == CustomerOverviewModel.ArticleId) != null)
+                    {
+                        var monthlyDeliveries = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries];
+                        @for (int i = 1; i <= monthlyDeliveries.DailyDeliveries.Last().DayOfMonth; i++)
+                        {
+                            var dailyDelivery = CustomerOverviewModel.MonthlyDeliveries[CustomerOverviewModel.selectedMonthlyDeliveries].DailyDeliveries.First(d => d.DayOfMonth == i);
+                            var dayOfWeek = new DateTime(monthlyDeliveries.MonthOfTheYear.Year, (int)monthlyDeliveries.MonthOfTheYear.Month, i).DayOfWeek;
+
+                            <div class="grid grid-cols-8 gap-2 mt-1">
+                                <a class="@($"text-center col-span-2 select-none {(dayOfWeek == DayOfWeek.Saturday ? "text-yellow" : dayOfWeek == DayOfWeek.Sunday ? "text-red" : "text-black")}")">@i</a>
+                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
+                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                            </div>
+                        }
+                    }
+
+                    <div class="grid grid-cols-8 gap-2">
+                        <a class="font-semibold col-span-2 text-center select-none"></a>
+                        <a class="font-semibold col-span-3 text-center select-none">Total Price: @CustomerOverviewModel.TotalPrice()</a>
+                        <a class="font-semibold col-span-3 text-center select-none"></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
             <div>
-                @if(CustomerOverviewModel.Id == 0){
+                @if (CustomerOverviewModel.Id == 0)
+                {
                     <FormDefaultSelect Label="Select Route" @bind-Value="CustomerOverviewModel.RouteId" SelectInputs="CustomerOverviewModel.RouteDetails" />
                 }
                 <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
