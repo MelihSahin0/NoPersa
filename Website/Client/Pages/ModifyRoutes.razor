@@ -3,13 +3,23 @@
 @using Website.Client.FormModels
 @using Website.Client.Styles
 
-<LoadingPopup IsVisible="@IsSubmitting" />
+<LoadingPopup IsVisible="@IsSubmitting"/>
 <EditForm Model="ModifyRoutesModel" OnValidSubmit="@Submit" class="w-full flex flex-col">
     <ObjectGraphDataAnnotationsValidator />
 
+    <div class="w-4/6 flex flex-row self-center">
+        <div class="p-4 bg-gray-100 rounded-md justify-center w-1/2 m-2">
+            <h3 class="text-lg font-semibold mb-4 select-none">Routes to drive</h3>
+            <FormDragDropList Class="w-full flex self-center" MaxHeight="max-h-96" IsDrivable="true"
+                              @bind-RouteOverviews="ModifyRoutesModel.RouteDeliverableSummary" Placeholder="Route name"/>
+        </div>
 
-    <FormDragDropList Class="w-2/6 flex self-center p-4 bg-gray-100 rounded-md" MaxHeight="max-h-96"
-                      @bind-RouteOverviews="ModifyRoutesModel.RouteSummary" Placeholder="Route name"/>
+        <div class="p-4 bg-gray-100 rounded-md justify-center w-1/2 m-2">
+            <h3 class="text-lg font-semibold mb-4 select-none">Local delivery</h3>
+            <FormDragDropList Class="w-full flex self-center" MaxHeight="max-h-96" IsDrivable="false"
+                              @bind-RouteOverviews="ModifyRoutesModel.RouteNonDeliverableSummary" Placeholder="Route Name" />
+        </div>
+    </div>
 
    <div class="flex flex-row self-center mt-5">
         <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightRed w-20 mx-2")" @onclick="() => Cancel()">Cancel</button>

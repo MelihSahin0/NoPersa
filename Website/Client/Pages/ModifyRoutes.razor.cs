@@ -32,7 +32,7 @@ namespace Website.Client.Pages
 
         protected override void OnInitialized()
         {
-            ModifyRoutesModel = new ModifyRoutesModel() { RouteSummary = [] };
+            ModifyRoutesModel = new ModifyRoutesModel() { RouteDeliverableSummary = [], RouteNonDeliverableSummary = [] };
         }
 
         protected override async Task OnInitializedAsync()
@@ -43,7 +43,9 @@ namespace Website.Client.Pages
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    ModifyRoutesModel.RouteSummary = JsonSerializer.Deserialize<List<RouteSummary>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    var routes = JsonSerializer.Deserialize<List<RouteSummary>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    ModifyRoutesModel.RouteDeliverableSummary = [.. routes.Where(r => r.IsDrivable)];
+                    ModifyRoutesModel.RouteNonDeliverableSummary = [.. routes.Where(r => !r.IsDrivable)];
                 }
                 else
                 {
@@ -61,7 +63,10 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateRoutes", ModifyRoutesModel.RouteSummary, JsonSerializerOptions);
+                List<RouteSummary> routes = [];
+                routes.AddRange(ModifyRoutesModel.RouteDeliverableSummary);
+                routes.AddRange(ModifyRoutesModel.RouteNonDeliverableSummary);
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateRoutes", routes, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

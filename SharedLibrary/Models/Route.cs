@@ -16,6 +16,9 @@ namespace SharedLibrary.Models
         [MaxLength(64)]
         public required string Name { get; set; }
 
+        [Required]
+        public bool IsDrivable { get; set; }
+
         public List<Customer> Customers { get; set; } = [];
     }
 }

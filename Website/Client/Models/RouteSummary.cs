@@ -17,6 +17,9 @@ namespace Website.Client.Models
         public required string Name { get; set; }
 
         [Required]
+        public required bool IsDrivable { get; set;}
+
+        [Required]
         [IntType(min: 0)]
         public required int NumberOfCustomers { get; set; }
 

@@ -127,6 +127,7 @@ namespace MaintenanceService.Database
                     Id = int.MinValue,
                     Name = "Archive",
                     Position = int.MaxValue,
+                    IsDrivable = false
                 });
                 SaveChanges();
             }

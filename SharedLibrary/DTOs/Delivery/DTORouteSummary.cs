@@ -8,6 +8,8 @@ namespace SharedLibrary.DTOs.Delivery
 
         public string? Name { get; set; }
 
+        public bool IsDrivable { get; set; }
+
         public int? NumberOfCustomers { get; set; }
     }
 }

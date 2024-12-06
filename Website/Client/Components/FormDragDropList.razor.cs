@@ -36,6 +36,9 @@ namespace Website.Client.Components
         public string StartFilter { get; set; } = string.Empty;
 
         [Parameter]
+        public bool IsDrivable { get; set; }
+
+        [Parameter]
         public required List<RouteSummary> RouteOverviews { get; set; }
 
         [Parameter]
@@ -82,7 +85,7 @@ namespace Website.Client.Components
 
         private void AddRoute()
         {
-            RouteOverviews.Add(new RouteSummary() { Id = 0, Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0 });
+            RouteOverviews.Add(new RouteSummary() { Id = 0, Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0, IsDrivable = IsDrivable });
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)
