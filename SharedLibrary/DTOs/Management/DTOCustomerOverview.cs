@@ -28,7 +28,7 @@ namespace SharedLibrary.DTOs.Management
 
         public int? ArticleId { get; set; }
 
-        public string? DefaultNumberOfBoxes { get; set; }
+        public int DefaultNumberOfBoxes { get; set; }
 
         public DTOMonthlyDelivery[]? MonthlyDeliveries { get; set; }
 

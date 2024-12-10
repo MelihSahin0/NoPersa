@@ -429,7 +429,8 @@ namespace DeliveryService.Controllers
                             Address = dbCustomer.DeliveryLocation.Address,
                             Latitude = dbCustomer.DeliveryLocation.Latitude,
                             Longitude = dbCustomer.DeliveryLocation.Longitude,
-                            DeliveryWishes = dbCustomer.DeliveryLocation.DeliveryWhishes
+                            DeliveryWishes = dbCustomer.DeliveryLocation.DeliveryWhishes,
+                            NumberOfBoxes = dbCustomer.DefaultNumberOfBoxes
                         });
                     }
                 }

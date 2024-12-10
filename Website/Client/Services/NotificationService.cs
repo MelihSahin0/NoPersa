@@ -10,6 +10,7 @@ namespace Website.Client.Services
         private readonly NavigationManager navigationManager;
         private Timer? clearNotificationTimer;
         private int remainingSeconds;
+        private bool setMessage = false;
 
         public event Action<string>? OnSuccess;
         public event Action<string>? OnError;
@@ -23,17 +24,27 @@ namespace Website.Client.Services
 
         public void SetSuccess(string message)
         {
+            setMessage = true;
             OnSuccess?.Invoke(message);
         }
 
         public void SetError(string message)
         {
+            setMessage = true;
             OnError?.Invoke(message);
         }
 
         private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            StartClearTimer();
+            if (setMessage)
+            {
+                setMessage = false;
+                StartClearTimer();
+            }
+            else
+            {
+                ClearNotifications();
+            }
         }
 
         private void StartClearTimer()

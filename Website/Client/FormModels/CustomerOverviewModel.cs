@@ -10,6 +10,7 @@ using Website.Client.Components;
 using Website.Client.Components.Default;
 using Website.Client.Models;
 using Website.Client.Services;
+using Website.Client.Util;
 
 namespace Website.Client.FormModels
 {
@@ -81,9 +82,12 @@ namespace Website.Client.FormModels
         [JsonIgnore]
         public List<ArticlesForCustomer> ArticlesPrice { get; set; }
 
-        [Required(ErrorMessage = "Number of Boxes is required")]
-        [IntType(min: 1)]
-        public required string DefaultNumberOfBoxes { get; set; }
+        [Required]
+        [IntType(min: 1, max: 10)]
+        public required int DefaultNumberOfBoxes { get; set; }
+
+        [JsonIgnore]
+        public List<SelectInput> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection.Where(x => x.Id != 0).ToList();
 
         [ValidateComplexType]
         [Required(ErrorMessage = "Monthly Delivery is required")]

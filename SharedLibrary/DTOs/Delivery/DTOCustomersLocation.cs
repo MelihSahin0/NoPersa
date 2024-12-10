@@ -8,5 +8,6 @@
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public string? DeliveryWishes { get; set; }
+        public int NumberOfBoxes { get; set; }
     }
 }

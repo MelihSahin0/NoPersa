@@ -5,35 +5,28 @@ using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Website.Client.Components.Default;
 using Website.Client.Enums;
 using Website.Client.Models;
 using Website.Client.Services;
+using Website.Client.Util;
 
 namespace Website.Client.FormModels
 {
     public class DeliverModel : IDisposable
     {
-        [JsonIgnore]
         public ILocalStorageService LocalStorage { get; init; }
 
-        [JsonIgnore]
         public JsonSerializerOptions JsonSerializerOptions { get; init; }
 
-        [JsonIgnore]
         public HttpClient HttpClient { get; init; }
 
-        [JsonIgnore]
         public NotificationService NotificationService { get; init; }
 
-        [JsonIgnore]
         public NavigationManager NavigationManager { get; set; }
 
-        [JsonIgnore]
         public GeoLocationService GeoLocationService { get; set; }
 
-        [JsonIgnore]
         public LeafletService LeafletService { get; set; }
 
         public DeliverModel(ILocalStorageService localStorage, JsonSerializerOptions jsonSerializerOptions, HttpClient httpClient, NotificationService notificationService, NavigationManager navigationManager, GeoLocationService geoLocationService, LeafletService leafletService) 
@@ -51,7 +44,6 @@ namespace Website.Client.FormModels
         [IntType]
         public required int RouteId { get; set; }
 
-        [JsonIgnore]
         public List<SelectInput>? RouteSummary { get; set; }
 
         [Required]
@@ -66,12 +58,10 @@ namespace Website.Client.FormModels
         [Required]
         public required List<DeliverSummary> CustomerDelivery { get; set; }
 
-        public int CustomerIndex = 0;
+        public int CustomerIndex { get; set; } = 0;
 
-        [JsonIgnore]
         public bool IsSubmitting { get; set; } = false;
 
-        [JsonIgnore]
         public bool DisplayMap { get; set; } = false;
 
         public async Task GetRouteCustomers(EditContext editContext)
@@ -90,6 +80,7 @@ namespace Website.Client.FormModels
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     CustomerDelivery = [.. JsonSerializer.Deserialize<List<DeliverSummary>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!];
+                    CustomersBoxStatuses = [.. CustomerDelivery.Select(r => new CustomersBoxStatus() { Id = r.Id, DeliveredBoxes = r.NumberOfBoxes, ReceivedBoxes = r.NumberOfBoxes })];
 
                     if (CustomerDelivery.Count != 0)
                     {
@@ -247,7 +238,18 @@ namespace Website.Client.FormModels
                 await LeafletService.ClearMap();
                 GeoLocationService.OnLocationUpdated -= HandleLocationUpdated;
                 LeafletService.SetCoordinates([]);
-                NavigationManager.NavigateTo("/");
+
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/BoxManagement/UpdateCustomersBoxStatus", CustomersBoxStatuses, JsonSerializerOptions)!;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    NotificationService.SetSuccess("Successfully updated customers box status");
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                }
             }
             catch
             {
@@ -256,11 +258,16 @@ namespace Website.Client.FormModels
             IsSubmitting = false;
         }
 
+        public List<SelectInput> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection;
+
         public bool ButtonPrevious { get; set; } = false;
 
         public bool ButtonNext { get; set; } = false;
 
         public bool ButtonSubmit { get; set; } = false;
+
+        [Required]
+        public required List<CustomersBoxStatus> CustomersBoxStatuses {get; set;}
 
         public DeliverSummary? displayCustomer;
         public async Task Next()

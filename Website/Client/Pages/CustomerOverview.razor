@@ -147,7 +147,7 @@
                         {
                             <FormTextDisplay Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Price" Value="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()"/>
                         }
-                        <FormTextInput Class="col-span-3" TextOrientation="text-center" LabelTextOrientation="center" Label="Number of Boxes" @bind-Value="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => CustomerOverviewModel.DefaultNumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                        <FormDefaultSelect Class="col-span-3" IsColumn="true" Label="Number of Boxes" @bind-Value="@CustomerOverviewModel.DefaultNumberOfBoxes" SelectInputs="@CustomerOverviewModel.DefaultNumbers" />
                     </div>
                         <div class="grid grid-cols-8 gap-2">
                         <a class="font-semibold col-span-2 text-center select-none">Day</a>
@@ -166,7 +166,7 @@
                             <div class="grid grid-cols-8 gap-2 mt-1">
                                 <a class="@($"text-center col-span-2 select-none {(dayOfWeek == DayOfWeek.Saturday ? "text-yellow" : dayOfWeek == DayOfWeek.Sunday ? "text-red" : "text-black")}")">@i</a>
                                 <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.Price" Placeholder="@CustomerOverviewModel.ArticlesPrice.First(ap => ap.Id == CustomerOverviewModel.ArticleId).Price.ToString()" For="@(() => dailyDelivery.Price)" ValidationFunction="OnInputValidation.Double" />
-                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@CustomerOverviewModel.DefaultNumberOfBoxes" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
+                                <FormTextInput Class="col-span-3" TextOrientation="text-center" IsDisabled="@(!CustomerOverviewModel.ModifyMonthlyDelivery)" Label="" @bind-Value="dailyDelivery.NumberOfBoxes" Placeholder="@CustomerOverviewModel.DefaultNumberOfBoxes.ToString()" For="@(() => dailyDelivery.NumberOfBoxes)" ValidationFunction="OnInputValidation.Integer" />
                             </div>
                         }
                     }

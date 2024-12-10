@@ -44,7 +44,8 @@ namespace Website.Client.Pages
                 Year = dateTime.Year,
                 Month = (Enums.Months)(dateTime.Month),
                 Day = dateTime.Day,
-                CustomerDelivery = []
+                CustomerDelivery = [],
+                CustomersBoxStatuses = [],
             };
         }
 

@@ -31,7 +31,7 @@ namespace SharedLibrary.Models
         public required Article Article { get; set; }
 
         [Required]
-        [IntType(min: 0)]
+        [IntType(min: 1, max: 10)]
         public required int DefaultNumberOfBoxes { get; set; }
 
         public List<MonthlyOverview> MonthlyOverviews { get; set; } = [];
@@ -71,5 +71,7 @@ namespace SharedLibrary.Models
         public List<CustomersFoodWish> CustomersFoodWish { get; set; } = [];
 
         public List<FoodWish> FoodWishes { get; set; } = [];
+
+        public BoxStatus? BoxStatus { get; set; }
     }
 }

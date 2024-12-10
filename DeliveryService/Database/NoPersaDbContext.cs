@@ -13,6 +13,7 @@ namespace DeliveryService.Database
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Route> Routes { get; set; }
         public DbSet<Holiday> Holidays { get; set; }
+        public DbSet<BoxStatus> BoxStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,10 @@ namespace DeliveryService.Database
             modelBuilder.Entity<Holiday>()
                 .ToTable("Holiday")
                 .HasKey(h => h.Id);
+
+            modelBuilder.Entity<BoxStatus>()
+                .ToTable("BoxStatus")
+                .HasKey(b => b.Id);
         }
     }
 }

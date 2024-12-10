@@ -19,6 +19,7 @@ namespace MaintenanceService.Database
         public DbSet<Route> Route { get; set; }
         public DbSet<Holiday> Holiday { get; set; }
         public DbSet<Article> Article { get; set; }
+        public DbSet<BoxStatus> BoxStatus { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

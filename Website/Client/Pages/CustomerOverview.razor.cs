@@ -74,7 +74,7 @@ namespace Website.Client.Pages
                 ArticleId = 0,
                 Articles = [],
                 ArticlesPrice = [],
-                DefaultNumberOfBoxes = "1",
+                DefaultNumberOfBoxes = 1,
                 MonthlyDeliveries = [
                     new MonthlyDelivery()
                     {
