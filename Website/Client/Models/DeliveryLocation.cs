@@ -5,7 +5,8 @@ namespace Website.Client.Models
 {
     public class DeliveryLocation
     {
-        public int Id { get; set; }
+        [Required]
+        public required int Id { get; set; }
 
         [Required]
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]

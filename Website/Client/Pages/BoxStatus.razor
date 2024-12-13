@@ -1,0 +1,61 @@
+﻿@page "/boxStatus"
+@using Website.Client.Components
+@using Website.Client.Components.Base
+@using Website.Client.Components.Default
+@using Website.Client.FormModels
+@using Website.Client.Styles
+
+<LoadingPopup IsVisible="@IsSubmitting" />
+<EditForm Model="BoxStatusModel" OnValidSubmit="@Submit" class="w-full flex flex-col">
+    <ObjectGraphDataAnnotationsValidator />
+
+    <div class="flex flex-row w-full justify-center">
+        <div class="p-4 bg-gray-100 rounded-md w-4/6 m-2">
+            <div class="flex flex-col">
+                <div class="grid grid-cols-6 gap-2">
+                    <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} col-span-2 text-left border-black mb-5")"
+                               Placeholder="Route filter"
+                               @bind-Value="@BoxStatusModel.RouteFilter" />
+
+                    <TextInput class="@($"{Scaling.GetTextScaling()} {InputStyles.GetInputDefaultStyle()} col-span-2 text-left border-black mb-5")"
+                               Placeholder="Customer filter"
+                               @bind-Value="@BoxStatusModel.CustomerFilter" />
+                </div>
+
+                <div class="@($"grid grid-cols-12 gap-2 {(isOverflow ? "pr-5" : "pr-1")}")">
+                    <a class="font-semibold col-span-2 text-center select-none">Route</a>
+                    <a class="font-semibold col-span-2 text-center select-none">Customer</a>
+                    <a class="font-semibold col-span-2 text-center select-none">Number of Boxes yesterday</a>
+                    <a class="font-semibold col-span-2 text-center select-none">Number of Boxes delivered today</a>
+                    <a class="font-semibold col-span-2 text-center select-none">Number of Boxes received today</a>
+                    <a class="font-semibold col-span-2 text-center select-none">Number of Boxes today</a>
+                </div>
+     
+                <div id="overflowContainer" class="max-h-96 overflow-y-auto w-full p-1">
+                    @foreach (var boxStatusOverview in BoxStatusModel.BoxStatusOverviews)
+                    {
+                        @if ((string.IsNullOrEmpty(BoxStatusModel.RouteFilter) && string.IsNullOrEmpty(BoxStatusModel.CustomerFilter)) ||
+                             (boxStatusOverview.RouteName.StartsWith(BoxStatusModel.RouteFilter) && boxStatusOverview.CustomersName.StartsWith(BoxStatusModel.CustomerFilter)) ||
+                             (string.IsNullOrEmpty(BoxStatusModel.RouteFilter) && boxStatusOverview.CustomersName.StartsWith(BoxStatusModel.CustomerFilter)) ||
+                             (boxStatusOverview.RouteName.StartsWith(BoxStatusModel.RouteFilter) && string.IsNullOrEmpty(BoxStatusModel.CustomerFilter)))
+                        {
+                            <div class="grid grid-cols-12 gap-2 mt-1">
+                                <a class="text-center col-span-2 select-none">@boxStatusOverview.RouteName</a>
+                                <a class="text-center col-span-2 select-none">@boxStatusOverview.CustomersName</a>
+                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.NumberOfBoxesPreviousDay" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.DeliveredBoxes" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.ReceivedBoxes" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.NumberOfBoxesCurrentDay" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                            </div>
+                        }
+                    } 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-row self-center mt-5">
+        <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightRed w-20 mx-2")" @onclick="() => Cancel()">Cancel</button>
+        <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen w-20 mx-2")">Save</button>
+    </div>
+</EditForm>

@@ -61,6 +61,7 @@ namespace Website.Client.Pages
                 Title = string.Empty,
                 DeliveryLocation = new DeliveryLocation()
                 {
+                    Id = 0,
                     Address = string.Empty,
                     Region = string.Empty,
                     GeoLocation = string.Empty,

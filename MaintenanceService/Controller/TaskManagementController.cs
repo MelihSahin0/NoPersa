@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
 using MaintenanceService.Database;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi.Extensions;
 using SharedLibrary.DTOs.AnswerDTO;
-using SharedLibrary.DTOs.GetDTOs;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MaintenanceService.Controller

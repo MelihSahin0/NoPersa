@@ -15,6 +15,7 @@ builder.Services.AddSingleton<NotificationService>();
 builder.Services.AddSingleton<NavigationContainer>();
 builder.Services.AddSingleton<GeoLocationService>();
 builder.Services.AddSingleton<LeafletService>();
+builder.Services.AddSingleton<UtilityService>();
 
 builder.Services.AddSingleton(new JsonSerializerOptions
 {

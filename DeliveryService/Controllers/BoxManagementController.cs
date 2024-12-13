@@ -26,6 +26,67 @@ namespace DeliveryService.Controllers
             this.httpClient = httpClient;
         }
 
+        [HttpGet("GetBoxStatus", Name = "GetBoxStatus")]
+        public IActionResult GetBoxStatus()
+        {
+            try
+            {
+                List<DTOBoxStatus> dTOBoxStatuses = mapper.Map<List<DTOBoxStatus>>(context.BoxStatuses.AsNoTracking().Include(b => b.Customer).ThenInclude(c => c.Route));
+
+                return Ok(dTOBoxStatuses.OrderBy(x => (x.RouteName, x.CustomersName)));
+            }
+            catch (ValidationException e)
+            {
+                logger.LogError(e, "Could not map box status");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Getting box status failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
+        [HttpPost("UpdateBoxStatus", Name = "UpdateBoxStatus")]
+        public IActionResult UpdateBoxStatus(List<DTOBoxStatus> dTOBoxStatuses)
+        {
+            using var transaction = context.Database.BeginTransaction();
+
+            try
+            {
+                List<BoxStatus> boxStatuses = mapper.Map<List<BoxStatus>>(dTOBoxStatuses);
+
+                var existingBoxStatuses = context.BoxStatuses.ToDictionary(a => a.Id);
+                foreach (var boxStatus in boxStatuses)
+                {
+                    if (existingBoxStatuses.TryGetValue(boxStatus.Id, out var foundBoxStatus))
+                    {
+                        foundBoxStatus.NumberOfBoxesPreviousDay = boxStatus.NumberOfBoxesPreviousDay;
+                        foundBoxStatus.DeliveredBoxes = boxStatus.DeliveredBoxes;
+                        foundBoxStatus.ReceivedBoxes = boxStatus.ReceivedBoxes;
+                        foundBoxStatus.NumberOfBoxesCurrentDay = boxStatus.NumberOfBoxesCurrentDay;
+                    }
+                }
+
+                context.SaveChanges();
+                transaction.Commit();
+
+                return Ok();
+            }
+            catch (ValidationException e)
+            {
+                transaction.Rollback();
+                logger.LogError(e, "Could not map box status");
+                return ValidationProblem("The request contains invalid data: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                transaction.Rollback();
+                logger.LogError(e, "Updating box status failed");
+                return BadRequest("An error occurred while processing your request.");
+            }
+        }
+
         [HttpPost("UpdateCustomersBoxStatus", Name = "UpdateCustomersBoxStatus")]
         public IActionResult UpdateUpdateCustomersBoxStatusRoutes([FromBody] List<DTOCustomersBoxStatus> dTOCustomersBoxStatuses)
         {

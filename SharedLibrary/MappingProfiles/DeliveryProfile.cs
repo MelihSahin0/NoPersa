@@ -41,6 +41,22 @@ namespace SharedLibrary.MappingProfiles
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Position, opt => opt.MapFrom(src => src.Position));
+
+            CreateMap<DTOBoxStatus, BoxStatus>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.NumberOfBoxesPreviousDay, opt => opt.MapFrom(src => src.NumberOfBoxesPreviousDay))
+                .ForMember(dest => dest.DeliveredBoxes, opt => opt.MapFrom(src => src.DeliveredBoxes))
+                .ForMember(dest => dest.ReceivedBoxes, opt => opt.MapFrom(src => src.ReceivedBoxes))
+                .ForMember(dest => dest.NumberOfBoxesCurrentDay, opt => opt.MapFrom(src => src.NumberOfBoxesCurrentDay));
+
+            CreateMap<BoxStatus, DTOBoxStatus>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.NumberOfBoxesPreviousDay, opt => opt.MapFrom(src => src.NumberOfBoxesPreviousDay))
+                .ForMember(dest => dest.DeliveredBoxes, opt => opt.MapFrom(src => src.DeliveredBoxes))
+                .ForMember(dest => dest.ReceivedBoxes, opt => opt.MapFrom(src => src.ReceivedBoxes))
+                .ForMember(dest => dest.NumberOfBoxesCurrentDay, opt => opt.MapFrom(src => src.NumberOfBoxesCurrentDay))
+                .ForPath(dest => dest.CustomersName, opt => opt.MapFrom(src => src.Customer.Name))
+                .ForPath(dest => dest.RouteName, opt => opt.MapFrom(src => src.Customer.Route!.Name));
         }
     }
 }

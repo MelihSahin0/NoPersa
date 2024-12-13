@@ -100,16 +100,19 @@ namespace Website.Client.FormModels
             {
                 foreach (var dailyOverview in MonthlyDeliveries[selectedMonthlyDeliveries].DailyDeliveries)
                 {
-                    double price = 0;
-                    int number = 0;
-                
-                    if (!string.IsNullOrWhiteSpace(dailyOverview.Price))
+                    if (double.TryParse(dailyOverview.Price?.Replace(",", "."), CultureInfo.InvariantCulture, out double price))
                     {
-                        price = double.Parse(dailyOverview.Price.Replace(",", "."), CultureInfo.InvariantCulture);
                     }
-                    if (!string.IsNullOrWhiteSpace(dailyOverview.NumberOfBoxes))
+                    else
                     {
-                        number = int.Parse(dailyOverview.NumberOfBoxes);
+                        price = 0;
+                    }
+                    if (int.TryParse(dailyOverview.NumberOfBoxes, out int number))
+                    { 
+                    }
+                    else
+                    {
+                        number = 0;
                     }
 
                     total += price * number;

@@ -39,8 +39,8 @@ namespace MaintenanceService.Services
                 foreach (BoxStatus boxStatus in context.BoxStatus)
                 {
                     boxStatus.NumberOfBoxesPreviousDay = boxStatus.NumberOfBoxesCurrentDay;
-                    boxStatus.ReceivedBoxes = null;
-                    boxStatus.DeliveredBoxes = null;
+                    boxStatus.ReceivedBoxes = 0;
+                    boxStatus.DeliveredBoxes = 0;
                 }
 
                 await context.SaveChangesAsync();

@@ -36,6 +36,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 builder.Services.AddHostedService<DailyDeliveryService>();
 builder.Services.AddHostedService<ArticleService>();
+builder.Services.AddHostedService<CustomersBoxStatusService>();
 builder.Services.AddAutoMapper(typeof(ManagementProfile), typeof(DeliveryProfile), typeof(GastronomyProfile), typeof(DefaultProfile));
 var app = builder.Build();
 

@@ -1,12 +1,12 @@
 ﻿using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 
-namespace SharedLibrary.Models
+namespace Website.Client.Models
 {
-    public class BoxStatus
+    public class BoxStatusOverview
     {
-        [Key]
-        public int Id { get; set; }
+        [Required]
+        public required int Id { get; set; }
 
         [Required]
         [IntType(min: 0)]
@@ -14,7 +14,7 @@ namespace SharedLibrary.Models
 
         [Required]
         [IntType(min: 0)]
-        public required int DeliveredBoxes {  get; set; }
+        public required int DeliveredBoxes { get; set; }
 
         [Required]
         [IntType(min: 0)]
@@ -24,8 +24,10 @@ namespace SharedLibrary.Models
         [IntType(min: 0)]
         public required int NumberOfBoxesCurrentDay { get; set; }
 
-        public int CustomerId { get; set; }
+        [Required]
+        public required string CustomersName { get; set; }
 
-        public required Customer Customer { get; set; }
+        [Required]
+        public required string RouteName { get; set; }
     }
 }

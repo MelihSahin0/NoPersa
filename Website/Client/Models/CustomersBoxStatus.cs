@@ -1,11 +1,19 @@
-﻿namespace Website.Client.Models
+﻿using SharedLibrary.Validations;
+using System.ComponentModel.DataAnnotations;
+
+namespace Website.Client.Models
 {
     public class CustomersBoxStatus
     {
-        public int Id { get; set; }
+        [Required]
+        public required int Id { get; set; }
 
-        public int DeliveredBoxes { get; set; }
+        [Required]
+        [IntType(min: 0)]
+        public required int DeliveredBoxes { get; set; }
 
-        public int ReceivedBoxes { get; set; }
+        [Required]
+        [IntType(min: 0)]
+        public required int ReceivedBoxes { get; set; }
     }
 }
