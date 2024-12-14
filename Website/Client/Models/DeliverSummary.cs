@@ -5,7 +5,7 @@ namespace Website.Client.Models
     public class DeliverSummary
     {
         [Required]
-        public required int Id { get; set; }
+        public required long Id { get; set; }
 
         [Required]
         public required string Name { get; set; }

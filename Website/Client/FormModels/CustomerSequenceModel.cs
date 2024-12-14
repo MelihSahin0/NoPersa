@@ -10,7 +10,7 @@ namespace Website.Client.FormModels
         public required List<SequenceDetail> SequenceDetails { get; set; }
 
         [Required]
-        public required int[] SelectedRouteDetailsId { get; set; }
+        public required long[] SelectedRouteDetailsId { get; set; }
 
         [Required]
         public required List<SelectInput> RouteOverview { get; set; }

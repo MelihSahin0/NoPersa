@@ -92,7 +92,7 @@ namespace Website.Client.Pages
                 Workdays = new Weekdays(),
                 Holidays = new Weekdays(),
                 ContactInformation = string.Empty,
-                RouteId = int.MinValue,
+                RouteId = long.MinValue,
                 RouteDetails = [],
                 LightDietOverviews = [],
                 FoodWishesOverviews = [],
@@ -113,7 +113,7 @@ namespace Website.Client.Pages
 
                 if (NavigationContainer.CustomerId != null)
                 {
-                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomer", data, JsonSerializerOptions)!;
+                    using var response1 = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetCustomer", data, JsonSerializerOptions)!;
                     if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                     {
                         CustomerOverviewModel customer = JsonSerializer.Deserialize<CustomerOverviewModel>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -144,7 +144,7 @@ namespace Website.Client.Pages
                     }
                 }
 
-                using var responseLightDiet = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetGastro", data, JsonSerializerOptions)!;
+                using var responseLightDiet = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetGastro", data, JsonSerializerOptions)!;
                 if (responseLightDiet.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     CustomersGastro customerGastro = JsonSerializer.Deserialize<CustomersGastro>(await responseLightDiet.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -159,7 +159,7 @@ namespace Website.Client.Pages
                     NotificationService.SetError(await responseLightDiet.Content.ReadAsStringAsync());
                 }
 
-                using var responseRoute = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetRoutesOverview")!;
+                using var responseRoute = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetRoutesOverview")!;
                 if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     CustomerOverviewModel.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
@@ -169,7 +169,7 @@ namespace Website.Client.Pages
                     NotificationService.SetError(await responseRoute.Content.ReadAsStringAsync());
                 }
 
-                using var responseArticle = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/ArticleManagement/GetArticlesForCustomer")!;
+                using var responseArticle = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/ArticleManagement/GetArticlesForCustomer")!;
                 if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var articles = JsonSerializer.Deserialize<List<ArticlesForCustomer>>(await responseArticle.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -199,9 +199,9 @@ namespace Website.Client.Pages
             try
             {
                 using var response = CustomerOverviewModel.Id == 0 ?
-                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/InsertCustomer", CustomerOverviewModel, JsonSerializerOptions)
+                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/InsertCustomer", CustomerOverviewModel, JsonSerializerOptions)
                    :
-                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/CustomerManagement/UpdateCustomer", CustomerOverviewModel, JsonSerializerOptions);
+                   await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/UpdateCustomer", CustomerOverviewModel, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

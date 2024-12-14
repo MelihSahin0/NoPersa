@@ -1,5 +1,6 @@
 ﻿@using Website.Client.Models
 @using Website.Client.Styles
+@using Microsoft.AspNetCore.Components.Forms;
 
 <div class="@($"{Class} flex {(IsColumn ? "flex-col" : "items-center flex-row")}")">
     @if (!string.IsNullOrWhiteSpace(Label))

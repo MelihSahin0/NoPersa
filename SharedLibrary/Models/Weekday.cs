@@ -5,7 +5,7 @@ namespace SharedLibrary.Models
     public class Weekday
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         public bool Monday { get; set; } = false;

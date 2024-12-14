@@ -2,11 +2,11 @@
 {
     public class CustomersFoodWish
     {
-        public int CustomerId { get; set; }
+        public long CustomerId { get; set; }
 
         public required Customer Customer { get; set; }
 
-        public int FoodWishId { get; set; }
+        public long FoodWishId { get; set; }
 
         public required FoodWish FoodWish { get; set; }
     }

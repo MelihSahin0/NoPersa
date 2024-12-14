@@ -50,7 +50,7 @@ namespace Website.Client.FormModels
         {
             try
             {
-                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetDeliveryStatus",
+                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/DeliveryManagement/GetDeliveryStatus",
                     new
                     {
                         Year = Year,

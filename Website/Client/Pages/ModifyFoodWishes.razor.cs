@@ -40,7 +40,7 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient.GetAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetFoodWishes");
+                using var response = await HttpClient.GetAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetFoodWishes");
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -68,7 +68,7 @@ namespace Website.Client.Pages
                 List<FoodWishes> foodWishes = [];
                 foodWishes.AddRange(ModifyFoodWishesModel.FoodWishes.Select(f => new FoodWishes() { Id = f.Id, Position = f.Position, Name = f.Value, IsIngredient = false }));
                 foodWishes.AddRange(ModifyFoodWishesModel.IngredientWishes.Select(f => new FoodWishes() { Id = f.Id, Position = f.Position, Name = f.Value, IsIngredient = true }));
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateFoodWishes", foodWishes, JsonSerializerOptions);
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/UpdateFoodWishes", foodWishes, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

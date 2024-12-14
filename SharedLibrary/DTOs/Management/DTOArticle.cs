@@ -3,7 +3,7 @@ namespace SharedLibrary.DTOs.Management
 {
     public class DTOArticle
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public int Position { get; set; }
 

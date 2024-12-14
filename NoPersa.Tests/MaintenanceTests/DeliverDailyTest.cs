@@ -1,10 +1,10 @@
-﻿using MaintenanceService.Database;
-using MaintenanceService.Services;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
+using NoPersaService.Database;
+using NoPersaService.Services;
 using SharedLibrary.Models;
 
 namespace NoPersa.Tests.MaintenanceTests
@@ -45,16 +45,16 @@ namespace NoPersa.Tests.MaintenanceTests
 
         public void SeedTestData()
         {
-            context.MonthlyOverview.AddRange(StaticMonthlyOverview.GetMonthlyOverviews(DateTime.Today.Year, DateTime.Today.Month));
+            context.MonthlyOverviews.AddRange(StaticMonthlyOverview.GetMonthlyOverviews(DateTime.Today.Year, DateTime.Today.Month));
             context.SaveChanges();
 
-            var dailyOverviews1 = StaticDailyOverviews.GetDailyOverview1(context.MonthlyOverview.First(m => m.Id == 1));
-            var dailyOverviews2 = StaticDailyOverviews.GetDailyOverview2(context.MonthlyOverview.First(m => m.Id == 2));
-            context.DailyOverview.AddRange(dailyOverviews1);
-            context.DailyOverview.AddRange(dailyOverviews2);
+            var dailyOverviews1 = StaticDailyOverviews.GetDailyOverview1(context.MonthlyOverviews.First(m => m.Id == 1));
+            var dailyOverviews2 = StaticDailyOverviews.GetDailyOverview2(context.MonthlyOverviews.First(m => m.Id == 2));
+            context.DailyOverviews.AddRange(dailyOverviews1);
+            context.DailyOverviews.AddRange(dailyOverviews2);
 
-            context.Holiday.AddRange(StaticHolidays.GetHolidays());
-            context.Maintenance.AddRange(StaticMaintenances.GetMaintenances());
+            context.Holidays.AddRange(StaticHolidays.GetHolidays());
+            context.Maintenances.AddRange(StaticMaintenances.GetMaintenances());
 
             context.SaveChanges();
         }
@@ -64,10 +64,10 @@ namespace NoPersa.Tests.MaintenanceTests
         [TestOrder(1)]
         public async Task SetDailyDelivery()
         { 
-            await service.CatchUp(context, (await context.Maintenance.AsNoTracking().FirstOrDefaultAsync(m => m.Id == 1))!);
+            await service.CatchUp(context, (await context.Maintenances.AsNoTracking().FirstOrDefaultAsync(m => m.Id == 1))!);
 
-            ICollection<DailyOverview> dailyOverviews1 = (await context.Customer.Include(c => c.MonthlyOverviews).ThenInclude(d => d.DailyOverviews).FirstOrDefaultAsync(c => c.Id == 1))!.MonthlyOverviews.FirstOrDefault(d => d.Id == 1)!.DailyOverviews; 
-            ICollection<DailyOverview> dailyOverviews2 = (await context.Customer.Include(c => c.MonthlyOverviews).ThenInclude(d => d.DailyOverviews).FirstOrDefaultAsync(c => c.Id == 2))!.MonthlyOverviews.FirstOrDefault(d => d.Id == 2)!.DailyOverviews;
+            ICollection<DailyOverview> dailyOverviews1 = (await context.Customers.Include(c => c.MonthlyOverviews).ThenInclude(d => d.DailyOverviews).FirstOrDefaultAsync(c => c.Id == 1))!.MonthlyOverviews.FirstOrDefault(d => d.Id == 1)!.DailyOverviews; 
+            ICollection<DailyOverview> dailyOverviews2 = (await context.Customers.Include(c => c.MonthlyOverviews).ThenInclude(d => d.DailyOverviews).FirstOrDefaultAsync(c => c.Id == 2))!.MonthlyOverviews.FirstOrDefault(d => d.Id == 2)!.DailyOverviews;
 
             Assert.AreEqual(1, dailyOverviews1.FirstOrDefault(d => d.DayOfMonth == 1)!.NumberOfBoxes);
             Assert.AreEqual(10.5, dailyOverviews1.FirstOrDefault(d => d.DayOfMonth == 1)!.Price);

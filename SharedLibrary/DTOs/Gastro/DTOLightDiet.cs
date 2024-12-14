@@ -2,7 +2,7 @@
 {
     public class DTOLightDiet
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public int Position { get; set; }
 

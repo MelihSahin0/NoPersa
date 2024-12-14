@@ -2,7 +2,7 @@
 {
     public class DTOMonthOfTheYear
     {
-        public int ReferenceId { get; set; }
+        public long ReferenceId { get; set; }
 
         public int Month { get; set; }
 

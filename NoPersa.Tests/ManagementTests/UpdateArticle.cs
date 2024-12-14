@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using EFCore.BulkExtensions;
-using ManagementService.Controllers;
-using ManagementService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
+using NoPersaService.Controllers;
+using NoPersaService.Database;
 using SharedLibrary.DTOs.Management;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;

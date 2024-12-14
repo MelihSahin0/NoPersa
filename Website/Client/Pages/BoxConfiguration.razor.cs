@@ -39,7 +39,7 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response1 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetLightDiets")!;
+                using var response1 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetLightDiets")!;
 
                 if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -50,7 +50,7 @@ namespace Website.Client.Pages
                     NotificationService.SetError(await response1.Content.ReadAsStringAsync());
                 }
 
-                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetBoxContents")!;
+                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetBoxContents")!;
 
                 if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -61,7 +61,7 @@ namespace Website.Client.Pages
                     NotificationService.SetError(await response2.Content.ReadAsStringAsync());
                 }
 
-                using var response3 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetPortionSizes")!;
+                using var response3 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetPortionSizes")!;
 
                 if (response3.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -83,9 +83,9 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response1 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateLightDiets", BoxConfigurationModel.LightDiets, JsonSerializerOptions);
-                using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdatePortionSizes", BoxConfigurationModel.PortionSizes, JsonSerializerOptions);
-                using var response3 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/UpdateBoxContents", BoxConfigurationModel.BoxContents, JsonSerializerOptions);
+                using var response1 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/UpdateLightDiets", BoxConfigurationModel.LightDiets, JsonSerializerOptions);
+                using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/UpdatePortionSizes", BoxConfigurationModel.PortionSizes, JsonSerializerOptions);
+                using var response3 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/UpdateBoxContents", BoxConfigurationModel.BoxContents, JsonSerializerOptions);
 
                 bool isSuccess1 = response1.StatusCode == System.Net.HttpStatusCode.OK;
                 bool isSuccess2 = response2.StatusCode == System.Net.HttpStatusCode.OK;

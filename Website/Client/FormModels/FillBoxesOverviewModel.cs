@@ -77,7 +77,7 @@ namespace Website.Client.FormModels
             {
                 if (DisplayTypeIndex == 0)
                 {
-                    using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetFoodOverview",
+                    using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetFoodOverview",
                         new
                         {
                             Year = Year,
@@ -96,7 +96,7 @@ namespace Website.Client.FormModels
                 }
                 else
                 {
-                    using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("GastronomyService")}/GastronomyManagement/GetRoutesFoodOverview",
+                    using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetRoutesFoodOverview",
                                            new
                                            {
                                                Year = Year,

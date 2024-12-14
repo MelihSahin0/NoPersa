@@ -3,7 +3,7 @@ namespace SharedLibrary.DTOs.Gastro
 {
     public class DTOPortionSize
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public int Position { get; set; }
 

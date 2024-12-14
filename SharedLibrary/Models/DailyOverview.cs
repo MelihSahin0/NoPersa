@@ -7,7 +7,7 @@ namespace SharedLibrary.Models
     public class DailyOverview
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [IntType(min: 0)]
@@ -20,7 +20,7 @@ namespace SharedLibrary.Models
         public int? NumberOfBoxes { get; set; }
 
         [ForeignKey("MonthlyOverviewId")]
-        public int MonthlyOverviewId { get; set; }
+        public long MonthlyOverviewId { get; set; }
 
         public required MonthlyOverview MonthlyOverview { get; set; }
 

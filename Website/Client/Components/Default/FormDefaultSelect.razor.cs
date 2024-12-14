@@ -17,13 +17,13 @@ namespace Website.Client.Components.Default
         public required string Label { get; init; }
 
         [Parameter]
-        public int Value { get; set; }
-
-        [Parameter]
         public List<SelectInput>? SelectInputs { get; set; }
 
         [Parameter]
-        public EventCallback<int> ValueChanged { get; set; }
+        public long Value { get; set; }
+
+        [Parameter]
+        public EventCallback<long> ValueChanged { get; set; }
 
         private List<SelectInput>? previousSelectInputs;
 
@@ -56,7 +56,7 @@ namespace Website.Client.Components.Default
     public class SelectInput
     {
         [Required]
-        public required int Id { get; set; }
+        public required long Id { get; set; }
 
         [Required(ErrorMessage = "Name is required.")]
         public required string Value { get; set; }

@@ -9,7 +9,7 @@ namespace Website.Client.FormModels
     {
         [ValidateComplexType]
         [Required]
-        [MinChildren(1)]
+        [MinChildren(1, ErrorMessage = "This requires one article")]
         public required List<ArticleSummary> Articles { get; set; }
 
         [Required]

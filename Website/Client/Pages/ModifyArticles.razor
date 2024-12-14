@@ -1,4 +1,5 @@
 ﻿@page "/modifyArticles"
+@using Microsoft.AspNetCore.Components.Forms
 @using Website.Client.Components
 @using Website.Client.FormModels
 @using Website.Client.Styles
@@ -10,11 +11,12 @@
 
     <Form2InputDragDropList Class="w-4/6 flex self-center" MaxHeight="max-h-96" @bind-ArticleSummary="@ModifyArticlesModel.Articles"
                             TitleLeft="Insert new / remove article" PlaceholderLeft="Article name" HasDefault="true"
-                            TitleRight="Update article" PlaceholderRight="Price" ValidationRightFunction="@OnInputValidation.Double" />
+                            TitleRight="Update article" PlaceholderRight="Price" ValidationRightFunction="@OnInputValidation.Double"
+                            For="@(() => ModifyArticlesModel.Articles)" />
 
     <div class="flex justify-end">
         <div class="w-1/2 flex flex-row justify-start mt-5">
-            <FormInputCheckbox Class="ml-5" Label="Change articles" @bind-Value="@ModifyArticlesModel.IsTaskSet" IsColumn="false" />
+            <FormInputCheckbox Class="ml-5" Label="Update articles" @bind-Value="@ModifyArticlesModel.IsTaskSet" IsColumn="false" />
             @if (ModifyArticlesModel.IsTaskSet)
             {
                 <FormDayPicker Label="at:" @bind-Year="@ModifyArticlesModel.Year" @bind-Month="@ModifyArticlesModel.Month" @bind-Day="@ModifyArticlesModel.Day" />

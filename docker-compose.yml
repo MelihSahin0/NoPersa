@@ -12,32 +12,12 @@ services:
     volumes:
         - NoPersaPostgresDb-data:/var/lib/postgresql/data
 
-  maintenanceservice:
-    image: ${DOCKER_REGISTRY-}maintenanceservice
-    container_name: MaintenanceService
+  nopersaservice:
+    image: ${DOCKER_REGISTRY-}nopersaservice
+    container_name: NoPersaService
     build:
       context: .
-      dockerfile: MaintenanceService/Dockerfile
-    ports:
-      - "8084:8084"
-    pull_policy: always
-    restart: always
-    depends_on:
-      - NoPersaPostgresDb
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - HOLIDAY_API=${HOLIDAY_API}
-
-  managementservice:
-    image: ${DOCKER_REGISTRY-}managementservice
-    container_name: ManagementService
-    build:
-      context: .
-      dockerfile: ManagementService/Dockerfile
+      dockerfile: NoPersaService/Dockerfile
     ports:
       - "8081:8081"
     pull_policy: always
@@ -50,44 +30,8 @@ services:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-
-  deliveryservice:
-    image: ${DOCKER_REGISTRY-}deliveryservice
-    container_name: DeliveryService
-    build:
-      context: .
-      dockerfile: DeliveryService/Dockerfile
-    ports:
-      - "8082:8082"
-    pull_policy: always
-    restart: always
-    depends_on:
-      - NoPersaPostgresDb
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - HOLIDAY_API=${HOLIDAY_API}
       - ROUTING_API=${ROUTING_API}
-
-  gastronomyservice:
-    image: ${DOCKER_REGISTRY-}gastronomyservice
-    container_name: GastronomyService
-    build:
-      context: .
-      dockerfile: GastronomyService/Dockerfile
-    ports: 
-      - "8083:8083"
-    pull_policy: always
-    depends_on:
-      - NoPersaPostgresDb
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD} 
 
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver

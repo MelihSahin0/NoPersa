@@ -41,8 +41,8 @@ namespace Website.Client.FormModels
         }
 
         [Required]
-        [IntType]
-        public required int RouteId { get; set; }
+        [LongType]
+        public required long RouteId { get; set; }
 
         public List<SelectInput>? RouteSummary { get; set; }
 
@@ -69,7 +69,7 @@ namespace Website.Client.FormModels
             IsSubmitting = true;
             try
             {
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetCustomerToDeliver", new
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/DeliveryManagement/GetCustomerToDeliver", new
                 {
                     ReferenceId = RouteId,
                     Year,
@@ -126,7 +126,7 @@ namespace Website.Client.FormModels
 
                     if (!LeafletService.CoordinatesSet())
                     {
-                        using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRouting", new
+                        using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/DeliveryManagement/GetRouting", new
                         {
                             ReferenceId = RouteId,
                             Year,
@@ -148,7 +148,7 @@ namespace Website.Client.FormModels
                             {
                                 LeafletService.SetCoordinates(route.Select(r => new[] { r.Latitude, r.Longitude }).ToArray());
 
-                                await LeafletService.Init(14, await LocalStorage.GetItemAsync<string>("DeliveryService"));
+                                await LeafletService.Init(14, await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString()));
 
                                 if (location != null)
                                 {
@@ -169,7 +169,7 @@ namespace Website.Client.FormModels
                     }
                     else
                     {
-                        await LeafletService.Init(14, await LocalStorage.GetItemAsync<string>("DeliveryService"));
+                        await LeafletService.Init(14, await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString()));
 
                         if (location != null)
                         {   
@@ -239,7 +239,7 @@ namespace Website.Client.FormModels
                 GeoLocationService.OnLocationUpdated -= HandleLocationUpdated;
                 LeafletService.SetCoordinates([]);
 
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/BoxManagement/UpdateCustomersBoxStatus", CustomersBoxStatuses, JsonSerializerOptions)!;
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/BoxManagement/UpdateCustomersBoxStatus", CustomersBoxStatuses, JsonSerializerOptions)!;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

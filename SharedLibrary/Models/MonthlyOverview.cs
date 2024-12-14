@@ -7,7 +7,7 @@ namespace SharedLibrary.Models
     public class MonthlyOverview
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [IntType(min: 0, max: 11)]
@@ -20,7 +20,7 @@ namespace SharedLibrary.Models
         public List<DailyOverview> DailyOverviews { get; set; } = [];
 
         [ForeignKey("CustomerId")]
-        public int CustomerId { get; set; }
+        public long CustomerId { get; set; }
 
         public required Customer Customer { get; set; }
 

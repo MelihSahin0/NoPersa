@@ -1,13 +1,8 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using System.ComponentModel.DataAnnotations;
-using System.Net.Http.Json;
 using System.Text.Json;
-using Website.Client.Components.Default;
-using Website.Client.FormModels;
-using Website.Client.Models;
 using Website.Client.Services;
-using static Website.Client.Pages.SearchCustomer;
 
 namespace Website.Client.Pages
 {
@@ -45,7 +40,7 @@ namespace Website.Client.Pages
         {
             try
             {      
-                using var response1 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetAllCustomersName")!;
+                using var response1 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetAllCustomersName")!;
 
                 if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                 {

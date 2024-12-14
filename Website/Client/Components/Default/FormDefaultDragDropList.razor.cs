@@ -108,7 +108,7 @@ namespace Website.Client.Components.Default
         {
             foreach (var item in DragDropInputs)
             {
-                if (item.Id == dragDropInput.Id)
+                if (item == dragDropInput)
                 {
                     item.IsDefault = true;
                 }
@@ -136,7 +136,7 @@ namespace Website.Client.Components.Default
     public class DragDropInput
     {
         [Required]
-        public required int Id { get; set; }
+        public required long Id { get; set; }
 
         [Required]
         public required int Position { get; set; }

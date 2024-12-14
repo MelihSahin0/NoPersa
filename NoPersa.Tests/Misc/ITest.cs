@@ -1,5 +1,4 @@
-﻿
-namespace NoPersa.Tests.Misc
+﻿namespace NoPersa.Tests.Misc
 {
     public interface ITest
     {

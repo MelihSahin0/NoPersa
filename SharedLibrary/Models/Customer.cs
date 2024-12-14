@@ -7,7 +7,7 @@ namespace SharedLibrary.Models
     public class Customer
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [MaxLength(64)]
         public string? SerialNumber { get; set; }
@@ -25,7 +25,7 @@ namespace SharedLibrary.Models
         public string? ContactInformation { get; set; }
 
         [ForeignKey("ArticleId")]
-        public int ArticleId { get; set; }
+        public long ArticleId { get; set; }
 
         [Required]
         public required Article Article { get; set; }
@@ -46,19 +46,19 @@ namespace SharedLibrary.Models
         public bool TemporaryNoDelivery { get; set; }
 
         [ForeignKey("WorkdaysId")]
-        public int WorkdaysId { get; set; }
+        public long WorkdaysId { get; set; }
 
         [Required]
         public required Weekday Workdays { get; set; }
 
         [ForeignKey("HolidaysId")]
-        public int HolidaysId { get; set; }
+        public long HolidaysId { get; set; }
 
         [Required]
         public required Weekday Holidays { get; set; }
 
         [ForeignKey("RouteId")]
-        public int RouteId { get; set; }
+        public long RouteId { get; set; }
 
         public Route? Route { get; set; }
 

@@ -1,4 +1,5 @@
-﻿@using Website.Client.Components.Base
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using Website.Client.Components.Base
 @using Website.Client.Components.Default
 @using Website.Client.Styles
 
@@ -55,6 +56,7 @@
                 <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()}")" @onclick="() => AddArticle()">Add new Article</button>
                 <button type="button" class="@($"{Scaling.GetTextScaling()} {ButtonStyles.GetButtonDefaultStyle()} ml-1")" @onclick="() => SortByName()">Sort by name</button>
             </ul>
+            <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red w-full")" For="@For" />
         </div>
     </div>
     <div class="w-full mx-5">

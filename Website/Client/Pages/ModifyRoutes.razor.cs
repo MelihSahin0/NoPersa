@@ -39,7 +39,7 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRoutesSummary")!;
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/DeliveryManagement/GetRoutesSummary")!;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -66,7 +66,7 @@ namespace Website.Client.Pages
                 List<RouteSummary> routes = [];
                 routes.AddRange(ModifyRoutesModel.RouteDeliverableSummary);
                 routes.AddRange(ModifyRoutesModel.RouteNonDeliverableSummary);
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/UpdateRoutes", routes, JsonSerializerOptions);
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/DeliveryManagement/UpdateRoutes", routes, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

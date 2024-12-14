@@ -5,7 +5,7 @@ namespace SharedLibrary.Models
     public class Maintenance
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         public required string Type { get; set; }

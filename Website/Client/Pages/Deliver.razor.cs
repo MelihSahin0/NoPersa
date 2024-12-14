@@ -53,7 +53,7 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/DeliveryManagement/GetRoutesSummary")!;
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/DeliveryManagement/GetRoutesSummary")!;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

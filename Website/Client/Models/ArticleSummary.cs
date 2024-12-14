@@ -6,7 +6,7 @@ namespace Website.Client.Models
     public class ArticleSummary
     {
         [Required]
-        public required int Id { get; set; }
+        public required long Id { get; set; }
 
         [Required]
         public required int Position { get; set; }

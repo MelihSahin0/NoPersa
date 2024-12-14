@@ -10,10 +10,12 @@ namespace Website.Client
 
         protected override async Task OnInitializedAsync()
         {
-            await LocalStorage.SetItemAsync("ManagementService", "localhost:8081");
-            await LocalStorage.SetItemAsync("DeliveryService", "localhost:8082");
-            await LocalStorage.SetItemAsync("GastronomyService", "localhost:8083");
-            await LocalStorage.SetItemAsync("MaintenanceService", "localhost:8084");
+            await LocalStorage.SetItemAsync(ServiceNames.NoPersaService.ToString(), "localhost:8081");
         }
+    }
+
+    public enum ServiceNames
+    {
+        NoPersaService,
     }
 }

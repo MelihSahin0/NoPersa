@@ -1,10 +1,10 @@
-﻿using MaintenanceService.Database;
-using MaintenanceService.Services;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
+using NoPersaService.Database;
+using NoPersaService.Services;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
 
@@ -45,7 +45,7 @@ namespace NoPersa.Tests.MaintenanceTests
 
         public void SeedTestData()
         {
-            context.Article.AddRange(StaticArticles.GetArticles());
+            context.Articles.AddRange(StaticArticles.GetArticles());
             context.SaveChanges();
         }
 
@@ -54,15 +54,15 @@ namespace NoPersa.Tests.MaintenanceTests
         [TestOrder(1)]
         public async Task SetArticleAsync()
         {
-            Article article = context.Article.AsNoTracking().First(a => a.Id == 1);
+            Article article = context.Articles.AsNoTracking().First(a => a.Id == 1);
             Assert.AreNotEqual(article.Name, article.NewName);
 
             Maintenance maintenance = new() { Id = 99, Type = MaintenanceTypes.Article.ToString(), Date = DateTime.Today.AddDays(-1) };
-            context.Maintenance.Add(maintenance);
+            context.Maintenances.Add(maintenance);
             context.SaveChanges();
             await service.CatchUp(context, maintenance);
 
-            Article dbArticle = context.Article.AsNoTracking().First(a => a.Id == 1);
+            Article dbArticle = context.Articles.AsNoTracking().First(a => a.Id == 1);
             Assert.AreEqual(dbArticle.Name, dbArticle.NewName);
             Assert.AreEqual(dbArticle.Price, dbArticle.NewPrice);
         }

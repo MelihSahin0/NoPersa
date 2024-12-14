@@ -41,7 +41,7 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/ArticleManagement/GetArticles")!;
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/ArticleManagement/GetArticles")!;
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     ModifyArticlesModel.Articles = JsonSerializer.Deserialize<List<ArticleSummary>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -51,7 +51,7 @@ namespace Website.Client.Pages
                     NotificationService.SetError(await response.Content.ReadAsStringAsync());
                 }
 
-                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("MaintenanceService")}/TaskManagement/GetArticleTask")!;
+                using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/TaskManagement/GetArticleTask")!;
                 if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var model = JsonSerializer.Deserialize<SelectedDay>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
@@ -80,9 +80,9 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("ManagementService")}/ArticleManagement/UpdateArticles", ModifyArticlesModel.Articles, JsonSerializerOptions);
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/ArticleManagement/UpdateArticles", ModifyArticlesModel.Articles, JsonSerializerOptions);
 
-                HttpResponseMessage response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("MaintenanceService")}/TaskManagement/UpdateArticleTask", new 
+                using var response2 = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/TaskManagement/UpdateArticleTask", new 
                     {
                         Year =  ModifyArticlesModel.IsTaskSet ? ModifyArticlesModel.Year : (int?)null, 
                         Month = ModifyArticlesModel.IsTaskSet ? (int?)ModifyArticlesModel.Month : (int?)null, 

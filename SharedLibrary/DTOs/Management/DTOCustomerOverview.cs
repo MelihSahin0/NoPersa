@@ -4,7 +4,7 @@ namespace SharedLibrary.DTOs.Management
 {
     public class DTOCustomerOverview
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public string? SerialNumber { get; set; }
 
@@ -26,13 +26,13 @@ namespace SharedLibrary.DTOs.Management
 
         public DTOMonthOfTheYear? DisplayMonth { get; set; }
 
-        public int? ArticleId { get; set; }
+        public long? ArticleId { get; set; }
 
         public int DefaultNumberOfBoxes { get; set; }
 
         public DTOMonthlyDelivery[]? MonthlyDeliveries { get; set; }
 
-        public int? RouteId { get; set; }
+        public long? RouteId { get; set; }
 
         public List<DTOLightDietOverview>? LightDietOverviews { get; set; }
 

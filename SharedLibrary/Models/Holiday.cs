@@ -6,7 +6,7 @@ namespace SharedLibrary.Models
     public class Holiday
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         public required string Country { get; set; }

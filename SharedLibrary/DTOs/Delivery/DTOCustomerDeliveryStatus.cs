@@ -2,7 +2,7 @@
 {
     public class DTOCustomerDeliveryStatus
     {
-        public int Id { get; init; }
+        public long Id { get; init; }
 
         public int? Position { get; set; }
 

@@ -42,7 +42,7 @@ namespace Website.Client.Pages
         {
             try
             {
-                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>("DeliveryService")}/BoxManagement/GetBoxStatus")!;
+                using var response = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/BoxManagement/GetBoxStatus")!;
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
@@ -76,7 +76,7 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>("DeliveryService")}/BoxManagement/UpdateBoxStatus", BoxStatusModel.BoxStatusOverviews, JsonSerializerOptions);
+                using var response = await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/BoxManagement/UpdateBoxStatus", BoxStatusModel.BoxStatusOverviews, JsonSerializerOptions);
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {

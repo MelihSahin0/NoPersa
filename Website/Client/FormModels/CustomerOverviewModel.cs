@@ -37,7 +37,7 @@ namespace Website.Client.FormModels
         }
 
         [Required]
-        public required int Id { get; set; }
+        public required long Id { get; set; }
 
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? SerialNumber { get; set; }
@@ -73,8 +73,8 @@ namespace Website.Client.FormModels
         public required MonthOfTheYear DisplayMonth { get; set; }
 
         [Required]
-        [IntType(min:1)]
-        public required int ArticleId { get; set; }
+        [LongType(min:1)]
+        public required long ArticleId { get; set; }
 
         [JsonIgnore]
         public List<SelectInput>? Articles { get; set; }
@@ -83,8 +83,8 @@ namespace Website.Client.FormModels
         public List<ArticlesForCustomer> ArticlesPrice { get; set; }
 
         [Required]
-        [IntType(min: 1, max: 10)]
-        public required int DefaultNumberOfBoxes { get; set; }
+        [LongType(min: 1, max: 10)]
+        public required long DefaultNumberOfBoxes { get; set; }
 
         [JsonIgnore]
         public List<SelectInput> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection.Where(x => x.Id != 0).ToList();
@@ -125,8 +125,8 @@ namespace Website.Client.FormModels
         public bool ModifyMonthlyDelivery => DateTimeCalc.MonthDifferenceMax1(DateTime.Today.Year, MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Year, DateTime.Today.Month, (int)MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Month);
 
         [Required]
-        [IntType]
-        public required int RouteId { get; set; }
+        [LongType]
+        public required long RouteId { get; set; }
 
         [JsonIgnore]
         public List<SelectInput>? RouteDetails { get; set; }
@@ -166,7 +166,7 @@ namespace Website.Client.FormModels
 
             try
             {
-                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>("ManagementService")}/CustomerManagement/GetCustomerDailyDelivery",
+                using var response = await HttpClient?.PostAsJsonAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetCustomerDailyDelivery",
                                          new
                                          {
                                              ReferenceId = Id,

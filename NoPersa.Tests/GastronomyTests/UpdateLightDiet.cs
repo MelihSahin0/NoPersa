@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using EFCore.BulkExtensions;
-using GastronomyService.Controllers;
-using GastronomyService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
+using NoPersaService.Controllers;
+using NoPersaService.Database;
 using SharedLibrary.DTOs.Gastro;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;

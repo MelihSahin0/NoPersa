@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 using System.Linq.Expressions;
 using Website.Client.Models;
 using Website.Client.Styles;
-using Website.Client.Components.Default;
 
 namespace Website.Client.Components
 {
@@ -47,6 +46,9 @@ namespace Website.Client.Components
 
         [Parameter]
         public EventCallback<List<ArticleSummary>> ArticleSummaryChanged { get; set; }
+
+        [Parameter]
+        public Expression<Func<List<ArticleSummary>>>? For { get; set; }
 
         private ArticleSummary? draggedItem;
         private void HandleDrop(ArticleSummary landingModel)
@@ -105,7 +107,7 @@ namespace Website.Client.Components
         {
             foreach (var item in ArticleSummary)
             {
-                if (item.Id == dragDropInput.Id)
+                if (item == dragDropInput)
                 {
                     item.IsDefault = true;
                 }

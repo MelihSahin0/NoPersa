@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using DeliveryService.Controllers;
-using DeliveryService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
+using NoPersaService.Controllers;
+using NoPersaService.Database;
 using SharedLibrary.DTOs.Delivery;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;
@@ -76,7 +76,7 @@ namespace NoPersa.Tests.DeliveryTests
 
             controller.UpdateRoutes(mapper.Map<List<DTORouteSummary>>(routes));
 
-            CollectionAssert.AreEqual(new List<int> {int.MinValue, 3,1,2}, context.Routes.OrderBy(r => r.Position)!.Select(r => r.Id).ToList());
+            CollectionAssert.AreEqual(new List<long> {long.MinValue, 3,1,2}, context.Routes.OrderBy(r => r.Position)!.Select(r => r.Id).ToList());
         }
 
         [TestMethod]

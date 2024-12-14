@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using DeliveryService.Controllers;
-using DeliveryService.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
+using NoPersaService.Controllers;
+using NoPersaService.Database;
 using SharedLibrary.DTOs.Delivery;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;
@@ -53,7 +53,6 @@ namespace NoPersa.Tests.DeliveryTests
             context.SaveChanges();
         }
 
-        [Ignore("This test will fail, because the in memory database has problems with the batch update")]
         [TestMethod]
         [TestOrder(1)]
         public void UpdateCustomerSequenceChangeRoute()

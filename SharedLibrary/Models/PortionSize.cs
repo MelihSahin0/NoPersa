@@ -6,7 +6,7 @@ namespace SharedLibrary.Models
     public class PortionSize
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [IntType(min: 0)]

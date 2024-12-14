@@ -6,7 +6,7 @@ namespace SharedLibrary.Models
     public class DeliveryLocation
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Required]
         [MaxLength(64)]
@@ -25,7 +25,7 @@ namespace SharedLibrary.Models
         public string? DeliveryWhishes { get; set; }
 
         [ForeignKey("CustomerId")]
-        public int CustomerId { get; set; }
+        public long CustomerId { get; set; }
 
         public required Customer Customer { get; set; }
     }
