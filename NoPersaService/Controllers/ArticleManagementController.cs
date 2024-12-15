@@ -82,13 +82,13 @@ namespace NoPersaService.Controllers
                 List<Article> toRemove = [.. context.Articles.Include(a => a.Customers).Where(a => !articleIds.Contains(a.Id))];
                 var toRemoveIds = new HashSet<long>(toRemove.Select(a => a.Id));
 
-                Article defaultArticle = context.Articles.First(a => a.Position == 0 && !toRemoveIds.Contains(a.Id));
+                Article dbDefaultArticle = context.Articles.First(a => a.IsDefault && !toRemoveIds.Contains(a.Id));
                 foreach (var article in toRemove) 
                 {
                     foreach (var customer in article.Customers)
                     {
-                        customer.ArticleId = defaultArticle.Id;
-                        customer.Article = defaultArticle;
+                        customer.ArticleId = dbDefaultArticle.Id;
+                        customer.Article = dbDefaultArticle;
                     }
                 }
                 context.Articles.RemoveRange(toRemove);

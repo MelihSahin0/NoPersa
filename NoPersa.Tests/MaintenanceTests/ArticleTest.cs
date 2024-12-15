@@ -25,7 +25,7 @@ namespace NoPersa.Tests.MaintenanceTests
             .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
             .Options;
 
-            context = new NoPersaDbContext(options);
+            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 

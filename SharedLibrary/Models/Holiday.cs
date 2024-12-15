@@ -1,4 +1,3 @@
-using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 
 namespace SharedLibrary.Models
@@ -12,15 +11,12 @@ namespace SharedLibrary.Models
         public required string Country { get; set; }
 
         [Required]
-        [IntType(min: 0)]
         public required int Year { get; set; }
 
         [Required]
-        [IntType(min: 0)]
         public required int Month { get; set; }
 
         [Required]
-        [IntType(min: 0)]
         public required int Day { get; set; }
     }
 

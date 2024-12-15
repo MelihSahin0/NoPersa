@@ -1,13 +1,17 @@
-﻿namespace SharedLibrary.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SharedLibrary.Models
 {
     public class CustomersFoodWish
     {
-        public long CustomerId { get; set; }
+        [Required]
+        public required long CustomerId { get; set; }
 
-        public required Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
 
-        public long FoodWishId { get; set; }
+        [Required]
+        public required long FoodWishId { get; set; }
 
-        public required FoodWish FoodWish { get; set; }
+        public FoodWish? FoodWish { get; set; }
     }
 }

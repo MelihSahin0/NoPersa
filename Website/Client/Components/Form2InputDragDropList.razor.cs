@@ -147,16 +147,14 @@ namespace Website.Client.Components
             {
                 ArticleSummary.Remove(ArticleSummary.FirstOrDefault((Func<ArticleSummary, bool>)(r => r.Position == toDeletePosition))!);
 
-                bool hasDefault = false;
                 int i = 0;
                 foreach (var article in ArticleSummary.OrderBy(x => x.Position).ToList())
                 {
                     article.Position = i++;
                     article.IsDragOver = false;
-                    hasDefault = article.IsDefault;
                 }
 
-                if (!hasDefault && ArticleSummary.Count != 0)
+                if (ArticleSummary.Count != 0 && !ArticleSummary.Any(a => a.IsDefault))
                 {
                     ArticleSummary.First().IsDefault = true;
                 }

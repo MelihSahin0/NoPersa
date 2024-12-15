@@ -1,0 +1,13 @@
+C# Attribute				Database						Constraint	Notes
+------------------------------------------------------------------------------------------------------
+[Required]					NOT NULL						Ensures non-null values.
+[MaxLength(N)]				NVARCHAR(N) or VARCHAR(N)		Restricts string column length.
+[Precision(P, S)]			DECIMAL(P, S)					For numeric precision (EF Core 6+).
+[Column(TypeName)]			Explicit column type			Useful for custom database types.
+[DefaultValue]				DEFAULT							Sets default value for the column.
+[Key]						Primary Key						Marks a property as the primary key.
+[ForeignKey]				Foreign Key						Creates a foreign key relationship.
+[Index] (Fluent API)		Database Index					Creates an index on a column.
+[ConcurrencyCheck]			Concurrency Token				Used for optimistic concurrency control.
+[Timestamp]					ROWVERSION						For row versioning (SQL Server).
+[Computed] (Fluent API)		Computed Column					Creates a computed column in the database.

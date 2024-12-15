@@ -1,5 +1,4 @@
 ﻿using SharedLibrary.Models;
-using System;
 
 namespace SharedLibrary.Util
 {
@@ -19,6 +18,7 @@ namespace SharedLibrary.Util
         {
             MonthlyOverview monthlyOverview = new()
             {
+                CustomerId = customer?.Id ?? 0,
                 Customer = customer,
                 Year = generateMonth.Year,
                 Month = generateMonth.Month
@@ -34,6 +34,7 @@ namespace SharedLibrary.Util
                     DayOfMonth = i,
                     Price = currentDay < today ? (customer?.Article.Price ?? 0) : null,
                     NumberOfBoxes = currentDay < today ? 0 : null,
+                    MonthlyOverviewId = monthlyOverview.Id,
                     MonthlyOverview = monthlyOverview
                 };
             }).ToList();

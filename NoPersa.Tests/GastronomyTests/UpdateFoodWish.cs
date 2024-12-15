@@ -9,6 +9,7 @@ using NoPersaService.Database;
 using SharedLibrary.DTOs.Gastro;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;
+using SharedLibrary.Util;
 
 namespace NoPersa.Tests.GastronomyTests
 {
@@ -27,7 +28,7 @@ namespace NoPersa.Tests.GastronomyTests
             .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
             .Options;
 
-            context = new NoPersaDbContext(options);
+            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 

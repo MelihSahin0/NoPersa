@@ -49,7 +49,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
             }
             catch
@@ -72,7 +72,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
             }
             catch

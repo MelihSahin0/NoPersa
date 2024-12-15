@@ -64,7 +64,7 @@ namespace Website.Client.FormModels
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
             }
             catch

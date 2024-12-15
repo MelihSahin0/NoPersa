@@ -289,7 +289,7 @@ namespace NoPersaService.Controllers
                 if (updateCustomersMenu)
                 {
                     List<BoxContent> dbBoxContents = [.. context.BoxContents];
-                    PortionSize dbPortionSize = context.PortionSizes.First(p => p.Position == 0);
+                    PortionSize dbDefaultPortionSize = context.PortionSizes.First(p => p.IsDefault);
 
                     foreach (Customer customer in context.Customers.Include(cmp => cmp.CustomerMenuPlans))
                     {
@@ -305,8 +305,8 @@ namespace NoPersaService.Controllers
                                     CustomerId = customer.Id,
                                     BoxContentId = boxContent.Id,
                                     BoxContent = boxContent,
-                                    PortionSize = dbPortionSize,
-                                    PortionSizeId = dbPortionSize.Id
+                                    PortionSize = dbDefaultPortionSize,
+                                    PortionSizeId = dbDefaultPortionSize.Id
                                 };
                                 customer.CustomerMenuPlans.Add(dBCustomersMenuPlan);
                             }

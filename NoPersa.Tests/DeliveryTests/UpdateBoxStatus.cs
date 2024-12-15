@@ -9,6 +9,7 @@ using NoPersaService.Database;
 using SharedLibrary.DTOs.Delivery;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;
+using SharedLibrary.Util;
 
 namespace NoPersa.Tests.DeliveryTests
 {
@@ -28,7 +29,7 @@ namespace NoPersa.Tests.DeliveryTests
             .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
             .Options;
 
-            context = new NoPersaDbContext(options);
+            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 
@@ -59,7 +60,7 @@ namespace NoPersa.Tests.DeliveryTests
         {
             List<BoxStatus> boxStatuses = [.. context.BoxStatuses.AsNoTracking()];
             BoxStatus boxStatus = boxStatuses.First(b => b.Id == 1);
-            boxStatus.DeliveredBoxes = 99;
+            boxStatus.DeliveredBoxes = 9;
 
             controller.UpdateBoxStatus(mapper.Map<List<DTOBoxStatus>>(boxStatuses));
 

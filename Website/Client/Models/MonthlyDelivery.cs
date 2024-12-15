@@ -20,7 +20,7 @@ namespace Website.Client.Models
         public required Months Month { get; set; }
 
         [Required]
-        [IntType(min: 0)]
+        [IntType(min: 1900)]
         public required int Year { get; set; }
     }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Routing;
+using SharedLibrary.DTOs.Maintenance;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Components.Default;
@@ -140,7 +141,7 @@ namespace Website.Client.Pages
                     {}
                     else
                     {
-                        NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                        NotificationService.SetError((await NoPersaResponse.Deserialize(response1)).Detail);
                     }
                 }
 
@@ -156,7 +157,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await responseLightDiet.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(responseLightDiet)).Detail);
                 }
 
                 using var responseRoute = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetRoutesOverview")!;
@@ -166,7 +167,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await responseRoute.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(responseRoute)).Detail);
                 }
 
                 using var responseArticle = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/ArticleManagement/GetArticlesForCustomer")!;
@@ -184,7 +185,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await responseArticle.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(responseArticle)).Detail);
                 }
             }
             catch
@@ -211,7 +212,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
             }
             catch

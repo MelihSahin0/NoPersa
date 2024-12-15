@@ -9,6 +9,7 @@ using NoPersaService.Database;
 using SharedLibrary.DTOs.Management;
 using SharedLibrary.MappingProfiles;
 using SharedLibrary.Models;
+using SharedLibrary.Util;
 
 namespace NoPersa.Tests.ManagementTests
 {
@@ -27,7 +28,7 @@ namespace NoPersa.Tests.ManagementTests
            .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
            .Options;
 
-            context = new NoPersaDbContext(options);
+            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 
@@ -86,6 +87,7 @@ namespace NoPersa.Tests.ManagementTests
         {
             List<Article> articles = [.. context.Articles];
             articles.Remove(articles.First(a => a.Id == 1));
+            articles.First(a => a.Id == 2).IsDefault = true;
 
             controller.UpdateArticles(mapper.Map<List<DTOArticle>>(articles));
             List<Article> dbArticles = [.. context.Articles.AsNoTracking()];

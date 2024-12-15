@@ -1,5 +1,4 @@
-﻿using SharedLibrary.Validations;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SharedLibrary.Models
 {
@@ -9,10 +8,10 @@ namespace SharedLibrary.Models
         public long Id { get; set; }
 
         [Required]
-        [IntType(min: 0)]
         public required int Position { get; set; }
 
         [Required]
+        [MaxLength(64)]
         public required string Name { get; set; }
 
         [Required]

@@ -1,10 +1,12 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using SharedLibrary.DTOs.Maintenance;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Components.Default;
 using Website.Client.FormModels;
+using Website.Client.Models;
 using Website.Client.Services;
 
 namespace Website.Client.Pages
@@ -47,7 +49,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response1)).Detail);
                 }
 
                 using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetBoxContents")!;
@@ -58,7 +60,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response2)).Detail);
                 }
 
                 using var response3 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/GastronomyManagement/GetPortionSizes")!;
@@ -69,7 +71,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response3.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response3)).Detail);
                 }
             }
             catch
@@ -100,15 +102,15 @@ namespace Website.Client.Pages
                 {
                     if (!isSuccess1)
                     {
-                        NotificationService.SetError(await response1.Content.ReadAsStringAsync());
+                        NotificationService.SetError((await NoPersaResponse.Deserialize(response1)).Detail);
                     }
                     if (!isSuccess2)
                     {
-                        NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                        NotificationService.SetError((await NoPersaResponse.Deserialize(response2)).Detail);
                     }
                     if (!isSuccess3)
                     {
-                        NotificationService.SetError(await response3.Content.ReadAsStringAsync());
+                        NotificationService.SetError((await NoPersaResponse.Deserialize(response3)).Detail);
                     }
                 }
             }

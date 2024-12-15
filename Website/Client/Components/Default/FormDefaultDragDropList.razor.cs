@@ -76,15 +76,13 @@ namespace Website.Client.Components.Default
         {
             DragDropInputs.Remove(DragDropInputs.FirstOrDefault(r => r.Position == position)!);
 
-            bool hasDefault = false;
             int i = 0;
             foreach (var item in DragDropInputs.OrderBy(x => x.Position).ToList())
             {
                 item.Position = i++;
-                hasDefault = item.IsDefault;
             }
 
-            if (!hasDefault && DragDropInputs.Count != 0)
+            if (DragDropInputs.Count != 0 && !DragDropInputs.Any(d => d.IsDefault))
             {
                 DragDropInputs.First().IsDefault = true;
             }

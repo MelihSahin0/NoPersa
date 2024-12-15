@@ -1,14 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+using SharedLibrary.FluentValidations;
 using SharedLibrary.Models;
 using SharedLibrary.Util;
+using System.ComponentModel.DataAnnotations;
 using Route = SharedLibrary.Models.Route;
+using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace NoPersaService.Database
 {
     public class NoPersaDbContext : DbContext
     {
-        public NoPersaDbContext(DbContextOptions<NoPersaDbContext> options) : base(options)
+        private readonly IServiceProvider serviceProvider;
+
+        public NoPersaDbContext(DbContextOptions<NoPersaDbContext> options, IServiceProvider serviceProvider) : base(options)
         {
+            this.serviceProvider = serviceProvider;
         }
 
         public DbSet<Maintenance> Maintenances { get; set; }
@@ -147,6 +154,47 @@ namespace NoPersaService.Database
             modelBuilder.Entity<CustomersFoodWish>().ToTable("CustomersFoodWish");
             modelBuilder.Entity<BoxStatus>().ToTable("BoxStatus");
             #endregion
+        }
+
+        public override int SaveChanges()
+        {
+            ValidateEntities();
+            return base.SaveChanges();
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            ValidateEntities();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        private void ValidateEntities()
+        {
+            var entities = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified)
+                .Select(e => e.Entity);
+
+            foreach (var entity in entities)
+            {
+                ValidateEntity(entity);
+            }
+        }
+
+        private void ValidateEntity(object entity)
+        {
+            var validator = serviceProvider.GetService(typeof(IValidator<>).MakeGenericType(entity.GetType())) as IValidator;
+           
+            if (validator != null)
+            {
+                var context = new ValidationContext<object>(entity);
+                var validationResult = validator.Validate(context);
+
+                if (!validationResult.IsValid)
+                {
+                    var errorMessages = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    throw new ValidationException($"Validation failed for {entity.GetType().Name}: {errorMessages}");
+                }
+            }
         }
 
         public void SeedData()

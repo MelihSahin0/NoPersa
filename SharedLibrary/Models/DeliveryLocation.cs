@@ -24,9 +24,10 @@ namespace SharedLibrary.Models
 
         public string? DeliveryWhishes { get; set; }
 
+        [Required]
         [ForeignKey("CustomerId")]
-        public long CustomerId { get; set; }
+        public required long CustomerId { get; set; }
 
-        public required Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
     }
 }

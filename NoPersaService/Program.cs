@@ -1,7 +1,11 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
 using NoPersaService.Services;
+using SharedLibrary.FluentValidations;
 using SharedLibrary.MappingProfiles;
+using SharedLibrary.Util;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +35,12 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
+
+foreach (var validator in SharedLibrary.Util.ProgramBuilder.GetFluentValidations())
+{
+    builder.Services.AddScoped(validator.Item1, validator.Item2);
+}
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();

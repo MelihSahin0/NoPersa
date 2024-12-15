@@ -48,7 +48,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
 
                 using var response2 = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/TaskManagement/GetArticleTask")!;
@@ -66,7 +66,7 @@ namespace Website.Client.Pages
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
             }
             catch
@@ -98,11 +98,11 @@ namespace Website.Client.Pages
                 {
                     if (response.StatusCode != System.Net.HttpStatusCode.OK)
                     {
-                        NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                        NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                     }
                     else
                     {
-                        NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                        NotificationService.SetError((await NoPersaResponse.Deserialize(response2)).Detail);
                     }
                 }
             }

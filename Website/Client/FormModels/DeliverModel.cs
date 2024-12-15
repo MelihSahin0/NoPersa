@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using SharedLibrary.DTOs.Maintenance;
 using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
@@ -106,7 +107,7 @@ namespace Website.Client.FormModels
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }              
             }
             catch
@@ -164,7 +165,7 @@ namespace Website.Client.FormModels
                         else
                         {
                             DisplayMap = false;
-                            NotificationService.SetError(await response2.Content.ReadAsStringAsync());
+                            NotificationService.SetError((await NoPersaResponse.Deserialize(response2)).Detail);
                         }
                     }
                     else
@@ -248,7 +249,7 @@ namespace Website.Client.FormModels
                 }
                 else
                 {
-                    NotificationService.SetError(await response.Content.ReadAsStringAsync());
+                    NotificationService.SetError((await NoPersaResponse.Deserialize(response)).Detail);
                 }
             }
             catch

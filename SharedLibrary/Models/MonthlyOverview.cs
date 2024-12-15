@@ -1,4 +1,3 @@
-using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,19 +9,18 @@ namespace SharedLibrary.Models
         public long Id { get; set; }
 
         [Required]
-        [IntType(min: 0, max: 11)]
-        public int Month { get; set; }
+        public required int Year { get; set; }
 
         [Required]
-        public int Year { get; set; }
+        public required int Month { get; set; }
 
-        [ExactChildren(31)]
         public List<DailyOverview> DailyOverviews { get; set; } = [];
 
+        [Required]
         [ForeignKey("CustomerId")]
-        public long CustomerId { get; set; }
+        public required long CustomerId { get; set; }
 
-        public required Customer Customer { get; set; }
+        public Customer? Customer { get; set; }
 
         [NotMapped]
         public double TotalPrice => CalculateTotalPrice();

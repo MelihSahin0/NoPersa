@@ -8,25 +8,25 @@ namespace SharedLibrary.Models
         public long Id { get; set; }
 
         [Required]
-        public bool Monday { get; set; } = false;
+        public required bool Monday { get; set; }
         
         [Required]
-        public bool Tuesday { get; set; } = false;
+        public required bool Tuesday { get; set; }
 
         [Required]
-        public bool Wednesday { get; set; } = false;
+        public required bool Wednesday { get; set; }
 
         [Required]
-        public bool Thursday { get; set; } = false;
+        public required bool Thursday { get; set; }
 
         [Required]
-        public bool Friday { get; set; } = false;
+        public required bool Friday { get; set; }
         
         [Required]
-        public bool Saturday { get; set; } = false;
+        public required bool Saturday { get; set; }
 
         [Required]
-        public bool Sunday { get; set; } = false;
+        public required bool Sunday { get; set; }
 
         public override bool Equals(object? obj)
         {
