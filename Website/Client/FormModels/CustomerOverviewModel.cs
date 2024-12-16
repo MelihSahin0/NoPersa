@@ -37,7 +37,7 @@ namespace Website.Client.FormModels
         }
 
         [Required]
-        public required long Id { get; set; }
+        public required string Id { get; set; }
 
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]
         public string? SerialNumber { get; set; }
@@ -73,21 +73,20 @@ namespace Website.Client.FormModels
         public required MonthOfTheYear DisplayMonth { get; set; }
 
         [Required]
-        [LongType(min:1)]
-        public required long ArticleId { get; set; }
+        public required string ArticleId { get; set; }
 
         [JsonIgnore]
-        public List<SelectInput>? Articles { get; set; }
+        public List<SelectInput<string>>? Articles { get; set; }
 
         [JsonIgnore]
         public List<ArticlesForCustomer> ArticlesPrice { get; set; }
 
         [Required]
-        [LongType(min: 1, max: 10)]
-        public required long DefaultNumberOfBoxes { get; set; }
+        [IntType(min: 1, max: 10)]
+        public required int DefaultNumberOfBoxes { get; set; }
 
         [JsonIgnore]
-        public List<SelectInput> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection.Where(x => x.Id != 0).ToList();
+        public List<SelectInput<int>> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection.Where(x => x.Id != 0).ToList();
 
         [ValidateComplexType]
         [Required(ErrorMessage = "Monthly Delivery is required")]
@@ -125,11 +124,10 @@ namespace Website.Client.FormModels
         public bool ModifyMonthlyDelivery => DateTimeCalc.MonthDifferenceMax1(DateTime.Today.Year, MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Year, DateTime.Today.Month, (int)MonthlyDeliveries[selectedMonthlyDeliveries].MonthOfTheYear.Month);
 
         [Required]
-        [LongType]
-        public required long RouteId { get; set; }
+        public required string RouteId { get; set; }
 
         [JsonIgnore]
-        public List<SelectInput>? RouteDetails { get; set; }
+        public List<SelectInput<string>>? RouteDetails { get; set; }
 
         [ValidateComplexType]
         [Required]
@@ -148,7 +146,7 @@ namespace Website.Client.FormModels
         [MinChildren(1, ErrorMessage = "At least one box content with one portion size should be defined")]
         public required List<BoxContentSelected> BoxContentSelectedList { get; set; }
 
-        public List<SelectInput>? PortionSizes { get; set; }
+        public List<SelectInput<string>>? PortionSizes { get; set; }
 
         [JsonIgnore]
         public int selectedMonthlyDeliveries = 0;

@@ -43,10 +43,10 @@
                             <div class="grid grid-cols-12 gap-2 mt-1">
                                 <a class="text-center col-span-2 select-none">@boxStatusOverview.RouteName</a>
                                 <a class="text-center col-span-2 select-none">@boxStatusOverview.CustomersName</a>
-                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.NumberOfBoxesPreviousDay" SelectInputs="@BoxStatusModel.DefaultNumbers" />
-                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.DeliveredBoxes" SelectInputs="@BoxStatusModel.DefaultNumbers" />
-                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.ReceivedBoxes" SelectInputs="@BoxStatusModel.DefaultNumbers" />
-                                <FormDefaultSelect Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.NumberOfBoxesCurrentDay" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect T="int" Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.NumberOfBoxesPreviousDay" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect T="int" Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.DeliveredBoxes" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect T="int" Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.ReceivedBoxes" SelectInputs="@BoxStatusModel.DefaultNumbers" />
+                                <FormDefaultSelect T="int" Class="col-span-2 w-full" IsColumn="false" @bind-Value="@boxStatusOverview.NumberOfBoxesCurrentDay" SelectInputs="@BoxStatusModel.DefaultNumbers" />
                             </div>
                         }
                     } 

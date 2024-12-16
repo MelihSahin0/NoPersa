@@ -6,7 +6,7 @@ namespace Website.Client.Models
     public class RouteDetails
     {
         [Required]
-        public required long Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
         [IntType(min: 0)]
@@ -23,7 +23,7 @@ namespace Website.Client.Models
     public class CustomerDeliveryStatus
     {
         [Required]
-        public required long Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
         [IntType(min: 0)]

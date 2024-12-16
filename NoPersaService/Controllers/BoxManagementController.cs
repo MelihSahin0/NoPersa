@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
-using SharedLibrary.DTOs.Delivery;
-using SharedLibrary.Models;
+using NoPersaService.DTOs.Box.Mapped;
+using NoPersaService.DTOs.Box.RA;
+using NoPersaService.DTOs.Box.Receive;
+using NoPersaService.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace NoPersaService.Controllers
@@ -87,17 +89,19 @@ namespace NoPersaService.Controllers
         }
 
         [HttpPost("UpdateCustomersBoxStatus", Name = "UpdateCustomersBoxStatus")]
-        public IActionResult UpdateUpdateCustomersBoxStatusRoutes([FromBody] List<DTOCustomersBoxStatus> dTOCustomersBoxStatuses)
+        public IActionResult UpdateCustomersBoxStatusRoutes([FromBody] List<DTOCustomersBoxStatus> dTOCustomersBoxStatuses)
         {
             using var transaction = context.Database.BeginTransaction();
 
             try
             {
-                var customerIds = dTOCustomersBoxStatuses.Select(status => status.Id).ToList();
+                var mappedCustomerBoxStatuses = mapper.Map<List<MappedCustomerBoxStatus>>(dTOCustomersBoxStatuses);
+
+                var customerIds = mappedCustomerBoxStatuses.Select(status => status.Id).ToList();
                 var dbCustomers = context.Customers.Where(c => customerIds.Contains(c.Id)).ToList();
                 var dbBoxStatuses = context.BoxStatuses.Where(b => customerIds.Contains(b.CustomerId)).ToList();
 
-                foreach (var customersBoxStatus in dTOCustomersBoxStatuses)
+                foreach (var customersBoxStatus in mappedCustomerBoxStatuses)
                 {
                     var dbBoxStatus = dbBoxStatuses.FirstOrDefault(b => b.CustomerId == customersBoxStatus.Id);
 

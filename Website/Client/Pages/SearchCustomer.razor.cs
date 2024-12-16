@@ -53,9 +53,8 @@ namespace Website.Client.Pages
             }
         }
 
-        private void OpenCustomerOverview(int customerId)
+        private void OpenCustomerOverview(string customerId)
         {
-            Console.WriteLine(customerId);
             NavigationContainer.CustomerId = customerId;
             NavigationManager.NavigateTo("/customer");
         }
@@ -63,7 +62,7 @@ namespace Website.Client.Pages
         public class DisplayCustomer
         {
             [Required]
-            public required int Id { get; set; }
+            public required string Id { get; set; }
 
             [Required]
             public required string Name { get; set; }

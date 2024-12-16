@@ -32,6 +32,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - HOLIDAY_API=${HOLIDAY_API}
       - ROUTING_API=${ROUTING_API}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - HMAC_KEY=${HMAC_KEY} 
 
   website.server:
     image: ${DOCKER_REGISTRY-}websiteserver

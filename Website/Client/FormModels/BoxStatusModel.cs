@@ -10,7 +10,7 @@ namespace Website.Client.FormModels
         [Required]
         public required List<BoxStatusOverview> BoxStatusOverviews { get; set; }
 
-        public List<SelectInput> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection;
+        public List<SelectInput<int>> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection;
 
         public string RouteFilter { get; set; } = string.Empty;
        

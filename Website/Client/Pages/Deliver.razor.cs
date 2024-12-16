@@ -39,7 +39,7 @@ namespace Website.Client.Pages
             DateTime dateTime = DateTime.Today;
             DeliverModel = new DeliverModel(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService, NavigationManager, GeoLocationService, LeafletService)
             {
-                RouteId = -1,
+                RouteId = "0",
                 RouteSummary = [],
                 Year = dateTime.Year,
                 Month = (Enums.Months)(dateTime.Month),
@@ -57,8 +57,8 @@ namespace Website.Client.Pages
 
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    DeliverModel.RouteSummary = JsonSerializer.Deserialize<List<RouteSummary>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.Select(r => new SelectInput() { Id = r.Id, Value = r.Name }).ToList();
-                    DeliverModel.RouteId = (DeliverModel.RouteSummary.FirstOrDefault()?.Id ?? -1);
+                    DeliverModel.RouteSummary = JsonSerializer.Deserialize<List<RouteSummary>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.Select(r => new SelectInput<string>() { Id = r.Id, Value = r.Name }).ToList();
+                    DeliverModel.RouteId = (DeliverModel.RouteSummary.FirstOrDefault()?.Id ?? "0");
                 }
                 else
                 {

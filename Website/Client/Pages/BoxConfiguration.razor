@@ -13,20 +13,20 @@
 
         <div class="p-4 bg-gray-100 rounded-md justify-center w-2/6 m-2">
             <h3 class="text-lg font-semibold mb-4 select-none">Light diets</h3>
-            <FormDefaultDragDropList Class="flex self-center justify-center items-center" MaxHeight="max-h-96" AddButtonDisplay="Add new light diet"
+            <FormDefaultDragDropList T="string" Class="flex self-center justify-center items-center" MaxHeight="max-h-96" AddButtonDisplay="Add new light diet"
                                  @bind-DragDropInputs="BoxConfigurationModel.LightDiets" Placeholder="Light diet name" RemoveButtonDisplay="Delete light diet"/>
         </div>
 
         <div class="p-4 bg-gray-100 rounded-md justify-center w-2/6 m-2">
             <h3 class="text-lg font-semibold mb-4 select-none">Box contents</h3>
-            <FormDefaultDragDropList Class="flex self-center justify-center items-center" MaxHeight="max-h-96" AddButtonDisplay="Add new box content"
+            <FormDefaultDragDropList T="string" Class="flex self-center justify-center items-center" MaxHeight="max-h-96" AddButtonDisplay="Add new box content"
                                  @bind-DragDropInputs="BoxConfigurationModel.BoxContents" Placeholder="Box content name" RemoveButtonDisplay="Delete box content"/>
             <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red w-full")" For="@(() => BoxConfigurationModel.BoxContents)" />
         </div>
 
         <div class="p-4 bg-gray-100 rounded-md justify-center w-2/6 m-2">
             <h3 class="text-lg font-semibold mb-4 select-none">Portion size</h3>
-                <FormDefaultDragDropList Class="flex self-center justify-center items-center" MaxHeight="max-h-96" AddButtonDisplay="Add new portion size" HasDefault="true"
+                <FormDefaultDragDropList T="string" Class="flex self-center justify-center items-center" MaxHeight="max-h-96" AddButtonDisplay="Add new portion size" HasDefault="true"
                                  @bind-DragDropInputs="BoxConfigurationModel.PortionSizes" Placeholder="Portion size name" RemoveButtonDisplay="Delete portion size" />
             <ValidationMessage class="@($"{Scaling.GetTextScaling()} text-red w-full")" For="@(() => BoxConfigurationModel.PortionSizes)" />
         </div>

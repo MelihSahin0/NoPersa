@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Website.Client.Components.Default
 {
-    public partial class FormDefaultDragDropList
+    public partial class FormDefaultDragDropList<T>
     {
         [CascadingParameter]
         private EditContext? CascadedEditContext { get; set; }
@@ -45,13 +45,13 @@ namespace Website.Client.Components.Default
         public bool HasDefault { get; set; } = false;
 
         [Parameter]
-        public required List<DragDropInput> DragDropInputs { get; set; }
+        public required List<DragDropInput<T>> DragDropInputs { get; set; }
 
         [Parameter]
-        public EventCallback<List<DragDropInput>> DragDropInputsChanged { get; set; }
+        public EventCallback<List<DragDropInput<T>>> DragDropInputsChanged { get; set; }
 
-        private DragDropInput? draggedItem;
-        private void HandleDrop(DragDropInput landingModel)
+        private DragDropInput<T>? draggedItem;
+        private void HandleDrop(DragDropInput<T> landingModel)
         {
             if (draggedItem is null)
             {
@@ -90,7 +90,32 @@ namespace Website.Client.Components.Default
 
         private void AddItem()
         {
-            DragDropInputs.Add(new DragDropInput() { Id = 0, Position = DragDropInputs.Count, Value = "", IsDefault = DragDropInputs.Count == 0 });
+            T id = default!;
+
+            if (typeof(T) == typeof(double))
+            {
+                id = (T)(object)0.0;
+            }
+            else if (typeof(T) == typeof(int))
+            {
+                id = (T)(object)0;
+            }
+            else if (typeof(T) == typeof(long))
+            {
+                id = (T)(object)0L;
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                id = (T)(object)"0";
+            }
+
+            DragDropInputs.Add(new DragDropInput<T>()
+            {
+                Id = id,
+                Position = DragDropInputs.Count,
+                Value = string.Empty,
+                IsDefault = DragDropInputs.Count == 0
+            });
         }
 
         private void SortByName()
@@ -102,7 +127,7 @@ namespace Website.Client.Components.Default
             }
         }
 
-        private void HandleIsDefault(DragDropInput dragDropInput)
+        private void HandleIsDefault(DragDropInput<T> dragDropInput)
         {
             foreach (var item in DragDropInputs)
             {
@@ -131,10 +156,10 @@ namespace Website.Client.Components.Default
         }
     }
 
-    public class DragDropInput
+    public class DragDropInput<T>
     {
         [Required]
-        public required long Id { get; set; }
+        public required T Id { get; set; }
 
         [Required]
         public required int Position { get; set; }

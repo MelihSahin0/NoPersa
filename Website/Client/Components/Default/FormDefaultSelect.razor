@@ -1,6 +1,7 @@
 ﻿@using Website.Client.Models
 @using Website.Client.Styles
 @using Microsoft.AspNetCore.Components.Forms;
+@typeparam T
 
 <div class="@($"{Class} flex {(IsColumn ? "flex-col" : "items-center flex-row")}")">
     @if (!string.IsNullOrWhiteSpace(Label))
@@ -9,7 +10,7 @@
     }
     <InputSelect id="@Id" class="@($"{Scaling.GetTextScaling()} w-full ring-black ring-1 rounded-md hover:ring-skyHover text-center select-none")" 
                 @bind-Value="Value" @oninput="OnValueChanged">
-        @foreach (SelectInput route in SelectInputs ?? [])
+        @foreach (SelectInput<T> route in SelectInputs ?? [])
         {
             <option @key="route" class="rounded-md bg-gray-700 hover:bg-skyHover text-white" value="@route.Id">@route.Value</option>
         }

@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using SharedLibrary.DTOs.Maintenance;
 using SharedLibrary.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
@@ -42,10 +41,9 @@ namespace Website.Client.FormModels
         }
 
         [Required]
-        [LongType]
-        public required long RouteId { get; set; }
+        public required string RouteId { get; set; }
 
-        public List<SelectInput>? RouteSummary { get; set; }
+        public List<SelectInput<string>>? RouteSummary { get; set; }
 
         [Required]
         public required int Year { get; set; }
@@ -259,7 +257,7 @@ namespace Website.Client.FormModels
             IsSubmitting = false;
         }
 
-        public List<SelectInput> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection;
+        public List<SelectInput<int>> DefaultNumbers = Misc.GetDefaultNumberOfBoxesSelection;
 
         public bool ButtonPrevious { get; set; } = false;
 

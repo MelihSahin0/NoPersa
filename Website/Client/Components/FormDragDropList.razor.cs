@@ -85,7 +85,7 @@ namespace Website.Client.Components
 
         private void AddRoute()
         {
-            RouteOverviews.Add(new RouteSummary() { Id = 0, Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0, IsDrivable = IsDrivable });
+            RouteOverviews.Add(new RouteSummary() { Id = "0", Position = RouteOverviews.Count, Name = "", NumberOfCustomers = 0, IsDrivable = IsDrivable });
         }
 
         public string ValidStateCss(Expression<Func<string>>? For)

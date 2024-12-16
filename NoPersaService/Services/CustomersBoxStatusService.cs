@@ -1,5 +1,5 @@
 ﻿using NoPersaService.Database;
-using SharedLibrary.Models;
+using NoPersaService.Models;
 
 namespace NoPersaService.Services
 {

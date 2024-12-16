@@ -13,7 +13,7 @@
     <EditForm Model="DeliverModel" OnValidSubmit="@DeliverModel.GetRouteCustomers">
         <div class="max-w-full">
             <div class="flex flex-row max-w-full justify-between mb-2 pb-2 border-black border-b-2">
-                <FormDefaultSelect Label="Select Route" @bind-Value="DeliverModel.RouteId" SelectInputs="DeliverModel.RouteSummary" />
+                <FormDefaultSelect T="string" Label="Select Route" @bind-Value="DeliverModel.RouteId" SelectInputs="DeliverModel.RouteSummary" />
                 <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2")">Start route</button>
                 <FormDayPicker Label="Date picker" @bind-Year="DeliverModel.Year" @bind-Month="DeliverModel.Month" @bind-Day="DeliverModel.Day"/>
             </div>
@@ -27,8 +27,8 @@ else
             <div class="w-full flex flex-row">
                 <div class="flex flex-row w-1/2 justify-between mb-2 pb-2 border-black border-b-2">   
                     <button type="button" disabled="@(!DeliverModel.ButtonPrevious)" @onclick="@DeliverModel.Previous" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonPrevious ? "bg-lightGreen" : "bg-lightGray")} mx-2 select-none")">Previous</button>
-                    <FormDefaultSelect IsColumn="false" Label="Boxes delivered" @bind-Value="@DeliverModel.CustomersBoxStatuses[DeliverModel.CustomerIndex].DeliveredBoxes" SelectInputs="@DeliverModel.DefaultNumbers" />
-                    <FormDefaultSelect IsColumn="false" Label="Boxes received" @bind-Value="@DeliverModel.CustomersBoxStatuses[DeliverModel.CustomerIndex].ReceivedBoxes" SelectInputs="@DeliverModel.DefaultNumbers" />
+                    <FormDefaultSelect T="int" IsColumn="false" Label="Boxes delivered" @bind-Value="@DeliverModel.CustomersBoxStatuses[DeliverModel.CustomerIndex].DeliveredBoxes" SelectInputs="@DeliverModel.DefaultNumbers" />
+                    <FormDefaultSelect T="int" IsColumn="false" Label="Boxes received" @bind-Value="@DeliverModel.CustomersBoxStatuses[DeliverModel.CustomerIndex].ReceivedBoxes" SelectInputs="@DeliverModel.DefaultNumbers" />
                     <button type="button" disabled="@(!DeliverModel.ButtonNext)" @onclick="@DeliverModel.Next" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonNext ? "bg-lightGreen" : "bg-lightGray")} mx-2 select-none")">Next</button>
                     <button type="submit" disabled="@(!DeliverModel.ButtonSubmit)" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(DeliverModel.ButtonSubmit ? "bg-lightGreen" : "bg-lightGray")} mx-2 select-none")">Submit</button>
                 </div>

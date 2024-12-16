@@ -13,6 +13,6 @@ namespace Website.Client.Models
 
         public List<BoxContentSelected>? BoxContentSelectedList { get; set; }
 
-        public List<SelectInput>? SelectInputs { get; set; }
+        public List<SelectInput<string>>? SelectInputs { get; set; }
     }
 }

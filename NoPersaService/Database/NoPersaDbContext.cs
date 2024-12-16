@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrary.FluentValidations;
-using SharedLibrary.Models;
+using NoPersaService.Models;
 using SharedLibrary.Util;
-using System.ComponentModel.DataAnnotations;
-using Route = SharedLibrary.Models.Route;
+using Route = NoPersaService.Models.Route;
 using ValidationException = System.ComponentModel.DataAnnotations.ValidationException;
 
 namespace NoPersaService.Database

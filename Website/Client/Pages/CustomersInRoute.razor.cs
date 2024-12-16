@@ -45,7 +45,7 @@ namespace Website.Client.Pages
                 {
                     CustomerSequenceModel.SequenceDetails = [.. JsonSerializer.Deserialize<List<SequenceDetail>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(r => r.Name)];
                     CustomerSequenceModel.SelectedRouteDetailsId = CustomerSequenceModel.SequenceDetails.Take(2).Select(r => r.Id).ToArray();
-                    CustomerSequenceModel.RouteOverview = [.. CustomerSequenceModel.SequenceDetails.Select(r => new SelectInput() { Id = r.Id, Value = r.Name}).OrderBy(r => r.Value)];
+                    CustomerSequenceModel.RouteOverview = [.. CustomerSequenceModel.SequenceDetails.Select(r => new SelectInput<string>() { Id = r.Id, Value = r.Name}).OrderBy(r => r.Value)];
                 }
                 else
                 {

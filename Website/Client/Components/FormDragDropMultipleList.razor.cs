@@ -37,10 +37,10 @@ namespace Website.Client.Components
         public EventCallback<List<SequenceDetail>> SequenceDetailsChanged { get; set; }
 
         [Parameter]
-        public required long[]? SelectedRouteId { get; set; }
+        public required string[]? SelectedRouteId { get; set; }
 
         private CustomerSequence? draggedItem;
-        private void HandleDrop(CustomerSequence landingModel, long targetId)
+        private void HandleDrop(CustomerSequence landingModel, string targetId)
         {
             if (draggedItem is null)
             {

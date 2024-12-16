@@ -1,11 +1,7 @@
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
 using NoPersaService.Services;
-using SharedLibrary.FluentValidations;
-using SharedLibrary.MappingProfiles;
-using SharedLibrary.Util;
-using System.Reflection;
+using NoPersaService.Util;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,18 +32,12 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 
-foreach (var validator in SharedLibrary.Util.ProgramBuilder.GetFluentValidations())
-{
-    builder.Services.AddScoped(validator.Item1, validator.Item2);
-}
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-builder.Services.AddAutoMapper(typeof(ManagementProfile), typeof(DeliveryProfile), typeof(GastronomyProfile), typeof(DefaultProfile));
-builder.Services.AddHostedService<DailyDeliveryService>();
-builder.Services.AddHostedService<ArticleService>();
-builder.Services.AddHostedService<CustomersBoxStatusService>();
+ProgramBuilder.RegisterHostedServices(builder.Services);
+ProgramBuilder.RegisterAutoMapperProfiles(builder.Services);
+ProgramBuilder.RegisterFluentValidations(builder.Services);
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

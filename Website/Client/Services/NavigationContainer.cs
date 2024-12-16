@@ -2,6 +2,6 @@
 {
     public class NavigationContainer
     {
-        public long? CustomerId { get; set; }
+        public string? CustomerId { get; set; }
     }
 }

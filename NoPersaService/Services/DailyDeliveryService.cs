@@ -1,11 +1,12 @@
-﻿using SharedLibrary.Models;
-using System.Text.Json;
+﻿using System.Text.Json;
 using EFCore.BulkExtensions;
-using Holiday = SharedLibrary.Models.Holiday;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrary.Util;
-using SharedLibrary.DTOs.Maintenance;
+using NoPersaService.Util;
 using NoPersaService.Database;
+using NoPersaService.Models;
+using NoPersaService.DTOs.APICalls;
+using Holiday = NoPersaService.Models.Holiday;
+using SharedLibrary.Util;
 
 namespace NoPersaService.Services
 {
@@ -196,7 +197,7 @@ namespace NoPersaService.Services
                 var response = await httpClient.GetAsync($"https://calendarific.com/api/v2/holidays?&api_key={Environment.GetEnvironmentVariable("HOLIDAY_API")}&country={currentCountry}&year={year}");
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    DTOYearlyHolidays? apiResponse = JsonSerializer.Deserialize<DTOYearlyHolidays>(await response.Content.ReadAsStringAsync());
+                    DTOYearlyHolidaysResponse? apiResponse = JsonSerializer.Deserialize<DTOYearlyHolidaysResponse>(await response.Content.ReadAsStringAsync());
 
                     if (apiResponse != null)
                     {

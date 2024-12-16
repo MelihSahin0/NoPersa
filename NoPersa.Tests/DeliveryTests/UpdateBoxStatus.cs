@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
 using NoPersaService.Controllers;
 using NoPersaService.Database;
-using SharedLibrary.DTOs.Delivery;
-using SharedLibrary.MappingProfiles;
-using SharedLibrary.Models;
-using SharedLibrary.Util;
+using NoPersaService.DTOs.Box.RA;
+using NoPersaService.DTOs.Box.Receive;
+using NoPersaService.Models;
+using NoPersaService.Util;
 
 namespace NoPersa.Tests.DeliveryTests
 {
@@ -25,22 +26,19 @@ namespace NoPersa.Tests.DeliveryTests
         [TestInitialize]
         public void Setup()
         {
-            var options = new DbContextOptionsBuilder<NoPersaDbContext>()
-            .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
-            .Options;
+            DotNetEnv.Env.Load(@"..\..\..\..\.env");
 
-            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
+            var services = new ServiceCollection();
+            ProgramBuilder.RegisterAutoMapperProfiles(services);
+            ProgramBuilder.RegisterFluentValidations(services);
+            services.AddDbContext<NoPersaDbContext>(opt => opt.UseSqlite("DataSource=:memory:"));
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            context = serviceProvider.GetRequiredService<NoPersaDbContext>();
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<ManagementProfile>();
-                cfg.AddProfile<DeliveryProfile>();
-                cfg.AddProfile<GastronomyProfile>();
-            });
-
-            mapper = config.CreateMapper();
+            mapper = serviceProvider.GetRequiredService<IMapper>();
             logger = new Mock<ILogger<BoxManagementController>>().Object;
             httpClient = new HttpClient();
             controller = new BoxManagementController(logger, context, mapper, httpClient);
@@ -78,12 +76,12 @@ namespace NoPersa.Tests.DeliveryTests
             List<DTOCustomersBoxStatus> customersBoxStatuses = [];
             customersBoxStatuses.Add(new()
             {
-                Id = boxStatus.Id,
+                Id = IdEncryption.EncryptId(boxStatus.Id),
                 DeliveredBoxes = boxStatus.DeliveredBoxes,
                 ReceivedBoxes = boxStatus.ReceivedBoxes
             });
 
-            controller.UpdateUpdateCustomersBoxStatusRoutes(customersBoxStatuses);
+            controller.UpdateCustomersBoxStatusRoutes(customersBoxStatuses);
 
             Assert.AreEqual(3, context.BoxStatuses.AsNoTracking().First(b => b.Id == 2).NumberOfBoxesCurrentDay);
         }

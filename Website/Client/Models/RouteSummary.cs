@@ -6,7 +6,7 @@ namespace Website.Client.Models
     public class RouteSummary
     {
         [Required]
-        public required long Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
         [IntType(min: 0)]

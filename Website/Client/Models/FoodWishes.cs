@@ -5,7 +5,7 @@ namespace Website.Client.Models
     public class FoodWishes
     {
         [Required]
-        public required long Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
         public required int Position { get; set; }

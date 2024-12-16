@@ -15,7 +15,7 @@
             @for (int i = 0; i < CustomerSequenceModel.SelectedRouteDetailsId.Count(); i++)
             {
                 int j = i;
-                <FormDefaultSelect Class="w-1/2 justify-center" SelectInputs="@([.. CustomerSequenceModel.RouteOverview.Where(r => r.Id != CustomerSequenceModel.SelectedRouteDetailsId[CustomerSequenceModel.SelectedRouteDetailsId.Count() - 1 - j])])"
+                <FormDefaultSelect T="string" Class="w-1/2 justify-center" SelectInputs="@([.. CustomerSequenceModel.RouteOverview.Where(r => r.Id != CustomerSequenceModel.SelectedRouteDetailsId[CustomerSequenceModel.SelectedRouteDetailsId.Count() - 1 - j])])"
                                    @bind-Value="CustomerSequenceModel.SelectedRouteDetailsId[j]"/>
             }
         </div>

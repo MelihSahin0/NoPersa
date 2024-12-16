@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NoPersaService.Database;
-using SharedLibrary.DTOs.AnswerDTO;
-using SharedLibrary.Models;
+using NoPersaService.DTOs.General.RA;
+using NoPersaService.Models;
 using SharedLibrary.Util;
 using System.ComponentModel.DataAnnotations;
 

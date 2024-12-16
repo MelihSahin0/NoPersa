@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using SharedLibrary.DTOs.Maintenance;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Components.Default;
@@ -45,7 +44,7 @@ namespace Website.Client.Pages
 
                 if (response1.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    BoxConfigurationModel.LightDiets = JsonSerializer.Deserialize<List<DragDropInput>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    BoxConfigurationModel.LightDiets = JsonSerializer.Deserialize<List<DragDropInput<string>>>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                 }
                 else
                 {
@@ -56,7 +55,7 @@ namespace Website.Client.Pages
 
                 if (response2.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    BoxConfigurationModel.BoxContents = JsonSerializer.Deserialize<List<DragDropInput>>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    BoxConfigurationModel.BoxContents = JsonSerializer.Deserialize<List<DragDropInput<string>>>(await response2.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                 }
                 else
                 {
@@ -67,7 +66,7 @@ namespace Website.Client.Pages
 
                 if (response3.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    BoxConfigurationModel.PortionSizes = JsonSerializer.Deserialize<List<DragDropInput>>(await response3.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
+                    BoxConfigurationModel.PortionSizes = JsonSerializer.Deserialize<List<DragDropInput<string>>>(await response3.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
                 }
                 else
                 {

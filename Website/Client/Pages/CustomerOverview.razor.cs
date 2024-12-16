@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Routing;
-using SharedLibrary.DTOs.Maintenance;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Website.Client.Components.Default;
@@ -56,13 +55,13 @@ namespace Website.Client.Pages
 
             CustomerOverviewModel = new(LocalStorage, JsonSerializerOptions, HttpClient, NotificationService)
             {
-                Id = 0,
+                Id = NavigationContainer.CustomerId ?? "0",
                 SerialNumber = string.Empty,
                 Name = string.Empty,
                 Title = string.Empty,
                 DeliveryLocation = new DeliveryLocation()
                 {
-                    Id = 0,
+                    Id = "0",
                     Address = string.Empty,
                     Region = string.Empty,
                     GeoLocation = string.Empty,
@@ -73,7 +72,7 @@ namespace Website.Client.Pages
                     Month = (Months)(dateTime.Month),
                     Year = dateTime.Year
                 },
-                ArticleId = 0,
+                ArticleId = "0",
                 Articles = [],
                 ArticlesPrice = [],
                 DefaultNumberOfBoxes = 1,
@@ -93,7 +92,7 @@ namespace Website.Client.Pages
                 Workdays = new Weekdays(),
                 Holidays = new Weekdays(),
                 ContactInformation = string.Empty,
-                RouteId = long.MinValue,
+                RouteId = long.MinValue.ToString(),
                 RouteDetails = [],
                 LightDietOverviews = [],
                 FoodWishesOverviews = [],
@@ -119,7 +118,6 @@ namespace Website.Client.Pages
                     {
                         CustomerOverviewModel customer = JsonSerializer.Deserialize<CustomerOverviewModel>(await response1.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
 
-                        CustomerOverviewModel.Id = customer.Id;
                         CustomerOverviewModel.SerialNumber = customer.SerialNumber;
                         CustomerOverviewModel.Title = customer.Title;
                         CustomerOverviewModel.Name = customer.Name;
@@ -163,7 +161,7 @@ namespace Website.Client.Pages
                 using var responseRoute = await HttpClient?.GetAsync($"https://{await LocalStorage!.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/GetRoutesOverview")!;
                 if (responseRoute.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    CustomerOverviewModel.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
+                    CustomerOverviewModel.RouteDetails = [.. JsonSerializer.Deserialize<List<SelectInput<string>>>(await responseRoute.Content.ReadAsStringAsync(), JsonSerializerOptions)!.OrderBy(x => x.Value)];
                 }
                 else
                 {
@@ -175,12 +173,12 @@ namespace Website.Client.Pages
                 {
                     var articles = JsonSerializer.Deserialize<List<ArticlesForCustomer>>(await responseArticle.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
 
-                    CustomerOverviewModel.Articles = articles.Select(a => new SelectInput() { Id = a.Id, Value = a.Name}).ToList();
+                    CustomerOverviewModel.Articles = articles.Select(a => new SelectInput<string>() { Id = a.Id, Value = a.Name}).ToList();
                     CustomerOverviewModel.ArticlesPrice = articles;
 
-                    if (CustomerOverviewModel.ArticleId == 0)
+                    if (CustomerOverviewModel.ArticleId.Equals("0"))
                     {
-                        CustomerOverviewModel.ArticleId = articles.FirstOrDefault(a => a.IsDefault)?.Id ?? 0;
+                        CustomerOverviewModel.ArticleId = articles.FirstOrDefault(a => a.IsDefault)?.Id ?? "0";
                     }
                 }
                 else
@@ -199,7 +197,7 @@ namespace Website.Client.Pages
             IsSubmitting = true;
             try
             {
-                using var response = CustomerOverviewModel.Id == 0 ?
+                using var response = CustomerOverviewModel.Id.Equals("0") ?
                    await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/InsertCustomer", CustomerOverviewModel, JsonSerializerOptions)
                    :
                    await HttpClient.PostAsJsonAsync($"https://{await LocalStorage.GetItemAsync<string>(ServiceNames.NoPersaService.ToString())}/CustomerManagement/UpdateCustomer", CustomerOverviewModel, JsonSerializerOptions);

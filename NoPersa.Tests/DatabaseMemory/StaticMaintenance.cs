@@ -1,5 +1,5 @@
 ﻿using Microsoft.OpenApi.Extensions;
-using SharedLibrary.Models;
+using NoPersaService.Models;
 using SharedLibrary.Util;
 
 namespace NoPersa.Tests.DatabaseMemory

@@ -7,10 +7,10 @@ namespace Website.Client.FormModels
     {
         [ValidateComplexType]
         [Required]
-        public required List<DragDropInput> FoodWishes { get; set; }
+        public required List<DragDropInput<string>> FoodWishes { get; set; }
 
         [ValidateComplexType]
         [Required]
-        public required List<DragDropInput> IngredientWishes { get; set; }
+        public required List<DragDropInput<string>> IngredientWishes { get; set; }
     }
 }

@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SharedLibrary.Models;
+using NoPersaService.Models;
 using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrary.DTOs.GetDTOs;
-using SharedLibrary.Util;
-using SharedLibrary.DTOs.Management;
-using SharedLibrary.DTOs.AnswerDTO;
+using NoPersaService.Util;
 using NoPersaService.Database;
+using SharedLibrary.Util;
+using NoPersaService.DTOs.General.Answer;
+using AutoMapper.QueryableExtensions;
+using NoPersaService.DTOs.General.Mapped;
+using NoPersaService.DTOs.General.Received;
+using NoPersaService.DTOs.Management.RA;
+using NoPersaService.DTOs.Management.Mapped;
 
 namespace NoPersaService.Controllers
 {
@@ -31,17 +35,8 @@ namespace NoPersaService.Controllers
         {
             try 
             {
-                List<DTOIDString> dTOIDStrings = [];
-                foreach (var customer in context.Customers.AsNoTracking().Select(c => new { c.Id, c.Name }).OrderBy(c => c.Name))
-                {
-                    dTOIDStrings.Add(new()
-                    {
-                        Id = customer.Id,
-                        Name = customer.Name,
-                    });
-                }
-
-                return Ok(dTOIDStrings);
+                var mappedIDString = context.Customers.AsNoTracking().ProjectTo<MappedIDString>(mapper.ConfigurationProvider).ToList();
+                return Ok(mapper.Map<List<DTOIDString>>(mappedIDString));
             }
             catch (ValidationException e)
             {
@@ -60,7 +55,9 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == dTOId.Id)
+                var mappedId = mapper.Map<MappedId>(dTOId);
+
+                Customer? dbCustomer = context.Customers.AsNoTracking().Where(c => c.Id == mappedId.Id)
                                         .Include(dl => dl.DeliveryLocation)
                                         .Include(w => w.Workdays).Include(h => h.Holidays)
                                         .Include(m => m.MonthlyOverviews.Where(n => n.Year == DateTime.Today.Year && n.Month == DateTime.Today.Month)).ThenInclude(d => d.DailyOverviews)
@@ -103,25 +100,18 @@ namespace NoPersaService.Controllers
                 DateTime today = DateTime.Today;
                 Customer customer = mapper.Map<Customer>(dTOCustomerOverview);
 
-                customer.Position = (context.Customers.Where(c => c.RouteId == dTOCustomerOverview.RouteId)
+                customer.Position = (context.Customers.Where(c => c.RouteId == customer.RouteId)
                                                           .Select(c => (int?)c.Position)
                                                           .Max() ?? -1) + 1;
 
-                customer.ArticleId = (int)dTOCustomerOverview.ArticleId!;
-                customer.Article = context.Articles.First(a => a.Id == dTOCustomerOverview.ArticleId);
+                customer.Article = context.Articles.First(a => a.Id == customer.ArticleId);
 
-                List<MonthlyOverview> overviewsToRemove = [];
                 foreach (MonthlyOverview monthlyOverview in customer.MonthlyOverviews)
                 {
                     if (!DateTimeCalc.MonthDifferenceMax1(today.Year, monthlyOverview.Year, today.Month, monthlyOverview.Month))
                     {
-                        overviewsToRemove.Add(monthlyOverview);
+                        customer.MonthlyOverviews.Remove(monthlyOverview);
                     }
-                }
-
-                foreach (MonthlyOverview overviewToRemove in overviewsToRemove)
-                {
-                    customer.MonthlyOverviews.Remove(overviewToRemove);
                 }
 
                 foreach (CustomersLightDiet customersLightDiet in customer.CustomersLightDiets)
@@ -130,7 +120,7 @@ namespace NoPersaService.Controllers
 
                     customersLightDiet.CustomerId = customer.Id;
                     customersLightDiet.Customer = customer;
-                    customersLightDiet.LightDiet.Id = dbLightDiet.Id;
+                    customersLightDiet.LightDietId = dbLightDiet.Id;
                     customersLightDiet.LightDiet = dbLightDiet;
                 }
 
@@ -218,8 +208,8 @@ namespace NoPersaService.Controllers
                 dbCustomer.DeliveryLocation.Longitude = customer.DeliveryLocation.Longitude;
                 dbCustomer.DeliveryLocation.DeliveryWhishes = customer.DeliveryLocation.DeliveryWhishes;
 
-                dbCustomer.ArticleId = (int)dTOCustomerOverview.ArticleId!;
-                dbCustomer.Article = context.Articles.First(a => a.Id == dTOCustomerOverview.ArticleId);
+                dbCustomer.ArticleId = customer.ArticleId;
+                dbCustomer.Article = context.Articles.First(a => a.Id == customer.ArticleId);
 
                 dbCustomer.Workdays.Monday = customer.Workdays.Monday;
                 dbCustomer.Workdays.Tuesday = customer.Workdays.Tuesday;
@@ -289,7 +279,7 @@ namespace NoPersaService.Controllers
 
                         lightDiet.CustomerId = dbCustomer.Id;
                         lightDiet.Customer = dbCustomer;
-                        lightDiet.LightDiet.Id = dbLightDiet.Id;
+                        lightDiet.LightDietId = dbLightDiet.Id;
                         lightDiet.LightDiet = dbLightDiet;
                         dbCustomer.CustomersLightDiets.Add(lightDiet);
                     }
@@ -362,9 +352,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOSelectInput> dTORoutes = mapper.Map<List<DTOSelectInput>>(context.Routes.AsNoTracking().Include(r => r.Customers));
-
-                return Ok(dTORoutes);
+                return Ok(context.Routes.AsNoTracking().ProjectTo<DTOSelectInput>(mapper.ConfigurationProvider).ToList());
             }
             catch (ValidationException e)
             {
@@ -383,13 +371,15 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.AsNoTracking().FirstOrDefault(m => m.CustomerId == dTOMonthOfTheYear.ReferenceId &&
-                                                                                                          m.Year == dTOMonthOfTheYear.Year &&
-                                                                                                          m.Month == dTOMonthOfTheYear.Month);
+                var mappedMonthOfTheYear = mapper.Map<MappedMonthOfTheYear>(dTOMonthOfTheYear);
+
+                MonthlyOverview? monthlyOverview = context.MonthlyOverviews.AsNoTracking().Include(d => d.DailyOverviews).FirstOrDefault(m => m.CustomerId == mappedMonthOfTheYear.ReferenceId &&
+                                                                                                                                         m.Year == mappedMonthOfTheYear.Year &&
+                                                                                                                                         m.Month == mappedMonthOfTheYear.Month);
                
                 if (monthlyOverview == null)
                 {
-                    monthlyOverview = CheckMonthlyOverview.Generate(null, new DateTime(dTOMonthOfTheYear.Year, dTOMonthOfTheYear.Month, DateTime.DaysInMonth(dTOMonthOfTheYear.Year, dTOMonthOfTheYear.Month)));
+                    monthlyOverview = CheckMonthlyOverview.Generate(null, new DateTime(mappedMonthOfTheYear.Year, mappedMonthOfTheYear.Month, DateTime.DaysInMonth(mappedMonthOfTheYear.Year, mappedMonthOfTheYear.Month)));
                 }
                 
                 return Ok(mapper.Map<DTOMonthlyDelivery>(monthlyOverview));
@@ -412,57 +402,40 @@ namespace NoPersaService.Controllers
         {
             try
             {
+                var mappedId = mapper.Map<MappedId>(dTOId);
+
                 DTOCustomersGastro dTOCustomersGastro = new();
 
                 #region lightDiet
-                List<DTOLightDietOverview> dTOLightDietOverview = [.. context.LightDiets.AsNoTracking().Select(lightDiet => new DTOLightDietOverview
-                {
-                    Id = lightDiet.Id,
-                    Position = lightDiet.Position,
-                    Name = lightDiet.Name,
-                    Selected = false
-                })];
+                var dTOLightDietOverview = context.LightDiets.AsNoTracking().ProjectTo<DTOLightDietOverview>(mapper.ConfigurationProvider).ToList();
 
-                if (dTOId.Id != null)
+                if (mappedId.Id != null)
                 {
-                    HashSet<long> selectedIds = new(context.CustomersLightDiets.AsNoTracking().Where(cld => cld.CustomerId == dTOId.Id).Select(x => x.LightDietId));
+                    HashSet<long> selectedIds = new(context.CustomersLightDiets.AsNoTracking().Where(cld => cld.CustomerId == mappedId.Id).Select(x => x.LightDietId));
                     foreach (var lightDiet in dTOLightDietOverview)
                     {
-                        lightDiet.Selected = selectedIds.Contains(lightDiet.Id);
+                        lightDiet.Selected = selectedIds.Contains((long)IdEncryption.DecryptId(lightDiet.Id)!);
                     }
                 }
                 dTOCustomersGastro.LightDietOverview = [.. dTOLightDietOverview.OrderBy(x => x.Position)];
                 #endregion
 
                 #region foodWishes
-                List<FoodWish> foodWishes = [.. context.FoodWishes.AsNoTracking()];
+                var foodWishes = context.FoodWishes.AsNoTracking().ProjectTo<DTOFoodWishesOverview>(mapper.ConfigurationProvider).ToList();
 
-                List<DTOFoodWishesOverview> dTOFoodWishes = [.. foodWishes.Where(f => !f.IsIngredient).Select(foodWishes => new DTOFoodWishesOverview
-                {
-                    Id = foodWishes.Id,
-                    Position = foodWishes.Position,
-                    Name = foodWishes.Name,
-                    Selected = false
-                })];
+                var dTOFoodWishes = foodWishes.Where(f => !f.IsIngredient).ToList();
+                var dTOIngredientWishes = foodWishes.Where(f => f.IsIngredient).ToList();
 
-                List<DTOFoodWishesOverview> dTOIngredientWishes = [.. foodWishes.Where(f => f.IsIngredient).Select(foodWishes => new DTOFoodWishesOverview
+                if (mappedId.Id != null)
                 {
-                    Id = foodWishes.Id,
-                    Position = foodWishes.Position,
-                    Name = foodWishes.Name,
-                    Selected = false
-                })];
-
-                if (dTOId.Id != null)
-                {
-                    HashSet<long> selectedIds = new(context.CustomersFoodWishes.AsNoTracking().Where(cld => cld.CustomerId == dTOId.Id).Select(x => x.FoodWishId));
+                    HashSet<long> selectedIds = new(context.CustomersFoodWishes.AsNoTracking().Where(cld => cld.CustomerId == mappedId.Id).Select(x => x.FoodWishId));
                     foreach (var foodWish in dTOFoodWishes)
                     {
-                        foodWish.Selected = selectedIds.Contains(foodWish.Id);
+                        foodWish.Selected = selectedIds.Contains((long)IdEncryption.DecryptId(foodWish.Id)!);
                     }
                     foreach (var ingredientWish in dTOIngredientWishes)
                     {
-                        ingredientWish.Selected = selectedIds.Contains(ingredientWish.Id);
+                        ingredientWish.Selected = selectedIds.Contains((long)IdEncryption.DecryptId(ingredientWish.Id)!);
                     }
                 }
                 dTOCustomersGastro.FoodWishesOverviews = [.. dTOFoodWishes.OrderBy(x => x.Position)];
@@ -476,15 +449,14 @@ namespace NoPersaService.Controllers
                 }
 
                 List<PortionSize> portionSizes = [.. context.PortionSizes.AsNoTracking()];
-
                 List<DTOBoxContentSelected> dTOBoxContentSelectedList = [];
 
-                if (dTOId.Id == null)
+                if (mappedId.Id == null)
                 {
-                    long id = portionSizes.First(ps => ps.IsDefault).Id;
+                    var id = IdEncryption.EncryptId(portionSizes.First(ps => ps.IsDefault).Id);
                     dTOBoxContentSelectedList = [.. context.BoxContents.AsNoTracking().Select(boxContent => new DTOBoxContentSelected
                     {
-                        Id = boxContent.Id,
+                        Id = IdEncryption.EncryptId(boxContent.Id),
                         Position = boxContent.Position,
                         Name = boxContent.Name,
                         PortionSizeId = id
@@ -492,7 +464,7 @@ namespace NoPersaService.Controllers
                 }
                 else
                 {
-                    dTOBoxContentSelectedList = mapper.Map<List<DTOBoxContentSelected>>(context.CustomersMenuPlans.AsNoTracking().Where(cmp => cmp.CustomerId == dTOId.Id).Include(b => b.BoxContent).Include(p => p.PortionSize));
+                    dTOBoxContentSelectedList = mapper.Map<List<DTOBoxContentSelected>>(context.CustomersMenuPlans.AsNoTracking().Where(cmp => cmp.CustomerId == mappedId.Id).Include(b => b.BoxContent).Include(p => p.PortionSize));
                 }
 
                 dTOCustomersGastro.BoxContentSelectedList = [.. dTOBoxContentSelectedList.OrderBy(x => x.Position)];

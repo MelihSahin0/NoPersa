@@ -1,4 +1,4 @@
-﻿using SharedLibrary.Models;
+﻿using NoPersaService.Models;
 
 namespace NoPersa.Tests.DatabaseMemory
 {

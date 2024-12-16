@@ -6,14 +6,14 @@ namespace Website.Client.Models
     public class CustomersBoxStatus
     {
         [Required]
-        public required long Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
-        [LongType(min: 0, max: 10)]
-        public required long DeliveredBoxes { get; set; }
+        [IntType(min: 0, max: 10)]
+        public required int DeliveredBoxes { get; set; }
 
         [Required]
-        [LongType(min: 0, max: 10)]
-        public required long ReceivedBoxes { get; set; }
+        [IntType(min: 0, max: 10)]
+        public required int ReceivedBoxes { get; set; }
     }
 }

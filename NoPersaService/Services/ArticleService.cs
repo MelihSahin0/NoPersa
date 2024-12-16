@@ -1,7 +1,7 @@
-﻿using SharedLibrary.Models;
-using Microsoft.EntityFrameworkCore;
-using SharedLibrary.Util;
+﻿using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
+using NoPersaService.Models;
+using SharedLibrary.Util;
 
 namespace NoPersaService.Services
 {

@@ -3,14 +3,17 @@ using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
-using NoPersaService.Model;
-using SharedLibrary.DTOs.Delivery;
-using SharedLibrary.DTOs.GetDTOs;
-using SharedLibrary.Models;
-using SharedLibrary.Util;
+using NoPersaService.DTOs.APICalls;
+using NoPersaService.DTOs.Delivery.Answer;
+using NoPersaService.DTOs.Delivery.Mapped;
+using NoPersaService.DTOs.Delivery.RA;
+using NoPersaService.DTOs.Delivery.Receive;
+using NoPersaService.DTOs.General.Received;
+using NoPersaService.Models;
+using NoPersaService.Util;
 using System.ComponentModel.DataAnnotations;
-using Holiday = SharedLibrary.Models.Holiday;
-using Route = SharedLibrary.Models.Route;
+using Holiday = NoPersaService.Models.Holiday;
+using Route = NoPersaService.Models.Route;
 
 namespace NoPersaService.Controllers
 {
@@ -181,9 +184,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<Route> dbRoutes = [.. context.Routes.AsNoTracking().Include(r => r.Customers)];
-
-                return Ok(mapper.Map<List<DTOCustomersInRoute>>(dbRoutes));
+                return Ok(mapper.Map<List<DTOCustomersInRoute>>(context.Routes.AsNoTracking().Include(r => r.Customers)));
             }
             catch (ValidationException e)
             {
@@ -204,22 +205,33 @@ namespace NoPersaService.Controllers
 
             try
             {
+                var routeId = new HashSet<long>(context.Routes.AsNoTracking().Select(r => r.Id)); 
                 List<Customer> customersToUpdate = [];
                 foreach (DTOCustomersInRoute dTOCustomerInRoute in dTOCustomersInRoutes)
                 {
+                    var idCustomerInRoute = IdEncryption.DecryptId(dTOCustomerInRoute.Id);
+                    var foundRouteId = routeId.Contains((long)idCustomerInRoute!);
+
+                    if (!foundRouteId)
+                    {
+                        continue;
+                    }
+
                     foreach (DTOCustomerSequence dTOCustomerSequence in dTOCustomerInRoute.CustomerSequence ?? [])
                     {
-                        Customer? dbCustomer = context.Customers.Include(a => a.Article).FirstOrDefault(c => c.Id == dTOCustomerSequence.Id);
+                        var idCustomerSequence = IdEncryption.DecryptId(dTOCustomerSequence.Id);
+
+                        Customer? dbCustomer = context.Customers.Include(a => a.Article).FirstOrDefault(c => c.Id == idCustomerSequence);
 
                         if (dbCustomer != null)
                         {
                             //Check if customer was taken out from Archive
-                            if (dTOCustomerInRoute.Id != long.MinValue && dbCustomer.RouteId == long.MinValue)
+                            if (idCustomerInRoute != long.MinValue && dbCustomer.RouteId == long.MinValue)
                             {
                                 CheckMonthlyOverview.CheckAndAdd(dbCustomer);
                             }
 
-                            dbCustomer.RouteId = dTOCustomerInRoute.Id;
+                            dbCustomer.RouteId = (long)idCustomerInRoute!;
                             dbCustomer.Position = dTOCustomerSequence.Position;
                             customersToUpdate.Add(dbCustomer);
                         }
@@ -282,14 +294,16 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                Route? dbRoute = await context.Routes.AsNoTracking().Where(r => r.Id != long.MinValue && r.Id == dTOSelectedDayWithReference.ReferenceId)
+                var mappedSelectedDayWithRef = mapper.Map<MappedSelectedDayWithReference>(dTOSelectedDayWithReference);
+
+                Route? dbRoute = await context.Routes.AsNoTracking().Where(r => r.Id != long.MinValue && r.Id == mappedSelectedDayWithRef.ReferenceId)
                                                       .Include(r => r.Customers).ThenInclude(c => c.DeliveryLocation)
                                                       .Include(r => r.Customers).ThenInclude(c => c.Workdays)
                                                       .Include(r => r.Customers).ThenInclude(c => c.Holidays)
-                                                      .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month))
-                                                                                .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDayWithReference.Day))
+                                                      .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == mappedSelectedDayWithRef.Year && x.Month == mappedSelectedDayWithRef.Month))
+                                                                                .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == mappedSelectedDayWithRef.Day))
                                                       .FirstOrDefaultAsync();
-                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDayWithReference.Year && h.Month == dTOSelectedDayWithReference.Month && h.Day == dTOSelectedDayWithReference.Day);
+                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == mappedSelectedDayWithRef.Year && h.Month == mappedSelectedDayWithRef.Month && h.Day == mappedSelectedDayWithRef.Day);
 
                 if (dbRoute == null)
                 {
@@ -298,24 +312,24 @@ namespace NoPersaService.Controllers
 
                 List<string> coordinatesList = [];
 
-                if (!string.IsNullOrWhiteSpace(dTOSelectedDayWithReference.GeoLocation))
+                if (!string.IsNullOrWhiteSpace(mappedSelectedDayWithRef.GeoLocation))
                 {
-                    coordinatesList.Add(dTOSelectedDayWithReference.GeoLocation);
+                    coordinatesList.Add(mappedSelectedDayWithRef.GeoLocation);
                 }
 
                 foreach (Customer dbCustomer in dbRoute.Customers.OrderBy(p => p.Position).ToList() ?? [])
                 {
-                    MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month);
+                    MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == mappedSelectedDayWithRef.Year && x.Month == mappedSelectedDayWithRef.Month);
                     bool toDeliver = false;
 
                     if (dbFoundOverview != null)
                     {
-                        int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDayWithReference.Day)).NumberOfBoxes;
-                        toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day));
+                        int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == mappedSelectedDayWithRef.Day)).NumberOfBoxes;
+                        toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, mappedSelectedDayWithRef.Year, mappedSelectedDayWithRef.Month, mappedSelectedDayWithRef.Day));
                     }
                     else //Safety Measure
                     {
-                        toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day);
+                        toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, mappedSelectedDayWithRef.Year, mappedSelectedDayWithRef.Month, mappedSelectedDayWithRef.Day);
                     }
 
                     if (toDeliver)
@@ -324,7 +338,7 @@ namespace NoPersaService.Controllers
                     }
                 }
 
-                if ((string.IsNullOrWhiteSpace(dTOSelectedDayWithReference.GeoLocation) && coordinatesList.Count == 0) || (!string.IsNullOrWhiteSpace(dTOSelectedDayWithReference.GeoLocation) && coordinatesList.Count == 1))
+                if ((string.IsNullOrWhiteSpace(mappedSelectedDayWithRef.GeoLocation) && coordinatesList.Count == 0) || (!string.IsNullOrWhiteSpace(mappedSelectedDayWithRef.GeoLocation) && coordinatesList.Count == 1))
                 {
                     return NoContent();
                 }
@@ -336,7 +350,7 @@ namespace NoPersaService.Controllers
                 {
                     var chunk = coordinatesList.Skip(i).Take(maxWaypoints).ToList();
   
-                    var response = await httpClient.GetFromJsonAsync<RouteResponse>($"https://api.tomtom.com/routing/1/calculateRoute/{string.Join(":", chunk)}/json?key={Environment.GetEnvironmentVariable("ROUTING_API")}");
+                    var response = await httpClient.GetFromJsonAsync<DTORouteResponse>($"https://api.tomtom.com/routing/1/calculateRoute/{string.Join(":", chunk)}/json?key={Environment.GetEnvironmentVariable("ROUTING_API")}");
 
                     if (response?.Routes != null)
                     {
@@ -390,52 +404,45 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                Route? dbRoute = await context.Routes.AsNoTracking().Where(r => r.Id != long.MinValue && r.Id == dTOSelectedDayWithReference.ReferenceId)
+                var mappedSelectedDayWithRef = mapper.Map<MappedSelectedDayWithReference>(dTOSelectedDayWithReference);
+
+                Route? dbRoute = await context.Routes.AsNoTracking().Where(r => r.Id != long.MinValue && r.Id == mappedSelectedDayWithRef.ReferenceId)
                                                       .Include(r => r.Customers).ThenInclude(c => c.DeliveryLocation)
                                                       .Include(r => r.Customers).ThenInclude(c => c.Workdays)
                                                       .Include(r => r.Customers).ThenInclude(c => c.Holidays)
-                                                      .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month))
-                                                                                .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == dTOSelectedDayWithReference.Day))
+                                                      .Include(r => r.Customers).ThenInclude(m => m.MonthlyOverviews.Where(x => x.Year == mappedSelectedDayWithRef.Year && x.Month == mappedSelectedDayWithRef.Month))
+                                                                                .ThenInclude(d => d.DailyOverviews.Where(x => x.DayOfMonth == mappedSelectedDayWithRef.Day))
                                                       .FirstOrDefaultAsync();
-                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == dTOSelectedDayWithReference.Year && h.Month == dTOSelectedDayWithReference.Month && h.Day == dTOSelectedDayWithReference.Day);
+                Holiday? holiday = await context.Holidays.AsNoTracking().FirstOrDefaultAsync(h => h.Country.Equals(currentCountry) && h.Year == mappedSelectedDayWithRef.Year && h.Month == mappedSelectedDayWithRef.Month && h.Day == mappedSelectedDayWithRef.Day);
 
                 if (dbRoute == null)
                 {
                     return NotFound();
                 }
 
-                List<DTOCustomersLocation> dTOCustomersLocations = [];
+                List<Customer> customers = [];
                 foreach (Customer dbCustomer in dbRoute.Customers.OrderBy(p => p.Position).ToList() ?? [])
                 {
-                    MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == dTOSelectedDayWithReference.Year && x.Month == dTOSelectedDayWithReference.Month);
+                    MonthlyOverview? dbFoundOverview = dbCustomer.MonthlyOverviews.FirstOrDefault(x => x.Year == mappedSelectedDayWithRef.Year && x.Month == mappedSelectedDayWithRef.Month);
                     bool toDeliver = false;
 
                     if (dbFoundOverview != null)
                     {
-                        int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == dTOSelectedDayWithReference.Day)).NumberOfBoxes;
-                        toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day));
+                        int? numberOfBoxes = ((DailyOverview)dbFoundOverview.DailyOverviews.First(x => x.DayOfMonth == mappedSelectedDayWithRef.Day)).NumberOfBoxes;
+                        toDeliver = numberOfBoxes > 0 || (numberOfBoxes == null && CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, mappedSelectedDayWithRef.Year, mappedSelectedDayWithRef.Month, mappedSelectedDayWithRef.Day));
                     }
                     else //Safety Measure
                     {
-                        toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, dTOSelectedDayWithReference.Year, dTOSelectedDayWithReference.Month, dTOSelectedDayWithReference.Day);
+                        toDeliver = CheckMonthlyOverview.GetDeliveryTrueOrFalse(dbCustomer, holiday, mappedSelectedDayWithRef.Year, mappedSelectedDayWithRef.Month, mappedSelectedDayWithRef.Day);
                     }
 
                     if (toDeliver)
                     {
-                        dTOCustomersLocations.Add(new()
-                        {
-                            Id = dbCustomer.Id,
-                            Name = dbCustomer.Name,
-                            Address = dbCustomer.DeliveryLocation.Address,
-                            Latitude = dbCustomer.DeliveryLocation.Latitude,
-                            Longitude = dbCustomer.DeliveryLocation.Longitude,
-                            DeliveryWishes = dbCustomer.DeliveryLocation.DeliveryWhishes,
-                            NumberOfBoxes = dbCustomer.DefaultNumberOfBoxes
-                        });
+                        customers.Add(dbCustomer);
                     }
                 }
               
-                return Ok(dTOCustomersLocations);
+                return Ok(mapper.Map<List<DTOCustomersLocation>>(customers));
             }
             catch (ValidationException e)
             {

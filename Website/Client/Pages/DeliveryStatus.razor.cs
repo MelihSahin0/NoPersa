@@ -47,7 +47,7 @@ namespace Website.Client.Pages
             await DeliveryStatusModel.OnDayMonthYearSelected();
         }
 
-        private void OpenCustomerOverview(long customerId)
+        private void OpenCustomerOverview(string customerId)
         {
             NavigationContainer.CustomerId = customerId;
             NavigationManager.NavigateTo("/customer");

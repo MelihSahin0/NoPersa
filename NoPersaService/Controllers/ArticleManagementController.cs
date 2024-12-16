@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
-using SharedLibrary.DTOs.AnswerDTO;
-using SharedLibrary.DTOs.Management;
-using SharedLibrary.Models;
+using NoPersaService.DTOs.Article.Answer;
+using NoPersaService.DTOs.Article.RA;
+using NoPersaService.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace NoPersaService.Controllers
@@ -117,20 +117,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOSelectArticleWithPrice> articleWithPrices = [];
-
-                foreach (var article in context.Articles.AsNoTracking().OrderBy(x => x.Position).Select(a => new { a.Id, a.Name, a.Price, a.IsDefault }).ToList())
-                {
-                    articleWithPrices.Add(new()
-                    {
-                        Id = article.Id,
-                        Name = article.Name,
-                        Price = article.Price,
-                        IsDefault = article.IsDefault
-                    });
-                }
-
-                return Ok(articleWithPrices);
+                return Ok(mapper.Map<List<DTOSelectArticleWithPrice>>(context.Articles.AsNoTracking().OrderBy(x => x.Position)));
             }
             catch (ValidationException e)
             {

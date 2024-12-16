@@ -46,8 +46,8 @@ namespace Website.Client.Pages
                 {
                    
                     var foodWishes = JsonSerializer.Deserialize<List<FoodWishes>>(await response.Content.ReadAsStringAsync(), JsonSerializerOptions)!;
-                    ModifyFoodWishesModel.FoodWishes = foodWishes.Where(f => !f.IsIngredient).Select(f => new DragDropInput() { Id = f.Id, Position = f.Position, Value = f.Name }).ToList();
-                    ModifyFoodWishesModel.IngredientWishes = foodWishes.Where(f => f.IsIngredient).Select(f => new DragDropInput() { Id = f.Id, Position = f.Position, Value = f.Name }).ToList();
+                    ModifyFoodWishesModel.FoodWishes = foodWishes.Where(f => !f.IsIngredient).Select(f => new DragDropInput<string>() { Id = f.Id, Position = f.Position, Value = f.Name }).ToList();
+                    ModifyFoodWishesModel.IngredientWishes = foodWishes.Where(f => f.IsIngredient).Select(f => new DragDropInput<string>() { Id = f.Id, Position = f.Position, Value = f.Name }).ToList();
                 }
                 else
                 {

@@ -91,7 +91,7 @@ namespace Website.Client.Components
 
         private void AddArticle()
         {
-            ArticleSummary.Add(new ArticleSummary() { Id = 0, Position = ArticleSummary.Count, Name = "", Price = "", NewName = "", NewPrice = "", NumberOfCustomers = 0, IsDefault = ArticleSummary.Count == 0, IsDisabled = false });
+            ArticleSummary.Add(new ArticleSummary() { Id = "0", Position = ArticleSummary.Count, Name = "", Price = "", NewName = "", NewPrice = "", NumberOfCustomers = 0, IsDefault = ArticleSummary.Count == 0, IsDisabled = false });
         }
 
         private void SortByName()

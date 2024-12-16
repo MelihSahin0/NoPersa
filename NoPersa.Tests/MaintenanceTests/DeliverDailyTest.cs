@@ -5,8 +5,10 @@ using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
 using NoPersaService.Database;
 using NoPersaService.Services;
-using SharedLibrary.Models;
-using SharedLibrary.Util;
+using NoPersaService.Models;
+using NoPersaService.Util;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NoPersa.Tests.MaintenanceTests
 {
@@ -21,11 +23,15 @@ namespace NoPersa.Tests.MaintenanceTests
         [TestInitialize]
         public void Setup()
         {
-            var options = new DbContextOptionsBuilder<NoPersaDbContext>()
-            .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
-            .Options;
+            DotNetEnv.Env.Load(@"..\..\..\..\.env");
 
-            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
+            var services = new ServiceCollection();
+            ProgramBuilder.RegisterAutoMapperProfiles(services);
+            ProgramBuilder.RegisterFluentValidations(services);
+            services.AddDbContext<NoPersaDbContext>(opt => opt.UseSqlite("DataSource=:memory:"));
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            context = serviceProvider.GetRequiredService<NoPersaDbContext>();
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 

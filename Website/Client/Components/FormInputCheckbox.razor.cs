@@ -37,7 +37,7 @@ namespace Website.Client.Components
     public class SelectedInputCheckbox
     {
         [Required]
-        public int Id { get; set; }
+        public required string Id { get; set; }
 
         [Required]
         [StringLength(64, ErrorMessage = "Maximum allowed characters are 64.")]

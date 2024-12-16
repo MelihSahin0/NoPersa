@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NoPersa.Tests.DatabaseMemory;
 using NoPersa.Tests.Misc;
 using NoPersaService.Controllers;
 using NoPersaService.Database;
-using SharedLibrary.DTOs.Management;
-using SharedLibrary.MappingProfiles;
-using SharedLibrary.Models;
-using SharedLibrary.Util;
+using NoPersaService.DTOs.Management.RA;
+using NoPersaService.Models;
+using NoPersaService.Util;
 
 namespace NoPersa.Tests.ManagementTests
 {
@@ -25,23 +25,19 @@ namespace NoPersa.Tests.ManagementTests
         [TestInitialize]
         public void Setup()
         {
-            var options = new DbContextOptionsBuilder<NoPersaDbContext>()
-            .UseSqlite("DataSource=:memory:").EnableSensitiveDataLogging()
-            .Options;
+            DotNetEnv.Env.Load(@"..\..\..\..\.env");
 
-            context = new NoPersaDbContext(options, SharedLibrary.Util.ProgramBuilder.BuildServiceProvider());
+            var services = new ServiceCollection();
+            ProgramBuilder.RegisterAutoMapperProfiles(services);
+            ProgramBuilder.RegisterFluentValidations(services);
+            services.AddDbContext<NoPersaDbContext>(opt => opt.UseSqlite("DataSource=:memory:"));
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            context = serviceProvider.GetRequiredService<NoPersaDbContext>();
             context.Database.OpenConnection();
             context.Database.EnsureCreated();
 
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<ManagementProfile>();
-                cfg.AddProfile<DeliveryProfile>();
-                cfg.AddProfile<GastronomyProfile>();
-                cfg.AddProfile<DefaultProfile>();
-            });
-
-            mapper = config.CreateMapper();
+            mapper = serviceProvider.GetRequiredService<IMapper>();
             logger = new Mock<ILogger<CustomerManagementController>>().Object;
             controller = new CustomerManagementController(logger, context, mapper);
 

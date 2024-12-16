@@ -8,16 +8,16 @@ namespace Website.Client.FormModels
     {
         [ValidateComplexType]
         [Required]
-        public required List<DragDropInput> LightDiets { get; set; }
+        public required List<DragDropInput<string>> LightDiets { get; set; }
 
         [ValidateComplexType]
         [Required]
         [MinChildren(1, ErrorMessage = "This requires one box content")]
-        public required List<DragDropInput> BoxContents { get; set; }
+        public required List<DragDropInput<string>> BoxContents { get; set; }
 
         [ValidateComplexType]
         [Required]
         [MinChildren(1, ErrorMessage = "This requires one portion size")]
-        public required List<DragDropInput> PortionSizes { get; set; }
+        public required List<DragDropInput<string>> PortionSizes { get; set; }
     }
 }

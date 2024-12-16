@@ -3,14 +3,14 @@ using EFCore.BulkExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NoPersaService.Database;
-using SharedLibrary.DTOs.Gastro;
-using SharedLibrary.DTOs.GetDTOs;
-using SharedLibrary.DTOs.Management;
-using SharedLibrary.Models;
-using SharedLibrary.Util;
+using NoPersaService.DTOs.Gastro.Answer;
+using NoPersaService.DTOs.Gastro.RA;
+using NoPersaService.DTOs.General.Received;
+using NoPersaService.Models;
+using NoPersaService.Util;
 using System.ComponentModel.DataAnnotations;
-using Holiday = SharedLibrary.Models.Holiday;
-using Route = SharedLibrary.Models.Route;
+using Holiday = NoPersaService.Models.Holiday;
+using Route = NoPersaService.Models.Route;
 
 namespace NoPersaService.Controllers
 {
@@ -35,9 +35,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOLightDiet> dTOLightDiets = mapper.Map<List<DTOLightDiet>>(context.LightDiets.AsNoTracking());
-
-                return Ok(dTOLightDiets);
+                return Ok(mapper.Map<List<DTOLightDiet>>(context.LightDiets.AsNoTracking()));
             }
             catch (ValidationException e)
             {
@@ -108,9 +106,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOBoxContent> dTOBoxContents= mapper.Map<List<DTOBoxContent>>(context.BoxContents.AsNoTracking());
-
-                return Ok(dTOBoxContents);
+                return Ok(mapper.Map<List<DTOBoxContent>>(context.BoxContents.AsNoTracking()));
             }
             catch (ValidationException e)
             {
@@ -218,9 +214,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOPortionSize> dTOPortionSizes = mapper.Map<List<DTOPortionSize>>(context.PortionSizes.AsNoTracking());
-
-                return Ok(dTOPortionSizes);
+                return Ok(mapper.Map<List<DTOPortionSize>>(context.PortionSizes.AsNoTracking()));
             }
             catch (ValidationException e)
             {
@@ -395,14 +389,14 @@ namespace NoPersaService.Controllers
                         {
                             foreach (CustomersLightDiet lightDiet in dbCustomer.CustomersLightDiets)
                             {
-                                dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
-                                dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == lightDiet.LightDietId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
+                                dTORoutesFoodSummary.LightDietSummary.First(l => l.Id == IdEncryption.EncryptId(lightDiet.LightDietId)).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
+                                dTOSummaryRoutesFoodSummary.LightDietSummary.First(l => l.Id == IdEncryption.EncryptId(lightDiet.LightDietId)).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
                             }
 
                             foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
                             {
-                                dTORoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
-                                dTOSummaryRoutesFoodSummary.BoxContentSummary.First(b => b.Id == menuPlan.BoxContentId).PortionSizeSummary!.First(p => p.Id == menuPlan.PortionSizeId).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes; 
+                                dTORoutesFoodSummary.BoxContentSummary.First(b => b.Id == IdEncryption.EncryptId(menuPlan.BoxContentId)).PortionSizeSummary!.First(p => p.Id == IdEncryption.EncryptId(menuPlan.PortionSizeId)).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes;
+                                dTOSummaryRoutesFoodSummary.BoxContentSummary.First(b => b.Id == IdEncryption.EncryptId(menuPlan.BoxContentId)).PortionSizeSummary!.First(p => p.Id == IdEncryption.EncryptId(menuPlan.PortionSizeId)).Value += numberOfBoxes == null ? dbCustomer.DefaultNumberOfBoxes : (int)numberOfBoxes; 
                             }
                         }
                     }
@@ -471,15 +465,15 @@ namespace NoPersaService.Controllers
 
                             foreach (CustomersLightDiet lightDiet in dbCustomer.CustomersLightDiets)
                             {
-                                lightDiets.Add(lightDiet.LightDiet.Name);
+                                lightDiets.Add(lightDiet.LightDiet!.Name);
                             }
 
                             foreach (CustomersMenuPlan menuPlan in dbCustomer.CustomerMenuPlans)
                             {
                                 dTOCustomersBoxContents.Add(new()
                                 {
-                                    BoxName = menuPlan.BoxContent.Name,
-                                    PortionSize = menuPlan.PortionSize.Name
+                                    BoxName = menuPlan.BoxContent!.Name,
+                                    PortionSize = menuPlan.PortionSize!.Name
                                 });
                             }
 
@@ -521,9 +515,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOFoodWish> dTOFoodWishes = mapper.Map<List<DTOFoodWish>>(context.FoodWishes.AsNoTracking());
-
-                return Ok(dTOFoodWishes);
+                return Ok(mapper.Map<List<DTOFoodWish>>(context.FoodWishes.AsNoTracking()));
             }
             catch (ValidationException e)
             {
