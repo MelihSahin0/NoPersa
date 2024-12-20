@@ -1,0 +1,72 @@
+﻿@page "/invoiceExport"
+@using Microsoft.AspNetCore.Components.Forms
+@using Website.Client.Components;
+@using Website.Client.Components.Base;
+@using Website.Client.Components.Default;
+@using Website.Client.Models
+@using Website.Client.Styles
+@using Website.Client.Validations;
+@using OpenXml.Models;
+
+<LoadingPopup IsVisible="@IsSubmitting" Description="Depending on the number of data and your selected settings, this may take some minutes.
+                                                     This may result the warning 'Website does not react' appearing. Click on wait or do nothing until you receive the file."/>
+<EditForm Model="InvoiceExportModel" OnValidSubmit="GetExcelInvoice">
+    <div class="max-w-full flex flex-col">
+        <div class="flex flex-row max-w-full justify-between mb-2 pb-2 border-black border-b-2">
+            <FormMonthYearPicker Label="Month picker" @bind-Year="InvoiceExportModel.Year" @bind-Month="InvoiceExportModel.Month"/>         
+            <FormInputCheckbox Label="Show all days" IsColumn="false" @bind-Value="@InvoiceExportModel.ShowAllDays" />
+            <FormInputCheckbox Label="Split to routes" IsColumn="false" @bind-Value="@InvoiceExportModel.SplitToMultipleRoutes" />
+            <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2")">Get Excel-Sheet</button>
+            <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(InvoiceExportModel.Invoices.Any() && InvoiceExportModel.Invoices[0].Any() ? "bg-lightGreen"  : "bg-gray-500")} mx-2")"
+                    disabled="@(!InvoiceExportModel.Invoices.Any() || !InvoiceExportModel.Invoices[0].Any())" @onclick="@Download">
+                Download Excel-Sheet
+            </button>
+        </div>
+        @if (InvoiceExportModel.Invoices.Any() && InvoiceExportModel.Invoices[0].Any())
+        {
+            <div class="p-4 bg-gray-100 rounded-md w-5/6 self-center flex flex-col">
+                <div class="@($"flex flex-row w-full items-center {(InvoiceExportModel.Invoices.Count() == 1 ? "justify-center" : "justify-between")}")">
+                    @if (InvoiceExportModel.Invoices.Count() != 1)
+                    {
+                        <button class="@($"text-4xl text-black mb-4 {(sheetNumber <= 0 ? "" : "hover:text-skyHover")}")" type="button" @onclick="() => ChangeSheet(-1)"
+                                disabled="@(sheetNumber <= 0)">&lt;</button>
+                    }
+                    <h3 class="text-lg font-semibold mb-4 self-center select-none">@($"Preview - {InvoiceExportModel.SheetNames[sheetNumber]}")</h3>
+                    @if (InvoiceExportModel.Invoices.Count() != 1)
+                    {
+                        <button class="@($"text-4xl text-black mb-4 {(sheetNumber >= InvoiceExportModel.Invoices.Count() - 1 ? "" : "hover:text-skyHover")}")" type="button" @onclick="() => ChangeSheet(1)"
+                                disabled="@(sheetNumber >= InvoiceExportModel.Invoices.Count() - 1)">&gt;</button>
+                    }
+                </div>
+                <div class="flex flex-col w-full overflow-x-auto border border-gray-300">
+                    <div class="flex flex-row">
+                        @for (var i = 0; i < InvoiceExportModel.Header.Count(); i++)
+                        {
+                            <div class=@($"flex-1 {(i >= Invoice.InvoiceHeaderWidth.Count ? Invoice.InvoiceHeaderWidth[Invoice.InvoiceHeaderWidth.Count() - 1] : Invoice.InvoiceHeaderWidth[i])} border-b border-gray-300 font-bold text-center select-none")>@InvoiceExportModel.Header[i]</div>
+                        }
+                    </div>
+                    @foreach (var invoice in InvoiceExportModel.Invoices[sheetNumber])
+                    {
+                        <div class="flex flex-row">
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@invoice.SerialNumber</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@invoice.CustomerName</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@invoice.TotalSales</div>
+
+                            @foreach (var dailySale in invoice.DailySales)
+                            {
+                                <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@dailySale</div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (InvoiceExportModel.ExcelFileBytes.Any())
+        {
+            <div class="p-4 bg-gray-100 rounded-md w-5/6 self-center flex flex-col">
+                <h3 class="text-lg font-semibold self-center select-none">No Result</h3>
+            </div>
+        }
+    </div>
+</EditForm>
+

@@ -27,7 +27,7 @@ namespace Website.Client.Models
     public class DailyDelivery
     {
         [Required]
-        [IntType(min: 0)]
+        [IntType(min: 1)]
         public required int DayOfMonth { get; set; }
 
         [DoubleType(min: 0)]

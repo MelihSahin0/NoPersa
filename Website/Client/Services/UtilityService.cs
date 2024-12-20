@@ -15,5 +15,10 @@ namespace Website.Client.Services
         {
             return await jSRuntime.InvokeAsync<bool>("isOverflowActive", element);
         }
+
+        public async void DownLoadFile(string fileName, byte[] args, string fileType)
+        {
+            await jSRuntime.InvokeVoidAsync("downloadFile", fileName, args, fileType);
+        }
     }
 }

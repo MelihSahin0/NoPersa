@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using DocumentFormat.OpenXml.Office2013.Excel;
+using Microsoft.AspNetCore.Components;
 using System.Linq.Expressions;
 using Website.Client.Enums;
 
@@ -7,6 +8,9 @@ namespace Website.Client.Components
     public partial class FormMonthYearPicker
     {
         private readonly string Id = Guid.NewGuid().ToString();
+
+        [Parameter]
+        public string Class { get; set; } = string.Empty;
 
         [Parameter]
         public required string Label { get; init; }

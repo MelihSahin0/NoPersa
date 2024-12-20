@@ -221,7 +221,8 @@ namespace NoPersaService.Controllers
                     {
                         var idCustomerSequence = IdEncryption.DecryptId(dTOCustomerSequence.Id);
 
-                        Customer? dbCustomer = context.Customers.Include(a => a.Article).FirstOrDefault(c => c.Id == idCustomerSequence);
+                        Customer? dbCustomer = context.Customers.Include(a => a.Article)
+                                                                .Include(m => m.MonthlyOverviews).FirstOrDefault(c => c.Id == idCustomerSequence);
 
                         if (dbCustomer != null)
                         {

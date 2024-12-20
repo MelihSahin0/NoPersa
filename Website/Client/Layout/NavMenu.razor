@@ -26,7 +26,7 @@
 
             <Dropdown Title="Import/Export"
                       Items="@(new string[] {"Fahrpläne exportieren", "Kunden exportieren", "Kunde importieren", "Rechnungen exportieren"}.AsReadOnly())"
-                      ItemsHref="@(new string[] {"", "", "", "", ""}.AsReadOnly())"/>
+                      ItemsHref="@(new string[] {"", "customerExport", "", "invoiceExport"}.AsReadOnly())" />
 
             <Dropdown Title="Admin Einstellungen"
                       Items="@(new string[] {"Globale Einstellungen", "Rechte verwalten", "Benutzer verwalten"}.AsReadOnly())"

@@ -32,7 +32,7 @@ namespace NoPersaService.Controllers
         {
             try
             {
-                List<DTOBoxStatus> dTOBoxStatuses = mapper.Map<List<DTOBoxStatus>>(context.BoxStatuses.AsNoTracking().Include(b => b.Customer).ThenInclude(c => c.Route));
+                List<DTOBoxStatus> dTOBoxStatuses = mapper.Map<List<DTOBoxStatus>>(context.BoxStatuses.AsNoTracking().Include(b => b.Customer).ThenInclude(c => c!.Route));
 
                 return Ok(dTOBoxStatuses.OrderBy(x => (x.RouteName, x.CustomersName)));
             }

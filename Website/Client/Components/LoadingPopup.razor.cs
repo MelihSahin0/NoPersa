@@ -5,7 +5,10 @@ namespace Website.Client.Components
     public partial class LoadingPopup
     {
         [Parameter]
-        public bool IsVisible { get; set; }
+        public required bool IsVisible { get; set; }
+
+        [Parameter]
+        public string Description { get; set; } = string.Empty;
 
     }
 }

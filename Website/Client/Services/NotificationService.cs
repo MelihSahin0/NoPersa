@@ -30,7 +30,7 @@ namespace Website.Client.Services
 
         public void SetError(string message)
         {
-            setMessage = true;
+            OnCountdown?.Invoke(0);
             OnError?.Invoke(message);
         }
 

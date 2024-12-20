@@ -1,0 +1,96 @@
+﻿@page "/customerExport"
+@using Microsoft.AspNetCore.Components.Forms
+@using Website.Client.Components;
+@using Website.Client.Components.Base;
+@using Website.Client.Components.Default;
+@using Website.Client.Models
+@using Website.Client.Styles
+@using Website.Client.Validations;
+@using OpenXml.Models;
+
+<LoadingPopup IsVisible="@IsSubmitting" Description="Depending on the number of data and your selected settings, this may take some minutes.
+                                                     This may result the warning 'Website does not react' appearing. Click on wait or do nothing until you receive the file." />
+<EditForm Model="CustomerExportModel" OnValidSubmit="GetExcelInvoice">
+    <div class="max-w-full flex flex-col">
+        <div class="flex flex-row max-w-full justify-between mb-2 pb-2 border-black border-b-2">
+            <FormInputCheckbox Label="Split to routes" IsColumn="false" @bind-Value="@CustomerExportModel.SplitToMultipleRoutes" />
+            <button type="submit" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} bg-lightGreen mx-2")">Get Excel-Sheet</button>
+            <button type="button" class="@($"{ButtonStyles.GetButtonNavigationDefaultStyle()} {(CustomerExportModel.Customers.Any() && CustomerExportModel.Customers[0].Any() ? "bg-lightGreen"  : "bg-gray-500")} mx-2")"
+                    disabled="@(!CustomerExportModel.Customers.Any() || !CustomerExportModel.Customers[0].Any())" @onclick="@Download">
+                    Download Excel-Sheet
+            </button>
+        </div>
+        @if (CustomerExportModel.Customers.Any() && CustomerExportModel.Customers[0].Any())
+        {
+            <div class="p-4 bg-gray-100 rounded-md w-5/6 self-center flex flex-col">
+                <div class="@($"flex flex-row w-full items-center {(CustomerExportModel.Customers.Count() == 1 ? "justify-center" : "justify-between")}")">
+                    @if (CustomerExportModel.Customers.Count() != 1)
+                    {
+                        <button class="@($"text-4xl text-black mb-4 {(sheetNumber <= 0 ? "" : "hover:text-skyHover")}")" type="button" @onclick="() => ChangeSheet(-1)"
+                                disabled="@(sheetNumber <= 0)">
+                            &lt;
+                        </button>
+                    }
+                    <h3 class="text-lg font-semibold mb-4 self-center select-none">@($"Preview - {CustomerExportModel.SheetNames[sheetNumber]}")</h3>
+                    @if (CustomerExportModel.Customers.Count() != 1)
+                    {
+                        <button class="@($"text-4xl text-black mb-4 {(sheetNumber >= CustomerExportModel.Customers.Count() - 1 ? "" : "hover:text-skyHover")}")" type="button" @onclick="() => ChangeSheet(1)"
+                                disabled="@(sheetNumber >= CustomerExportModel.Customers.Count() - 1)">
+                            &gt;
+                        </button>
+                    }
+                </div>
+                <div class="flex flex-col w-full overflow-x-auto border border-gray-300">
+                    <div class="flex flex-row">
+                        @for (var i = 0; i < CustomerExportModel.Header.Count(); i++)
+                        {
+                            <div class=@($"flex-1 {(i >= ExcelCustomer.ExcelCustomerHeaderWidth.Count ? ExcelCustomer.ExcelCustomerHeaderWidth[ExcelCustomer.ExcelCustomerHeaderWidth.Count() - 1] : ExcelCustomer.ExcelCustomerHeaderWidth[i])} border-b border-gray-300 font-bold text-center select-none")>@CustomerExportModel.Header[i]</div>
+                        }
+                    </div>
+                    @foreach (var customer in CustomerExportModel.Customers[sheetNumber])
+                    {
+                        <div class="flex flex-row">
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.RouteName</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.SerialNumber</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Title</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Name</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Address</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Region</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Latitude</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Longitude</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.DeliveryWhishes</div>
+                            <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.ContactInformation</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.Article</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.DefaultNumberOfBoxes</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WMonday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WTuesday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WWednesday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WThursday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WFriday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WSaturday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WSunday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HMonday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HTuesday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HWednesday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HThursday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HFriday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HSaturday</div>
+                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HSunday</div>
+
+                            @foreach (var portionSize in customer.PortionSizes)
+                            {
+                                <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@portionSize</div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (CustomerExportModel.ExcelFileBytes.Any())
+        {
+            <div class="p-4 bg-gray-100 rounded-md w-5/6 self-center flex flex-col">
+                <h3 class="text-lg font-semibold self-center select-none">No Result</h3>
+            </div>
+        }
+    </div>
+</EditForm>

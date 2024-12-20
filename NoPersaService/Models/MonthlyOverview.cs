@@ -29,7 +29,17 @@ namespace NoPersaService.Models
         public int TotalBoxes => CalculateTotalBoxes();
 
         [NotMapped]
-        public double TotalSales => TotalPrice * TotalBoxes;
+        public double TotalSales => CalculateTotalSale();
+
+        private double CalculateTotalSale()
+        {
+            double total = 0;
+            foreach (var dailyOverview in DailyOverviews)
+            {
+                total += dailyOverview.TotalSales;
+            }
+            return total;
+        }
 
         private double CalculateTotalPrice()
         {

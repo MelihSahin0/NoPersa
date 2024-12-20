@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoPersa.Tests", "NoPersa.Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoPersaService", "NoPersaService\NoPersaService.csproj", "{FEA95C31-B38A-4567-BE88-173A45CF361F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenXml", "OpenXml\OpenXml.csproj", "{EA7F5B01-24EE-4258-A9CE-E13CF01ECB66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{FEA95C31-B38A-4567-BE88-173A45CF361F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEA95C31-B38A-4567-BE88-173A45CF361F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEA95C31-B38A-4567-BE88-173A45CF361F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA7F5B01-24EE-4258-A9CE-E13CF01ECB66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA7F5B01-24EE-4258-A9CE-E13CF01ECB66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA7F5B01-24EE-4258-A9CE-E13CF01ECB66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA7F5B01-24EE-4258-A9CE-E13CF01ECB66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

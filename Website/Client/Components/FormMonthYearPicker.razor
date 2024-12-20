@@ -3,10 +3,10 @@
 @using Website.Client.Styles;
 @using Website.Client.Enums;
 
-<div class="flex justify-between items-center">
+<div class="@($"{Class} flex justify-between items-center")">
     @if (!Label.Equals(string.Empty))
     {
-        <label for="@Id" class="@Scaling.GetTextScaling() select-none">@Label</label>
+        <label for="@Id" class="@Scaling.GetTextScaling() select-none mr-2">@Label</label>
     }
     <MonthPicker Id="@Id"
                 Year="@Year"
