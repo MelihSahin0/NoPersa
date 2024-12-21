@@ -60,24 +60,28 @@
                             <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.Longitude</div>
                             <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.DeliveryWhishes</div>
                             <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@customer.ContactInformation</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.Article</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.DefaultNumberOfBoxes</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WMonday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WTuesday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WWednesday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WThursday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WFriday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WSaturday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.WSunday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HMonday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HTuesday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HWednesday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HThursday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HFriday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HSaturday</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@customer.HSunday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.Article</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.DefaultNumberOfBoxes</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WMonday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WTuesday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WWednesday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WThursday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WFriday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WSaturday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.WSunday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HMonday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HTuesday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HWednesday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HThursday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HFriday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HSaturday</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@customer.HSunday</div>
 
-                            @foreach (var portionSize in customer.PortionSizes)
+                            @foreach (var portionSize in customer.Menus)
+                            {
+                                <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@portionSize</div>
+                            }
+                            @foreach (var portionSize in customer.LightDiets)
                             {
                                 <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@portionSize</div>
                             }

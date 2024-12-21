@@ -2,9 +2,9 @@
 {
     public class ExcelCustomer
     {
-        public static readonly List<string> ExcelCustomerHeaderWidth = ["min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-20", "min-w-20",
-                                                                        "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-20",
-                                                                        "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-20", "min-w-40"];
+        public static readonly List<string> ExcelCustomerHeaderWidth = ["min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-40", "min-w-28", "min-w-28",
+                                                                        "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-28",
+                                                                        "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-28", "min-w-40"];
         public static List<string> ExcelCustomerHeader => ["Route", "Serial Number", "Title", "Name", "Address", "Region", "Latitude", "Longitude", "Delivery Whishes", "Contact Information", "Article", "Default Number of Boxes", 
                                                            "Workday - Monday", "Workday - Tuesday", "Workday - Wednesday", "Workday - Thursday", "Workday - Friday", "Workday - Saturday", "Workday - Sunday",
                                                            "Holiday - Monday", "Holiday - Tuesday", "Holiday - Wednesday", "Holiday - Thursday", "Holiday - Friday", "Holiday - Saturday", "Holiday - Sunday"];
@@ -36,9 +36,10 @@
         public required bool HFriday { get; set; }
         public required bool HSaturday { get; set; }
         public required bool HSunday { get; set; }
-        public required List<string> PortionSizes { get; set; }
+        public required List<string> Menus { get; set; }
+        public required List<bool> LightDiets { get; set; }
 
-        public static List<Table> Parse(List<ExcelCustomer> customer, List<string> header, List<string> routes, List<string> articles, List<string> portionSizes, List<string> trueAndFalse, bool splitToMultipleRoutes)
+        public static List<Table> Parse(List<ExcelCustomer> customer, List<string> header, List<string> routes, List<string> articles, int numberOfBoxContent, int numberOfLightDiets, List<string> portionSizes, List<string> trueAndFalse, bool splitToMultipleRoutes)
         {
             List<List<ExcelCustomer>> preparedCustomers = [];
             if (splitToMultipleRoutes)
@@ -81,9 +82,14 @@
                         new() { Column = "Z", Data = trueAndFalse, StartRow = 2 }
                     ];
 
-            for (int i = 0; i < header.Count - ExcelCustomerHeader.Count; i++)
+            for (int i = 0; i < numberOfBoxContent; i++)
             {
                 dopDownInformations.Add(new() { Column = SpreadSheetTable.GetExcelColumnName(i + 27), Data = portionSizes, StartRow = 2 });
+            }
+
+            for (int i = 0; i < numberOfLightDiets; i++)
+            {
+                dopDownInformations.Add(new() { Column = SpreadSheetTable.GetExcelColumnName(i + 27 + numberOfBoxContent), Data = trueAndFalse, StartRow = 2 });
             }
 
             var tables = new List<Table>();
@@ -124,7 +130,9 @@
                                 customer.HSaturday,
                                 customer.HSaturday,
                         };
-                        row.AddRange(customer.PortionSizes.Select(portion => (object?)portion));
+                        row.AddRange(customer.Menus.Select(portion => (object?)portion));
+                        row.AddRange(customer.LightDiets.Concat(Enumerable.Repeat(false, numberOfLightDiets - customer.LightDiets.Count))
+                                                        .Select(lightDiet => (object?)lightDiet));
 
                         return row;
                     }).ToList(),
@@ -173,7 +181,8 @@
                         HFriday = false,
                         HSaturday = false,
                         HSunday = false,
-                        PortionSizes = []
+                        Menus = [],
+                        LightDiets = [],
                     };
 
                     for (int j = 0; j < data[i].Count; j++)
@@ -261,7 +270,14 @@
                                 customer.HSunday = Convert.ToBoolean(value);
                                 break;
                             default:
-                                customer.PortionSizes.Add(Convert.ToString(value) ?? string.Empty);
+                                if (value is bool)
+                                {
+                                    customer.LightDiets.Add(Convert.ToBoolean(value));
+                                }
+                                else
+                                {
+                                    customer.Menus.Add(Convert.ToString(value) ?? string.Empty);
+                                }
                                 break;
                         }
                     }

@@ -50,11 +50,11 @@
                         <div class="flex flex-row">
                             <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@invoice.SerialNumber</div>
                             <div class="flex-1 min-w-40 border-b border-gray-300 text-center select-none">@invoice.CustomerName</div>
-                            <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@invoice.TotalSales</div>
+                            <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@invoice.TotalSales</div>
 
                             @foreach (var dailySale in invoice.DailySales)
                             {
-                                <div class="flex-1 min-w-20 border-b border-gray-300 text-center select-none">@dailySale</div>
+                                <div class="flex-1 min-w-28 border-b border-gray-300 text-center select-none">@dailySale</div>
                             }
                         </div>
                     }

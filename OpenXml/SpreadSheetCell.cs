@@ -58,7 +58,7 @@ namespace OpenXml
             }
             if (dataType == CellValues.Boolean)
             {
-                return (T?)(object?)(value);
+                return (T?)(object?)ReadBool(value);
             }
             if (dataType == CellValues.Number)
             {
@@ -70,7 +70,6 @@ namespace OpenXml
                 {
                     if (value?.Contains('.') == true || value?.Contains(',') == true)
                     {
-                        Console.WriteLine((T?)(object?)ReadDouble(value));
                         return (T?)(object?)ReadDouble(value);
                     }
                     else
@@ -180,6 +179,16 @@ namespace OpenXml
             }
 
             return double.Parse(value, CultureInfo.InvariantCulture);
+        }
+
+        private static bool ReadBool(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            return bool.Parse(value);
         }
 
         private bool CheckForDateFormat(Cell cell)

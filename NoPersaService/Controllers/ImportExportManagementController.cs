@@ -63,15 +63,22 @@ namespace NoPersaService.Controllers
                                                                .Include(a => a.Article)
                                                                .Include(w => w.Workdays).Include(h => h.Holidays)
                                                                .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(b => b.BoxContent)
-                                                               .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(p => p.PortionSize));
+                                                               .Include(cmp => cmp.CustomerMenuPlans).ThenInclude(p => p.PortionSize)
+                                                               .Include(cld => cld.CustomersLightDiets).ThenInclude(l => l.LightDiet));
+
+                List<LightDiet> lightDiets = [.. context.LightDiets.AsNoTracking().OrderBy(ld => ld.Position)];
+                List<BoxContent> boxContents = [.. context.BoxContents.AsNoTracking().OrderBy(b => b.Position)];
+                header.AddRange(boxContents.Select(b => b.Name));
+                header.AddRange(lightDiets.Select(b => b.Name));
+                int numberOfBoxContent = context.LightDiets.AsNoTracking().Count();
+                int numberOfLightDiets = context.BoxContents.AsNoTracking().Count();
 
                 List<string> routes = [.. context.Routes.AsNoTracking().OrderBy(r => r.Name).Select(r => r.Name)];
                 List<string> articles = [.. context.Articles.AsNoTracking().OrderBy(a => a.Position).Select(a => a.Name)];
                 List<string> portionSize = [.. context.PortionSizes.AsNoTracking().OrderBy(p => p.Position).Select(a => a.Name)];
                 List<string> trueAndFalse = ["FALSE", "TRUE"];
-                header.AddRange(context.BoxContents.AsNoTracking().Select(b => b.Name));
 
-                var spreadsheetBytes = SpreadSheet.CreateSpreadsheet(ExcelCustomer.Parse(customer, header, routes, articles, portionSize, trueAndFalse, dTOExportCustomer.SplitToMultipleRoutes));
+                var spreadsheetBytes = SpreadSheet.CreateSpreadsheet(ExcelCustomer.Parse(customer, header, routes, articles, numberOfBoxContent, numberOfLightDiets ,portionSize, trueAndFalse, dTOExportCustomer.SplitToMultipleRoutes));
                 return File(spreadsheetBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"customers.xlsx");
             }
             catch (Exception e)

@@ -42,7 +42,10 @@ namespace NoPersaService.MappingProfiles
                 .ForPath(dest => dest.HFriday, opt => opt.MapFrom(src => src.Holidays!.Friday))
                 .ForPath(dest => dest.HSaturday, opt => opt.MapFrom(src => src.Holidays!.Saturday))
                 .ForPath(dest => dest.HSunday, opt => opt.MapFrom(src => src.Holidays!.Sunday))
-                .ForPath(dest => dest.PortionSizes, opt => opt.MapFrom(src => src.CustomerMenuPlans.OrderBy(cmp => cmp.BoxContent!.Name).Select(cmp => cmp.PortionSize!.Name).ToList()));
+                .ForPath(dest => dest.Menus, opt => opt.MapFrom(src => src.CustomerMenuPlans.OrderBy(cmp => cmp.BoxContent!.Position).Select(cmp => cmp.PortionSize!.Name).ToList()))
+                .ForPath(dest => dest.LightDiets, static opt => opt.MapFrom(src => src.CustomersLightDiets.Count != 0 ? Enumerable.Range(0, src.CustomersLightDiets.Max(cld => cld.LightDiet!.Position) + 1)
+                                                                            .Select(pos => src.CustomersLightDiets.Any(cld => cld.LightDiet!.Position == pos))
+                                                                            .ToList() : new List<bool>()));
         }
     }
 }

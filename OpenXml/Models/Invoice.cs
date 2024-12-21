@@ -2,7 +2,7 @@
 {
     public class Invoice
     {
-        public static readonly List<string> InvoiceHeaderWidth = ["min-w-40", "min-w-40", "min-w-20", "min-w-20"];
+        public static readonly List<string> InvoiceHeaderWidth = ["min-w-40", "min-w-40", "min-w-28", "min-w-28"];
         public static List<string> InvoiceHeader => ["Serial Number", "Name", "Total Sales"];
 
         public required string RouteName { get; set; }
